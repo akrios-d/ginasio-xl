@@ -1,0 +1,237 @@
+/* ═══════════════════════════════════════════
+   Ginásio XL — Global styles & design system
+   ═══════════════════════════════════════════
+
+   Single source of truth for design tokens. Components should only read
+   from these CSS variables — never hardcode hex values or pixel sizes
+   outside of layout-specific overrides.
+
+   Theming is driven by `data-theme` on <html>:
+     - missing / "auto"  → follows prefers-color-scheme
+     - "light"           → forces light palette
+     - "dark"            → forces dark palette
+
+   ThemeService writes the attribute; tokens below flip accordingly.
+*/
+
+/* ── Light tokens (default) ───────────────── */
+:root {
+  /* Surfaces */
+  --c-bg:            #ffffff;
+  --c-surface:       #f8fafc;
+  --c-surface-alt:   #eef2f7;
+  --c-border:        #e2e8f0;
+  --c-border-strong: #94a3b8;
+
+  /* Ink (text) */
+  --c-ink:   #0f172a;
+  --c-ink-2: #475569;
+  --c-ink-3: #94a3b8;
+
+  /* Accent — swap for your brand */
+  --c-accent:    #2563eb;
+  --c-accent-lt: #dbeafe;
+  --c-accent-dk: #1d4ed8;
+
+  /* Semantics */
+  --c-success: #16a34a;
+  --c-warn:    #d97706;
+  --c-danger:  #dc2626;
+
+  /* Radii */
+  --r-sm:   6px;
+  --r-md:   10px;
+  --r-lg:   16px;
+  --r-pill: 999px;
+
+  /* Shadows — only for interactive elevation */
+  --sh-xs: 0 1px 3px rgba(15, 23, 42, 0.06);
+  --sh-sm: 0 2px 8px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --sh-md: 0 6px 20px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.05);
+
+  /* Fonts */
+  --f-sans:  system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-mono:  ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type scale — 5 stops only */
+  --t-display:   clamp(2.2rem, 5vw, 3.4rem);
+  --t-section:   1.35rem;
+  --t-body:      1rem;
+  --t-secondary: 0.875rem;
+  --t-meta:      0.75rem;
+
+  /* Layout */
+  --max-w: 1060px;
+  --pad-page: clamp(16px, 3vw, 32px);
+}
+
+/* ── Dark tokens — applied when explicitly forced ── */
+:root[data-theme='dark'] {
+  --c-bg:            #0f172a;
+  --c-surface:       #1e293b;
+  --c-surface-alt:   #273449;
+  --c-border:        #334155;
+  --c-border-strong: #64748b;
+
+  --c-ink:   #f1f5f9;
+  --c-ink-2: #cbd5e1;
+  --c-ink-3: #94a3b8;
+
+  --c-accent:    #60a5fa;
+  --c-accent-lt: #1e3a8a;
+  --c-accent-dk: #93c5fd;
+
+  --c-success: #4ade80;
+  --c-warn:    #fbbf24;
+  --c-danger:  #f87171;
+
+  --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
+  --sh-md: 0 6px 20px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+/* ── Dark tokens — follow OS when data-theme is unset or "auto" ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --c-bg:            #0f172a;
+    --c-surface:       #1e293b;
+    --c-surface-alt:   #273449;
+    --c-border:        #334155;
+    --c-border-strong: #64748b;
+
+    --c-ink:   #f1f5f9;
+    --c-ink-2: #cbd5e1;
+    --c-ink-3: #94a3b8;
+
+    --c-accent:    #60a5fa;
+    --c-accent-lt: #1e3a8a;
+    --c-accent-dk: #93c5fd;
+
+    --c-success: #4ade80;
+    --c-warn:    #fbbf24;
+    --c-danger:  #f87171;
+
+    --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
+    --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
+    --sh-md: 0 6px 20px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.22);
+  }
+}
+
+/* ── Reset ─────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--f-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+/* ── Inputs ────────────────────────────────── */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-family: var(--f-sans);
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  background: var(--c-surface);
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-lt);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--c-ink-3);
+}
+
+/* ── Button ────────────────────────────────── */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  padding: 10px 20px;
+  min-height: 44px;
+  font-family: var(--f-sans);
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--c-accent);
+  color: #fff;
+  transition: background 150ms, box-shadow 150ms;
+}
+
+button:hover {
+  background: var(--c-accent-dk);
+  box-shadow: var(--sh-sm);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Secondary / icon button ───────────────── */
+.btn-ghost {
+  background: transparent;
+  color: var(--c-ink-2);
+  border-color: var(--c-border);
+}
+
+.btn-ghost:hover {
+  background: var(--c-surface-alt);
+  border-color: var(--c-border-strong);
+  color: var(--c-ink);
+  box-shadow: none;
+}
+
+/* ── Eyebrow label ─────────────────────────── */
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: var(--t-meta);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--c-ink-3);
+}
+
+/* ── Layout helpers ────────────────────────── */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--pad-page);
+}

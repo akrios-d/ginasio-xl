@@ -1,0 +1,61 @@
+/**
+ * MongoDB helper for Vercel Serverless Functions.
+ *
+ * - The client is module-scoped and reused across invocations (warm starts).
+ * - `attachDatabasePool` lets Vercel drain connections cleanly between deploys.
+ * - The DB name defaults to `ginasio-xl` — override via MONGODB_DB_NAME.
+ *
+ * Usage:
+ *   const { getCollection, toObjectId, mapDocumentId } = require('./lib/mongo');
+ *   const col = await getCollection('users');
+ *   const doc = await col.findOne({ _id: toObjectId(id) });
+ *   return mapDocumentId(doc);
+ */
+const { MongoClient, ObjectId } = require('mongodb');
+const { attachDatabasePool } = require('@vercel/functions');
+
+const uri = process.env['MONGODB_URI'];
+const dbName = process.env['MONGODB_DB_NAME'] || 'ginasio-xl';
+
+if (!uri) {
+  throw new Error('MONGODB_URI is not defined — set it in .env.local or Vercel env settings');
+}
+
+const client = new MongoClient(uri, {
+  appName: 'ginasio-xl',
+  maxIdleTimeMS: 5000,
+});
+
+attachDatabasePool(client);
+
+async function getDatabase() {
+  await client.connect();
+  return client.db(dbName);
+}
+
+async function getCollection(name: string) {
+  const db = await getDatabase();
+  return db.collection(name);
+}
+
+/** Throws a 400-coded error if `id` isn't a valid ObjectId. */
+function toObjectId(id: string) {
+  if (!ObjectId.isValid(id)) {
+    const err = new Error(`Invalid ID: ${id}`);
+    (err as any).status = 400;
+    throw err;
+  }
+  return new ObjectId(id);
+}
+
+/** Converts Mongo's `_id` to a string `id` while preserving the rest of the document. */
+function mapDocumentId<T extends Record<string, any>>(document: T) {
+  const { _id, ...rest } = document;
+  return { id: _id.toString(), ...rest };
+}
+
+module.exports = {
+  getCollection,
+  toObjectId,
+  mapDocumentId,
+};

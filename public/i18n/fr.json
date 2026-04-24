@@ -1,0 +1,20 @@
+{
+  "app.title": "Ginásio XL",
+  "app.kicker": "Squelette de base",
+  "app.languageLabel": "Langue",
+  "app.themeLabel": "Thème",
+  "theme.light": "Clair",
+  "theme.dark": "Sombre",
+  "theme.auto": "Auto",
+  "home.welcome": "Bienvenue",
+  "home.subtitle": "Votre squelette Angular + Vercel + MongoDB est prêt.",
+  "home.cta": "Commencer",
+  "home.feature.i18n.title": "Traductions",
+  "home.feature.i18n.desc": "Quatre langues incluses (PT, EN, ZH, FR). Changez via le sélecteur en haut.",
+  "home.feature.theme.title": "Thème",
+  "home.feature.theme.desc": "Clair, sombre et auto — suit le système par défaut.",
+  "home.feature.api.title": "API",
+  "home.feature.api.desc": "Points d'accès Vercel serverless avec validation Zod et utilitaires MongoDB.",
+  "common.loading": "Chargement…",
+  "common.error": "Une erreur est survenue."
+}

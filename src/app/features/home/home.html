@@ -1,0 +1,13 @@
+<section class="container home">
+  <p class="eyebrow">{{ i18n.t('home.welcome') }}</p>
+  <h2 class="home-title">{{ i18n.t('home.subtitle') }}</h2>
+
+  <div class="feature-grid">
+    @for (feature of features; track feature.key) {
+      <article class="feature-card">
+        <h3>{{ i18n.t('home.feature.' + feature.key + '.title') }}</h3>
+        <p>{{ i18n.t('home.feature.' + feature.key + '.desc') }}</p>
+      </article>
+    }
+  </div>
+</section>
