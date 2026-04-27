@@ -1,5 +1,5 @@
 {
-  "app.title": "健身 XL",
+  "app.title": "Ginásio XL",
   "app.kicker": "基础骨架",
   "app.languageLabel": "语言",
   "app.themeLabel": "主题",
@@ -7,14 +7,18 @@
   "theme.dark": "深色",
   "theme.auto": "自动",
   "home.welcome": "欢迎",
-  "home.subtitle": "你的 Angular + Vercel + MongoDB 骨架已就绪。",
+  "home.subtitle": "您的 Angular + Vercel + MongoDB 骨架已就绪。",
   "home.cta": "开始",
   "home.feature.i18n.title": "翻译",
-  "home.feature.i18n.desc": "内置四种语言(葡、英、中、法)。通过顶部选择器切换。",
+  "home.feature.i18n.desc": "四种语言就绪（PT、EN、ZH、FR），通过顶部选择器切换。",
   "home.feature.theme.title": "主题",
-  "home.feature.theme.desc": "浅色、深色、自动 — 默认跟随系统。",
+  "home.feature.theme.desc": "浅色、深色和自动 —— 默认跟随系统。",
   "home.feature.api.title": "API",
-  "home.feature.api.desc": "Vercel Serverless 接口,包含 Zod 校验与 MongoDB 辅助函数。",
+  "home.feature.api.desc": "Vercel Serverless 端点，含 Zod 校验与 MongoDB 辅助。",
+  "login.sub": "登录以继续。",
+  "login.github": "使用 GitHub 继续",
+  "login.google": "使用 Google 继续",
   "common.loading": "加载中…",
-  "common.error": "出错了。"
+  "common.error": "出错了。",
+  "app.signOut": "退出"
 }

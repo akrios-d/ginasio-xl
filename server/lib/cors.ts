@@ -10,7 +10,7 @@ interface CorsOptions {
   headers?: string[];
 }
 
-function setCors(res: any, options?: CorsOptions) {
+export function setCors(res: any, options?: CorsOptions): void {
   const {
     origin = '*',
     methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -24,19 +24,13 @@ function setCors(res: any, options?: CorsOptions) {
   // Security headers — cheap defence in depth.
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 }
 
-function handleOptions(req: any, res: any): boolean {
+export function handleOptions(req: any, res: any): boolean {
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return true;
   }
   return false;
 }
-
-module.exports = {
-  setCors,
-  handleOptions,
-};

@@ -43,6 +43,18 @@
         </div>
       }
     </div>
+
+    @if (auth.isAuthenticated()) {
+      <button
+        type="button"
+        class="logout-btn"
+        (click)="auth.logout()"
+        [attr.aria-label]="i18n.t('app.signOut')"
+        [title]="auth.user()?.email ?? auth.user()?.name ?? ''"
+      >
+        {{ i18n.t('app.signOut') }}
+      </button>
+    }
   </div>
 </header>
 

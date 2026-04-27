@@ -1,6 +1,6 @@
 {
   "app.title": "Ginásio XL",
-  "app.kicker": "Skeleton base",
+  "app.kicker": "Base skeleton",
   "app.languageLabel": "Language",
   "app.themeLabel": "Theme",
   "theme.light": "Light",
@@ -10,11 +10,15 @@
   "home.subtitle": "Your Angular + Vercel + MongoDB skeleton is ready.",
   "home.cta": "Get started",
   "home.feature.i18n.title": "Translations",
-  "home.feature.i18n.desc": "Four languages included (PT, EN, ZH, FR). Switch via the picker at the top.",
+  "home.feature.i18n.desc": "Four languages ready (PT, EN, ZH, FR). Switch via the picker on top.",
   "home.feature.theme.title": "Theme",
-  "home.feature.theme.desc": "Light, dark, and auto — follows the system by default.",
+  "home.feature.theme.desc": "Light, dark and auto — follows the system by default.",
   "home.feature.api.title": "API",
-  "home.feature.api.desc": "Vercel serverless endpoints with Zod validation and MongoDB helpers.",
+  "home.feature.api.desc": "Vercel Serverless endpoints with Zod validation and MongoDB helpers.",
+  "login.sub": "Sign in to continue.",
+  "login.github": "Continue with GitHub",
+  "login.google": "Continue with Google",
   "common.loading": "Loading…",
-  "common.error": "Something went wrong."
+  "common.error": "Something went wrong.",
+  "app.signOut": "Sign out"
 }

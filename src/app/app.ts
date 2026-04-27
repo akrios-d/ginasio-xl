@@ -1,6 +1,7 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { I18nService, AppLanguage } from './core/i18n/i18n.service';
+import { I18nService, type AppLanguage } from './core/i18n/i18n.service';
+import { AuthService } from './core/auth/auth.service';
 import { Flag } from './shared/components/flag/flag';
 import { ThemeToggle } from './shared/components/theme-toggle/theme-toggle';
 import { Toast } from './shared/components/toast/toast';
@@ -13,6 +14,7 @@ import { Toast } from './shared/components/toast/toast';
 })
 export class App {
   protected readonly i18n = inject(I18nService);
+  protected readonly auth = inject(AuthService);
   protected readonly langMenuOpen = signal(false);
 
   toggleLangMenu(): void {

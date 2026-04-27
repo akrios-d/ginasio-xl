@@ -3,16 +3,10 @@
  *
  * - The client is module-scoped and reused across invocations (warm starts).
  * - `attachDatabasePool` lets Vercel drain connections cleanly between deploys.
- * - The DB name defaults to `ginasio-xl` — override via MONGODB_DB_NAME.
- *
- * Usage:
- *   const { getCollection, toObjectId, mapDocumentId } = require('./lib/mongo');
- *   const col = await getCollection('users');
- *   const doc = await col.findOne({ _id: toObjectId(id) });
- *   return mapDocumentId(doc);
+ * - DB name defaults to `ginasio-xl` — override via MONGODB_DB_NAME.
  */
-const { MongoClient, ObjectId } = require('mongodb');
-const { attachDatabasePool } = require('@vercel/functions');
+import { MongoClient, ObjectId } from 'mongodb';
+import { attachDatabasePool } from '@vercel/functions';
 
 const uri = process.env['MONGODB_URI'];
 const dbName = process.env['MONGODB_DB_NAME'] || 'ginasio-xl';
@@ -33,13 +27,13 @@ async function getDatabase() {
   return client.db(dbName);
 }
 
-async function getCollection(name: string) {
+export async function getCollection(name: string) {
   const db = await getDatabase();
   return db.collection(name);
 }
 
 /** Throws a 400-coded error if `id` isn't a valid ObjectId. */
-function toObjectId(id: string) {
+export function toObjectId(id: string): ObjectId {
   if (!ObjectId.isValid(id)) {
     const err = new Error(`Invalid ID: ${id}`);
     (err as any).status = 400;
@@ -49,13 +43,7 @@ function toObjectId(id: string) {
 }
 
 /** Converts Mongo's `_id` to a string `id` while preserving the rest of the document. */
-function mapDocumentId<T extends Record<string, any>>(document: T) {
+export function mapDocumentId<T extends Record<string, any>>(document: T) {
   const { _id, ...rest } = document;
   return { id: _id.toString(), ...rest };
 }
-
-module.exports = {
-  getCollection,
-  toObjectId,
-  mapDocumentId,
-};

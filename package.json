@@ -10,6 +10,7 @@
     "lint": "ng lint"
   },
   "private": true,
+  "type": "module",
   "dependencies": {
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
@@ -18,6 +19,8 @@
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@angular/service-worker": "^21.2.0",
+    "@auth/core": "^0.41.2",
+    "@auth/mongodb-adapter": "^3.11.2",
     "@vercel/functions": "^3.4.3",
     "mongodb": "^7.1.1",
     "rxjs": "~7.8.0",

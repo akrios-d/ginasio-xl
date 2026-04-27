@@ -15,6 +15,10 @@
   "home.feature.theme.desc": "Claro, escuro e automático — segue o sistema por padrão.",
   "home.feature.api.title": "API",
   "home.feature.api.desc": "Endpoints Vercel Serverless com validação Zod e helpers MongoDB.",
+  "login.sub": "Entre para continuar.",
+  "login.github": "Continuar com GitHub",
+  "login.google": "Continuar com Google",
   "common.loading": "A carregar…",
-  "common.error": "Algo correu mal."
+  "common.error": "Algo correu mal.",
+  "app.signOut": "Sair"
 }

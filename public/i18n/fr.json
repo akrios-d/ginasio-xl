@@ -10,11 +10,15 @@
   "home.subtitle": "Votre squelette Angular + Vercel + MongoDB est prêt.",
   "home.cta": "Commencer",
   "home.feature.i18n.title": "Traductions",
-  "home.feature.i18n.desc": "Quatre langues incluses (PT, EN, ZH, FR). Changez via le sélecteur en haut.",
+  "home.feature.i18n.desc": "Quatre langues prêtes (PT, EN, ZH, FR). Choisissez via le sélecteur en haut.",
   "home.feature.theme.title": "Thème",
   "home.feature.theme.desc": "Clair, sombre et auto — suit le système par défaut.",
   "home.feature.api.title": "API",
-  "home.feature.api.desc": "Points d'accès Vercel serverless avec validation Zod et utilitaires MongoDB.",
+  "home.feature.api.desc": "Endpoints Vercel Serverless avec validation Zod et helpers MongoDB.",
+  "login.sub": "Connectez-vous pour continuer.",
+  "login.github": "Continuer avec GitHub",
+  "login.google": "Continuer avec Google",
   "common.loading": "Chargement…",
-  "common.error": "Une erreur est survenue."
+  "common.error": "Une erreur s'est produite.",
+  "app.signOut": "Déconnexion"
 }
