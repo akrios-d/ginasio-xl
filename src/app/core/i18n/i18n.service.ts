@@ -24,16 +24,20 @@ const LOADED_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 export class I18nService {
   readonly language = signal<AppLanguage>(this.detectInitialLanguage());
 
-  readonly languageOptions: readonly { code: AppLanguage }[] = [
-    { code: 'pt' },
-    { code: 'en' },
-    { code: 'zh' },
-    { code: 'fr' },
+  /**
+   * `label` is the language's *autonym* — what speakers call it themselves.
+   * Used as the visible text inside the language picker (and for aria-labels).
+   */
+  readonly languageOptions: readonly { code: AppLanguage; label: string }[] = [
+    { code: 'pt', label: 'Português' },
+    { code: 'en', label: 'English' },
+    { code: 'zh', label: '中文' },
+    { code: 'fr', label: 'Français' },
   ];
 
   readonly appTitle = computed(() => this.t('app.title'));
 
-  /** Called by provideAppInitializer - blocks bootstrap until every locale is fetched. */
+  /** Called by provideAppInitializer — blocks bootstrap until every locale is fetched. */
   loadAll(): Promise<void> {
     const requests = TRANSLATION_LANGS.map((lang) =>
       fetch(`/i18n/${lang}.json`)

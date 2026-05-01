@@ -21,7 +21,8 @@ Base project scaffold. Use it as the starting point for new apps.
 - **`src/app/core/guards/`** — `requireAuth` (redirects to `/login`) and `skipIfAuth` (redirects authenticated users away from `/login`).
 - **`src/app/core/interceptors/`** — `credentialsInterceptor` adds `withCredentials` to every `/api/*` call so cookies flow.
 - **`src/app/features/auth/login`** — sign-in page with GitHub + Google buttons and inline language picker.
-- **`src/app/shared/components/`** — `Flag`, `ThemeToggle`, `Toast` reusable components.
+- **`src/app/shared/components/`** — `Flag`, `ThemeToggle`, `Toast`, `Icon` (lazy-loaded SVGs from `public/icons/`), `ConfirmDialog` (modal via native `<dialog>`).
+- **`src/app/shared/utils/sort.util.ts`** — `createSort()` factory for signal-driven, persist-to-localStorage sort state.
 - **`server/lib/`** — `cors.ts`, `mongo.ts`, `auth.config.ts`, `session.ts`. Shared between `api/*` handlers.
 - **`server/schemas/`** — Zod schemas (`example.schema.ts` as a template).
 - **`api/auth.ts`** — Auth.js catch-all for `/api/auth/*`.
@@ -106,6 +107,10 @@ Push to a Vercel-linked repo. Set every variable in the table above in **Vercel 
 - `/api/auth/*` → the Auth.js handler
 - `/api/*` → matching `api/<name>.ts` files
 - everything else → Angular SPA fallback
+
+## PWA icons
+
+`public/manifest.webmanifest` is wired up but ships without bundled icons. Drop `icons/icon-192x192.png` and `icons/icon-512x512.png` (and any of the maskable Android sizes you want — 72/96/128/144/152/384) into `public/icons/` and you’re live.
 
 ## Testing
 

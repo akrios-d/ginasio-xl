@@ -12,7 +12,7 @@
           type="button"
           class="login-lang-btn"
           [class.login-lang-btn--active]="i18n.language() === option.code"
-          [attr.aria-label]="option.code"
+          [attr.aria-label]="option.label"
           (click)="pickLanguage(option.code)"
         >
           <app-flag [lang]="option.code" />

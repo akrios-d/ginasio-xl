@@ -1,0 +1,28 @@
+<dialog tabindex="-1"
+  #dlg
+  class="dialog-overlay"
+  (click)="onOverlayClick($event)"
+  (keydown.escape)="onCancel()"
+>
+  <div class="dialog-box">
+    <h2 class="dialog-title">{{ title }}</h2>
+
+    @if (message) {
+      <p class="dialog-message">{{ message }}</p>
+    }
+
+    <div class="dialog-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        {{ cancelLabel }}
+      </button>
+      <button
+        type="button"
+        class="btn-confirm"
+        [class.danger]="danger"
+        (click)="onConfirm()"
+      >
+        {{ confirmLabel }}
+      </button>
+    </div>
+  </div>
+</dialog>
