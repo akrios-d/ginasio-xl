@@ -1,0 +1,12 @@
+# Ginásio XL project git config
+# Activate once with: git config --local include.path ../project.gitconfig
+# (setup-hooks.cjs configures this automatically on `npm run prepare`)
+
+[pull]
+  rebase = true
+
+[rebase]
+  autoStash = true
+
+[merge]
+  ff = only

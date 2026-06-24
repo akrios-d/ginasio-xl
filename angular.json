@@ -48,6 +48,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "vercel": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.vercel.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -60,6 +71,9 @@
             },
             "development": {
               "buildTarget": "ginasio-xl-app:build:development"
+            },
+            "vercel": {
+              "buildTarget": "ginasio-xl-app:build:vercel"
             }
           },
           "defaultConfiguration": "development"

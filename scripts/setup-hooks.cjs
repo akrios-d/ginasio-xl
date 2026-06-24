@@ -13,6 +13,13 @@ const HUSKY_DIR = path.join(ROOT, '.husky');
 
 const HOOKS = [
   {
+    file: 'pre-commit',
+    body: `#!/usr/bin/env sh
+# Ginásio XL pre-commit hook — auto-format staged files
+node node_modules/lint-staged/bin/lint-staged.js
+`,
+  },
+  {
     file: 'pre-push',
     body: `#!/usr/bin/env sh
 # Ginásio XL pre-push hook — bumps version based on conventional commits
