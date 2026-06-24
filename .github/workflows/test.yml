@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Unit Tests
+  vitest:
+    name: Vitest (services + server)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,5 +18,16 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - name: Unit tests
-        run: npm run test:unit
+      - run: npm run test:unit
+
+  ng-test:
+    name: ng test (Angular components)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npm run test:ng

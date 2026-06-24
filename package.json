@@ -12,7 +12,9 @@
     "format": "prettier --write \"src/**/*.{ts,html,css}\" \"api/**/*.ts\" \"server/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,css}\" \"api/**/*.ts\" \"server/**/*.ts\"",
     "start:vercel": "ng serve --configuration=vercel",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "test:ng": "ng test --no-watch",
+    "test:all": "vitest run && ng test --no-watch"
   },
   "private": true,
   "type": "module",

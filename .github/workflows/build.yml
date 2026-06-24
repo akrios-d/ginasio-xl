@@ -18,7 +18,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - name: Unit tests
+      - name: Unit tests (Vitest — services + server)
         run: npm run test:unit
+      - name: Component tests (ng test — Angular components)
+        run: npm run test:ng
       - name: Build
         run: npx ng build --configuration=production
