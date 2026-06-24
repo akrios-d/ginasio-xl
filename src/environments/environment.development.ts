@@ -1,11 +1,16 @@
 /**
- * Dev environment.
+ * Local dev environment (ng serve without a real backend).
+ * Replaced at build time via angular.json fileReplacements for the "development" configuration.
  *
- * If the API runs on a different origin in dev (e.g. `vercel dev` on :3000 while
- * `ng serve` is on :4200), set apiUrl to the API origin so the credentials
- * interceptor sends cookies to the right host.
+ * devBypassAuth skips the real Auth.js session check and injects a local user.
+ * Fill devUserId + devBypassToken locally — DO NOT commit real values.
  */
 export const environment = {
   production: false,
   apiUrl: '',
+  devBypassAuth: true,
+  /** Real MongoDB userId from your Atlas users collection. Leave empty for the generic placeholder. */
+  devUserId: '',
+  /** Must match DEV_BYPASS_TOKEN in .env.local. Only needed when proxying to the real backend. */
+  devBypassToken: '',
 };

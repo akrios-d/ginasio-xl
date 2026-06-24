@@ -143,33 +143,30 @@
       }
     </div>
 
-    <!-- Selected day panel -->
+    <!-- Selected day panel — shows existing check-ins only -->
     @if (selectedDate()) {
       <div class="day-panel">
         <div class="day-panel-header">
           <span class="day-panel-date">
             {{ selectedDate()! | date: 'EEE, d MMM' }}
           </span>
-          @if (!addingCheckin()) {
-            <button type="button" class="add-checkin-btn" (click)="startAdd()">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              {{ i18n.t('home.checkin.add') }}
-            </button>
-          }
+          <button type="button" class="add-checkin-btn" (click)="startAdd()">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            {{ i18n.t('home.checkin.add') }}
+          </button>
         </div>
 
-        <!-- Existing check-ins for this day -->
         @if (selectedDayCheckins().length > 0) {
           <ul class="checkin-list">
             @for (c of selectedDayCheckins(); track c._id) {
@@ -209,69 +206,99 @@
               </li>
             }
           </ul>
-        } @else if (!addingCheckin()) {
+        } @else {
           <p class="day-empty">{{ i18n.t('home.checkin.empty') }}</p>
-        }
-
-        <!-- Add form -->
-        @if (addingCheckin()) {
-          <form class="checkin-form" (ngSubmit)="saveCheckin()">
-            <!-- Program picker — always shown; disabled with placeholder when still loading -->
-            <div class="form-group">
-              <label class="form-label">{{ i18n.t('home.checkin.program') }}</label>
-              <select
-                [(ngModel)]="form.programaTreinoId"
-                name="program"
-                (ngModelChange)="form.grupoLetra = ''"
-              >
-                <option value="">{{ i18n.t('home.checkin.noProgram') }}</option>
-                @for (p of programs(); track p._id) {
-                  <option [value]="p._id">
-                    {{ p.objetivos ?? p.ptNome ?? 'treino ' + ($index + 1) }}
-                  </option>
-                }
-              </select>
-            </div>
-
-            <!-- Group picker — shown only when the selected program has groups -->
-            @if (selectedProgramGroups().length > 0) {
-              <div class="form-group">
-                <label class="form-label">{{ i18n.t('home.checkin.group') }}</label>
-                <div class="group-chips">
-                  @for (g of selectedProgramGroups(); track g) {
-                    <button
-                      type="button"
-                      class="group-chip-btn"
-                      [class.group-chip-btn--active]="form.grupoLetra === g"
-                      (click)="form.grupoLetra = form.grupoLetra === g ? '' : g"
-                    >
-                      {{ g }}
-                    </button>
-                  }
-                </div>
-              </div>
-            }
-
-            <div class="form-group">
-              <label class="form-label">{{ i18n.t('home.checkin.notes') }}</label>
-              <input
-                type="text"
-                [(ngModel)]="form.notas"
-                name="notas"
-                [placeholder]="i18n.t('home.checkin.notesPlaceholder')"
-              />
-            </div>
-            <div class="checkin-form-actions">
-              <button type="button" class="btn-ghost" (click)="cancelAdd()">
-                {{ i18n.t('home.checkin.cancel') }}
-              </button>
-              <button type="submit" [disabled]="savingCheckin()">
-                {{ savingCheckin() ? i18n.t('common.saving') : i18n.t('home.checkin.save') }}
-              </button>
-            </div>
-          </form>
         }
       </div>
     }
   </div>
 </section>
+
+<!-- ── Check-in bottom sheet / modal ──────────────────────── -->
+@if (addingCheckin()) {
+  <div class="sheet-backdrop" (click)="cancelAdd()" aria-hidden="true"></div>
+  <div class="checkin-sheet" role="dialog" aria-modal="true">
+    <!-- drag handle (mobile only) -->
+    <div class="sheet-handle" aria-hidden="true"></div>
+
+    <div class="sheet-header">
+      <h3 class="sheet-title">{{ selectedDate()! | date: 'EEE, d MMM' }}</h3>
+      <button
+        type="button"
+        class="sheet-close"
+        (click)="cancelAdd()"
+        [attr.aria-label]="i18n.t('home.checkin.cancel')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <form class="sheet-body" (ngSubmit)="saveCheckin()">
+      <!-- Program picker -->
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('home.checkin.program') }}</label>
+        <select
+          [(ngModel)]="form.programaTreinoId"
+          name="program"
+          (ngModelChange)="form.grupoLetra = ''"
+        >
+          <option value="">{{ i18n.t('home.checkin.noProgram') }}</option>
+          @for (p of programs(); track p._id) {
+            <option [value]="p._id">
+              {{ p.objetivos ?? p.ptNome ?? 'treino ' + ($index + 1) }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Group chips — only when selected program has groups -->
+      @if (selectedProgramGroups().length > 0) {
+        <div class="form-group">
+          <label class="form-label">{{ i18n.t('home.checkin.group') }}</label>
+          <div class="group-chips">
+            @for (g of selectedProgramGroups(); track g) {
+              <button
+                type="button"
+                class="group-chip-btn"
+                [class.group-chip-btn--active]="form.grupoLetra === g"
+                (click)="form.grupoLetra = form.grupoLetra === g ? '' : g"
+              >
+                {{ g }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('home.checkin.notes') }}</label>
+        <input
+          type="text"
+          [(ngModel)]="form.notas"
+          name="notas"
+          [placeholder]="i18n.t('home.checkin.notesPlaceholder')"
+        />
+      </div>
+
+      <div class="sheet-actions">
+        <button type="button" class="btn-ghost" (click)="cancelAdd()">
+          {{ i18n.t('home.checkin.cancel') }}
+        </button>
+        <button type="submit" [disabled]="savingCheckin()">
+          {{ savingCheckin() ? i18n.t('common.saving') : i18n.t('home.checkin.save') }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
