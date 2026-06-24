@@ -9,4 +9,10 @@ export const environment = {
   production: false,
   /** Base URL for /api/* calls. Empty string = same origin (recommended for Vercel). */
   apiUrl: '',
+  /**
+   * Skip the real Auth.js session check and inject a fake user.
+   * Set to true when running `ng serve` without a local backend.
+   * NEVER set in environment.vercel.ts or environment.production.ts.
+   */
+  devBypassAuth: true,
 };
