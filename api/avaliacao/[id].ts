@@ -57,7 +57,7 @@ export default async function handler(req: any, res: any): Promise<void> {
     res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     if (err instanceof ZodError) {
-      res.status(400).json({ error: 'Validation error', details: err.errors });
+      res.status(400).json({ error: 'Validation error', details: err.issues });
       return;
     }
     const status = (err as any).status ?? 500;
