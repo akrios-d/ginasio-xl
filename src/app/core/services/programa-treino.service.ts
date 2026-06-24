@@ -10,7 +10,7 @@ export class ProgramaTreinoService {
   private readonly base = `${environment.apiUrl}/api/programa-treino`;
 
   list(alunoId?: string): Observable<ProgramaTreino[]> {
-    const params = alunoId ? { alunoId } : {};
+    const params: Record<string, string> | undefined = alunoId ? { alunoId } : undefined;
     return this.http.get<ProgramaTreino[]>(this.base, { params, withCredentials: true });
   }
 

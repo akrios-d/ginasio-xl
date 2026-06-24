@@ -10,7 +10,7 @@ export class AvaliacaoService {
   private readonly base = `${environment.apiUrl}/api/avaliacao`;
 
   list(alunoId?: string): Observable<FichaAvaliacao[]> {
-    const params = alunoId ? { alunoId } : {};
+    const params: Record<string, string> | undefined = alunoId ? { alunoId } : undefined;
     return this.http.get<FichaAvaliacao[]>(this.base, { params, withCredentials: true });
   }
 
