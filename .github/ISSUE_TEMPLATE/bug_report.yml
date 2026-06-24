@@ -1,0 +1,55 @@
+name: Bug report
+description: Algo não está a funcionar como esperado
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug. Preenche o máximo de detalhes possível.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: O que aconteceu?
+      description: Descrição clara do bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Ir a '...'
+        2. Clicar em '...'
+        3. Ver erro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: O que esperavas que acontecesse?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      multiple: true
+      options:
+        - Login / Autenticação
+        - Programa de Treino
+        - Ficha de Avaliação
+        - Perfil
+        - Outro
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser e SO
+      placeholder: ex. Chrome 124, Windows 11
+    validations:
+      required: true

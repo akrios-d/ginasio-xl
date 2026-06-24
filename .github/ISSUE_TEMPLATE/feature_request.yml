@@ -1,0 +1,36 @@
+name: Feature request
+description: Sugerir uma nova funcionalidade ou melhoria
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado pela sugestão! Descreve o teu caso de uso claramente.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Que problema resolve?
+      description: Descreve o caso de uso ou dificuldade.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução proposta
+      description: Como gostavas que funcionasse?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Programa de Treino
+        - Ficha de Avaliação
+        - Perfil / Conta
+        - Dashboard
+        - Definições
+        - Outro

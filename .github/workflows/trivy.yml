@@ -1,0 +1,47 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 8 * * 1' # Todas as segundas às 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  trivy-scan:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true
+          exit-code: '1'
+
+      # ── GitHub Security tab (SARIF) ───────────────────────────────────────────
+      # Requer GitHub Advanced Security (grátis em repos públicos).
+      # Para activar: descomentar as secções abaixo.
+      #
+      # - name: Re-scan for SARIF output
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'fs'
+      #     scan-ref: '.'
+      #     format: 'sarif'
+      #     output: 'trivy-results.sarif'
+      #     severity: 'CRITICAL,HIGH'
+      #     ignore-unfixed: true
+      #
+      # - name: Upload results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   if: always()
+      #   with:
+      #     sarif_file: 'trivy-results.sarif'
