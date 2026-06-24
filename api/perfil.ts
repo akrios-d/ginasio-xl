@@ -1,0 +1,59 @@
+/**
+ * GET  /api/perfil  — devolve o perfil do utilizador autenticado
+ * PUT  /api/perfil  — cria ou actualiza o perfil (upsert)
+ */
+import { ZodError } from 'zod';
+import { setCors, handleOptions } from '../server/lib/cors.js';
+import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
+import { requireSession } from '../server/lib/session.js';
+import { UpsertPerfilSchema } from '../server/schemas/perfil.schema.js';
+
+export default async function handler(req: any, res: any): Promise<void> {
+  setCors(res);
+  if (handleOptions(req, res)) return;
+
+  const userId = await requireSession(req, res);
+  if (!userId) return;
+
+  const col = await getCollection('perfis');
+
+  try {
+    // ── GET ──────────────────────────────────────────────────────────────────
+    if (req.method === 'GET') {
+      const doc = await col.findOne({ userId });
+      if (!doc) {
+        res.status(404).json({ error: 'Perfil não encontrado' });
+        return;
+      }
+      res.status(200).json(mapDocumentId(doc));
+      return;
+    }
+
+    // ── PUT (upsert) ─────────────────────────────────────────────────────────
+    if (req.method === 'PUT') {
+      const body = UpsertPerfilSchema.parse(req.body);
+      const now = new Date();
+
+      await col.updateOne(
+        { userId },
+        {
+          $set: { ...body, updatedAt: now },
+          $setOnInsert: { userId, role: 'aluno', createdAt: now },
+        },
+        { upsert: true },
+      );
+
+      res.status(200).json({ saved: true });
+      return;
+    }
+
+    res.status(405).json({ error: 'Method not allowed' });
+  } catch (err) {
+    if (err instanceof ZodError) {
+      res.status(400).json({ error: 'Validation error', details: err.errors });
+      return;
+    }
+    console.error('[perfil]', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
