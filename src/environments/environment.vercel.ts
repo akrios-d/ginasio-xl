@@ -5,4 +5,5 @@
 export const environment = {
   production: false,
   apiUrl: 'https://my-gym-desk.vercel.app',
+  devBypassAuth: false,
 };
