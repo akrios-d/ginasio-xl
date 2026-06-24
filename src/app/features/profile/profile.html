@@ -1,0 +1,47 @@
+<section class="container page">
+  <div class="page-header">
+    <h2 class="page-title">{{ i18n.t('perfil.title') }}</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="text-muted">{{ i18n.t('perfil.loading') }}</p>
+  } @else {
+    <form class="perfil-form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label class="form-label" for="nome">{{ i18n.t('perfil.nome') }}</label>
+        <input
+          id="nome"
+          type="text"
+          class="form-input"
+          [ngModel]="nome()"
+          (ngModelChange)="nome.set($event)"
+          name="nome"
+          autocomplete="name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="numeroAluno">{{ i18n.t('perfil.numeroAluno') }}</label>
+        <input
+          id="numeroAluno"
+          type="text"
+          class="form-input"
+          [ngModel]="numeroAluno()"
+          (ngModelChange)="numeroAluno.set($event)"
+          name="numeroAluno"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-footer">
+        <button type="submit" [disabled]="saving()">
+          {{ saving() ? i18n.t('common.loading') : i18n.t('perfil.save') }}
+        </button>
+
+        @if (saved()) {
+          <span class="save-confirm">✓ {{ i18n.t('perfil.saved') }}</span>
+        }
+      </div>
+    </form>
+  }
+</section>

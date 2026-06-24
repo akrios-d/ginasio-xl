@@ -1,0 +1,72 @@
+.page {
+  padding-top: clamp(28px, 4vw, 40px);
+  padding-bottom: clamp(28px, 4vw, 40px);
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.perfil-form {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: var(--t-secondary);
+  font-weight: 500;
+  color: var(--c-ink-2);
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-family: var(--f-sans);
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  background: var(--c-surface);
+  outline: none;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-input:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-lt);
+}
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.save-confirm {
+  font-size: var(--t-secondary);
+  color: var(--c-success);
+  font-weight: 500;
+}
+
+.text-muted {
+  color: var(--c-ink-3);
+  font-size: var(--t-secondary);
+}

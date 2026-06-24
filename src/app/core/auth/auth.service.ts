@@ -34,10 +34,6 @@ export class AuthService {
     }
   }
 
-  loginWithGitHub(): Promise<void> {
-    return this.csrfPostForm('/api/auth/signin/github');
-  }
-
   loginWithGoogle(): Promise<void> {
     return this.csrfPostForm('/api/auth/signin/google');
   }

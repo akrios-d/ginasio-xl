@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   Ginásio XL — Global styles & design system
+   GymDesk — Global styles & design system
    ═══════════════════════════════════════════
 
    Single source of truth for design tokens. Components should only read
@@ -14,29 +14,29 @@
    ThemeService writes the attribute; tokens below flip accordingly.
 */
 
-/* ── Light tokens (default) ───────────────── */
+/* ── Light tokens (default) ── CDM-inspired palette ── */
 :root {
   /* Surfaces */
-  --c-bg: #ffffff;
-  --c-surface: #f8fafc;
-  --c-surface-alt: #eef2f7;
-  --c-border: #e2e8f0;
-  --c-border-strong: #94a3b8;
+  --c-bg: #f6f8fa;
+  --c-surface: #ffffff;
+  --c-surface-alt: #edf0f4;
+  --c-border: #d0d7de;
+  --c-border-strong: #8c959f;
 
   /* Ink (text) */
-  --c-ink: #0f172a;
-  --c-ink-2: #475569;
-  --c-ink-3: #94a3b8;
+  --c-ink: #0d1117;
+  --c-ink-2: #485360;
+  --c-ink-3: #8c959f;
 
-  /* Accent — swap for your brand */
-  --c-accent: #2563eb;
-  --c-accent-lt: #dbeafe;
-  --c-accent-dk: #1d4ed8;
+  /* Accent */
+  --c-accent: #0550ae;
+  --c-accent-lt: #ddf4ff;
+  --c-accent-dk: #033d8b;
 
   /* Semantics */
-  --c-success: #16a34a;
-  --c-warn: #d97706;
-  --c-danger: #dc2626;
+  --c-success: #1a7f37;
+  --c-warn: #9a6700;
+  --c-danger: #cf222e;
 
   /* Radii */
   --r-sm: 6px;
@@ -65,55 +65,55 @@
   --pad-page: clamp(16px, 3vw, 32px);
 }
 
-/* ── Dark tokens — applied when explicitly forced ── */
+/* ── Dark tokens — CDM default palette ── */
 :root[data-theme='dark'] {
-  --c-bg: #0f172a;
-  --c-surface: #1e293b;
-  --c-surface-alt: #273449;
-  --c-border: #334155;
-  --c-border-strong: #64748b;
+  --c-bg: #0d1117;
+  --c-surface: #161b22;
+  --c-surface-alt: #21262d;
+  --c-border: #30363d;
+  --c-border-strong: #8b949e;
 
-  --c-ink: #f1f5f9;
-  --c-ink-2: #cbd5e1;
-  --c-ink-3: #94a3b8;
+  --c-ink: #e6edf3;
+  --c-ink-2: #8b949e;
+  --c-ink-3: #484f58;
 
-  --c-accent: #60a5fa;
-  --c-accent-lt: #1e3a8a;
-  --c-accent-dk: #93c5fd;
+  --c-accent: #58a6ff;
+  --c-accent-lt: #1f3352;
+  --c-accent-dk: #79b8ff;
 
-  --c-success: #4ade80;
-  --c-warn: #fbbf24;
-  --c-danger: #f87171;
+  --c-success: #3fb950;
+  --c-warn: #d29922;
+  --c-danger: #f85149;
 
-  --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
-  --sh-md: 0 6px 20px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.22);
+  --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --sh-md: 0 6px 20px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Dark tokens — follow OS when data-theme is unset or "auto" ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --c-bg: #0f172a;
-    --c-surface: #1e293b;
-    --c-surface-alt: #273449;
-    --c-border: #334155;
-    --c-border-strong: #64748b;
+    --c-bg: #0d1117;
+    --c-surface: #161b22;
+    --c-surface-alt: #21262d;
+    --c-border: #30363d;
+    --c-border-strong: #8b949e;
 
-    --c-ink: #f1f5f9;
-    --c-ink-2: #cbd5e1;
-    --c-ink-3: #94a3b8;
+    --c-ink: #e6edf3;
+    --c-ink-2: #8b949e;
+    --c-ink-3: #484f58;
 
-    --c-accent: #60a5fa;
-    --c-accent-lt: #1e3a8a;
-    --c-accent-dk: #93c5fd;
+    --c-accent: #58a6ff;
+    --c-accent-lt: #1f3352;
+    --c-accent-dk: #79b8ff;
 
-    --c-success: #4ade80;
-    --c-warn: #fbbf24;
-    --c-danger: #f87171;
+    --c-success: #3fb950;
+    --c-warn: #d29922;
+    --c-danger: #f85149;
 
-    --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
-    --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
-    --sh-md: 0 6px 20px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.22);
+    --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --sh-md: 0 6px 20px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
   }
 }
 

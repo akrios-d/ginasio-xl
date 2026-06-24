@@ -83,7 +83,7 @@ export class I18nService {
       if (lang.startsWith('en')) return 'en';
     }
 
-    return 'pt';
+    return 'en';
   }
 
   private isSupportedLanguage(value: string | null): value is AppLanguage {

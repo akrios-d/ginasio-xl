@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { I18nService, type AppLanguage } from './core/i18n/i18n.service';
@@ -10,7 +10,7 @@ import { Toast } from './shared/components/toast/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Flag, ThemeToggle, Toast],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Flag, ThemeToggle, Toast],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

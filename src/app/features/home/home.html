@@ -1,13 +1,67 @@
 <section class="container home">
-  <p class="eyebrow">{{ i18n.t('home.welcome') }}</p>
-  <h2 class="home-title">{{ i18n.t('home.subtitle') }}</h2>
+  <div class="home-greeting">
+    <h2 class="home-title">{{ greeting() }}</h2>
+    <p class="home-sub">{{ i18n.t('home.sub') }}</p>
+  </div>
 
-  <div class="feature-grid">
-    @for (feature of features; track feature.key) {
-      <article class="feature-card">
-        <h3>{{ i18n.t('home.feature.' + feature.key + '.title') }}</h3>
-        <p>{{ i18n.t('home.feature.' + feature.key + '.desc') }}</p>
-      </article>
+  <div class="section-grid">
+    @for (s of sections; track s.key) {
+      <a class="section-card" [routerLink]="s.route">
+        <div class="section-card-icon">
+          @switch (s.icon) {
+            @case ('dumbbell') {
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 5v14M18 5v14" />
+                <path d="M2 9h4M18 9h4M2 15h4M18 15h4" />
+                <path d="M6 9h12M6 15h12" />
+              </svg>
+            }
+            @case ('chart') {
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 3v18h18" />
+                <path d="m7 16 4-4 4 4 4-4" />
+              </svg>
+            }
+            @case ('person') {
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            }
+          }
+        </div>
+
+        <div class="section-card-body">
+          <h3>{{ i18n.t('home.' + s.key + '.title') }}</h3>
+          <p>{{ i18n.t('home.' + s.key + '.desc') }}</p>
+        </div>
+
+        <span class="section-card-arrow" aria-hidden="true">→</span>
+      </a>
     }
   </div>
 </section>

@@ -59,6 +59,29 @@
       }
     </div>
   </header>
+
+  @if (auth.isAuthenticated()) {
+    <nav class="app-nav" aria-label="Navegação principal">
+      <div class="container nav-inner">
+        <a
+          class="nav-link"
+          routerLink="/"
+          routerLinkActive="nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >{{ i18n.t('nav.home') }}</a
+        >
+        <a class="nav-link" routerLink="/training" routerLinkActive="nav-link--active">
+          {{ i18n.t('nav.treino') }}
+        </a>
+        <a class="nav-link" routerLink="/assessment" routerLinkActive="nav-link--active">
+          {{ i18n.t('nav.avaliacao') }}
+        </a>
+        <a class="nav-link" routerLink="/profile" routerLinkActive="nav-link--active">
+          {{ i18n.t('nav.perfil') }}
+        </a>
+      </div>
+    </nav>
+  }
 }
 
 <main>
