@@ -1,28 +1,68 @@
 .page {
-  padding-top: clamp(28px, 4vw, 40px);
-  padding-bottom: clamp(28px, 4vw, 40px);
+  padding-top: clamp(24px, 4vw, 40px);
+  padding-bottom: clamp(24px, 4vw, 40px);
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 12px;
+  margin-bottom: clamp(20px, 3vw, 28px);
 }
 
 .page-title {
   margin: 0;
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
   font-weight: 600;
   color: var(--c-ink);
+}
+
+/* ── States ───────────────────────────────────── */
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 0;
+  color: var(--c-ink-2);
+  font-size: var(--t-secondary);
+}
+
+.state-row--error {
+  color: var(--c-danger);
+}
+
+.state-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.state-text {
+  font-size: var(--t-secondary);
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--c-border);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 16px;
   padding: 64px 24px;
   text-align: center;
@@ -32,12 +72,263 @@
 .empty-state svg {
   width: 48px;
   height: 48px;
-  opacity: 0.5;
+  opacity: 0.4;
 }
-
 .empty-state p {
   margin: 0;
   font-size: var(--t-secondary);
-  max-width: 28ch;
+  max-width: 26ch;
   line-height: 1.5;
+}
+
+/* ── Card list ─────────────────────────────────── */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Ficha card ─────────────────────────────────── */
+.ficha-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: border-color 150ms;
+}
+
+.ficha-card--expanded {
+  border-color: var(--c-accent);
+}
+
+.ficha-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  min-height: unset;
+  transition: background 120ms;
+}
+
+.ficha-header:hover {
+  background: var(--c-surface-alt);
+  box-shadow: none;
+}
+
+.ficha-header:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -2px;
+}
+
+.ficha-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ficha-objective {
+  font-size: var(--t-body);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.ficha-latest {
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+}
+
+.expand-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--c-ink-3);
+  flex-shrink: 0;
+  transition: transform 200ms;
+}
+
+.ficha-card--expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+/* ── Card body ─────────────────────────────────── */
+.ficha-body {
+  padding: 0 16px 20px;
+  border-top: 1px solid var(--c-border);
+}
+
+/* ── Entries table ─────────────────────────────── */
+.entries-scroll {
+  overflow-x: auto;
+  margin-top: 16px;
+  margin-left: -4px;
+  margin-right: -4px;
+  padding: 0 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.entries-table {
+  width: 100%;
+  min-width: 340px;
+  border-collapse: collapse;
+  font-size: var(--t-meta);
+}
+
+.entries-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-ink-3);
+  background: var(--c-surface-alt);
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;
+}
+
+.entries-table th:first-child {
+  border-radius: var(--r-sm) 0 0 0;
+}
+.entries-table th:last-child {
+  border-radius: 0 var(--r-sm) 0 0;
+}
+
+.entries-table td {
+  padding: 8px 10px;
+  color: var(--c-ink);
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;
+}
+
+.entries-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.entries-table tbody tr:hover td {
+  background: var(--c-surface-alt);
+}
+
+/* ── Save confirm ──────────────────────────────── */
+.save-confirm {
+  margin: 12px 0 0;
+  font-size: var(--t-secondary);
+  color: var(--c-success);
+  font-weight: 500;
+}
+
+/* ── Add entry button ──────────────────────────── */
+.add-entry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1.5px dashed var(--c-border);
+  border-radius: var(--r-md);
+  color: var(--c-ink-2);
+  font-size: var(--t-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  min-height: unset;
+  width: 100%;
+  justify-content: center;
+  transition:
+    border-color 150ms,
+    color 150ms,
+    background 150ms;
+}
+
+.add-entry-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.add-entry-btn:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: var(--c-accent-lt);
+  box-shadow: none;
+}
+
+.add-entry-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* ── Entry form ────────────────────────────────── */
+.entry-form {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--c-surface-alt);
+  border-radius: var(--r-md);
+}
+
+.entry-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.entry-form-grid .form-group:first-child {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-label {
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: var(--c-ink-2);
+}
+
+.entry-form input {
+  padding: 8px 10px;
+  font-size: var(--t-secondary);
+}
+
+.entry-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-ink-2);
+  border: 1.5px solid var(--c-border);
+}
+
+.btn-ghost:hover {
+  background: var(--c-surface);
+  border-color: var(--c-border-strong);
+  color: var(--c-ink);
+  box-shadow: none;
+}
+
+/* ── Desktop tweaks ────────────────────────────── */
+@media (min-width: 600px) {
+  .ficha-header {
+    padding: 20px 24px;
+  }
+  .ficha-body {
+    padding: 0 24px 24px;
+  }
+
+  .entry-form-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .entry-form-grid .form-group:first-child {
+    grid-column: 1;
+  }
 }

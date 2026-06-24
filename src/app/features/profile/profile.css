@@ -1,24 +1,30 @@
 .page {
-  padding-top: clamp(28px, 4vw, 40px);
-  padding-bottom: clamp(28px, 4vw, 40px);
+  padding-top: clamp(24px, 4vw, 40px);
+  padding-bottom: clamp(24px, 4vw, 40px);
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: clamp(20px, 3vw, 28px);
 }
 
 .page-title {
   margin: 0;
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
   font-weight: 600;
   color: var(--c-ink);
 }
 
+.text-muted {
+  color: var(--c-ink-3);
+  font-size: var(--t-secondary);
+}
+
+/* ── Form ──────────────────────────────────────── */
 .perfil-form {
-  max-width: 480px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
+  max-width: 480px;
 }
 
 .form-group {
@@ -34,8 +40,7 @@
 }
 
 .form-input {
-  width: 100%;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border: 1px solid var(--c-border);
   border-radius: var(--r-md);
   font-family: var(--f-sans);
@@ -46,6 +51,8 @@
   transition:
     border-color 150ms,
     box-shadow 150ms;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .form-input:focus {
@@ -56,7 +63,7 @@
 .form-footer {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding-top: 4px;
 }
 
@@ -66,7 +73,8 @@
   font-weight: 500;
 }
 
-.text-muted {
-  color: var(--c-ink-3);
-  font-size: var(--t-secondary);
+@media (min-width: 600px) {
+  .perfil-form {
+    gap: 20px;
+  }
 }

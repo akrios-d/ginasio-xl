@@ -61,23 +61,77 @@
   </header>
 
   @if (auth.isAuthenticated()) {
-    <nav class="app-nav" aria-label="Navegação principal">
-      <div class="container nav-inner">
+    <nav class="app-nav" aria-label="Main navigation">
+      <div class="nav-inner">
         <a
           class="nav-link"
           routerLink="/"
           routerLinkActive="nav-link--active"
           [routerLinkActiveOptions]="{ exact: true }"
-          >{{ i18n.t('nav.home') }}</a
         >
+          <svg
+            class="nav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span class="nav-label">{{ i18n.t('nav.home') }}</span>
+        </a>
         <a class="nav-link" routerLink="/training" routerLinkActive="nav-link--active">
-          {{ i18n.t('nav.treino') }}
+          <svg
+            class="nav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M6 5v14M18 5v14" />
+            <path d="M2 9h4M18 9h4M2 15h4M18 15h4" />
+            <path d="M6 9h12M6 15h12" />
+          </svg>
+          <span class="nav-label">{{ i18n.t('nav.treino') }}</span>
         </a>
         <a class="nav-link" routerLink="/assessment" routerLinkActive="nav-link--active">
-          {{ i18n.t('nav.avaliacao') }}
+          <svg
+            class="nav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 3v18h18" />
+            <path d="m7 16 4-4 4 4 4-4" />
+          </svg>
+          <span class="nav-label">{{ i18n.t('nav.avaliacao') }}</span>
         </a>
         <a class="nav-link" routerLink="/profile" routerLinkActive="nav-link--active">
-          {{ i18n.t('nav.perfil') }}
+          <svg
+            class="nav-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+          </svg>
+          <span class="nav-label">{{ i18n.t('nav.perfil') }}</span>
         </a>
       </div>
     </nav>

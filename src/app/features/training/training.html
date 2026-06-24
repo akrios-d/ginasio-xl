@@ -1,23 +1,187 @@
 <section class="container page">
   <div class="page-header">
     <h2 class="page-title">{{ i18n.t('nav.treino') }}</h2>
-    <button type="button">{{ i18n.t('treino.novo') }}</button>
   </div>
 
-  <div class="empty-state">
-    <svg
-      viewBox="0 0 48 48"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M12 10v28M36 10v28" />
-      <path d="M4 18h8M36 18h8M4 30h8M36 30h8" />
-      <path d="M12 18h24M12 30h24" />
-    </svg>
-    <p>{{ i18n.t('treino.empty') }}</p>
-  </div>
+  @if (loading()) {
+    <div class="state-row">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="state-text">{{ i18n.t('treino.loading') }}</span>
+    </div>
+  } @else if (error()) {
+    <div class="state-row state-row--error">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        class="state-icon"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <span class="state-text">{{ i18n.t('common.error') }}</span>
+    </div>
+  } @else if (programs().length === 0) {
+    <div class="empty-state">
+      <svg
+        viewBox="0 0 48 48"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 10v28M36 10v28" />
+        <path d="M4 18h8M36 18h8M4 30h8M36 30h8" />
+        <path d="M12 18h24M12 30h24" />
+      </svg>
+      <p>{{ i18n.t('treino.empty') }}</p>
+    </div>
+  } @else {
+    <div class="card-list">
+      @for (p of programs(); track p._id) {
+        <article class="program-card" [class.program-card--expanded]="expandedId() === p._id">
+          <!-- Card header — always visible -->
+          <button
+            type="button"
+            class="program-header"
+            (click)="toggle(p._id!)"
+            [attr.aria-expanded]="expandedId() === p._id"
+          >
+            <div class="program-meta">
+              <span class="program-objective">{{
+                p.objetivos ?? i18n.t('treino.semObjetivo')
+              }}</span>
+              <span class="program-date">{{ p.data | date: 'dd MMM yyyy' }}</span>
+              @if (p.ptNome) {
+                <span class="program-pt">PT: {{ p.ptNome }}</span>
+              }
+            </div>
+            <div class="program-badges">
+              <span
+                class="badge"
+                [class.badge--active]="p.ativo"
+                [class.badge--inactive]="!p.ativo"
+              >
+                {{ p.ativo ? i18n.t('treino.active') : i18n.t('treino.inactive') }}
+              </span>
+              <span class="groups-preview">
+                @for (g of p.fasePrincipal.grupos; track g.letra) {
+                  <span class="group-chip">{{ g.letra }}</span>
+                }
+              </span>
+              <svg
+                class="expand-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+          </button>
+
+          <!-- Card body — shown when expanded -->
+          @if (expandedId() === p._id) {
+            <div class="program-body">
+              <!-- Warm-up cardio -->
+              @if (p.faseInicial.exercicios.length > 0) {
+                <div class="phase-section">
+                  <h4 class="phase-title">🏃 {{ i18n.t('treino.cardioWarmup') }}</h4>
+                  <div class="cardio-list">
+                    @for (c of p.faseInicial.exercicios; track c.equipamento) {
+                      <div class="cardio-row">
+                        <span class="cardio-name">{{ c.equipamento }}</span>
+                        <span class="cardio-detail"
+                          >{{ c.tempo }} {{ i18n.t('treino.min') }}
+                          @if (c.nivel) {
+                            · {{ i18n.t('treino.level') }} {{ c.nivel }}
+                          }
+                          @if (c.velocidade) {
+                            · {{ c.velocidade }}
+                          }
+                        </span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Resistance groups -->
+              @for (g of p.fasePrincipal.grupos; track g.letra) {
+                <div class="phase-section">
+                  <h4 class="phase-title">
+                    💪 {{ i18n.t('treino.group') }} {{ g.letra }}
+                    @if (g.cardioAposTreino) {
+                      <span class="cardio-after-badge">+ cardio</span>
+                    }
+                  </h4>
+                  <div class="exercise-list">
+                    @for (ex of g.exercicios; track ex.nome) {
+                      <div class="exercise-row">
+                        <div class="exercise-info">
+                          <span class="exercise-name">{{ ex.nome }}</span>
+                          @if (ex.numeroMaquina) {
+                            <span class="exercise-machine"
+                              >{{ i18n.t('treino.machine') }} #{{ ex.numeroMaquina }}</span
+                            >
+                          }
+                        </div>
+                        <div class="exercise-params">
+                          <span class="sets-reps">{{ ex.series }}×{{ ex.repeticoes }}</span>
+                          @if (ex.progressao.length > 0) {
+                            <span class="load-badge"
+                              >{{ ex.progressao[ex.progressao.length - 1].carga ?? ''
+                              }}{{
+                                ex.progressao[ex.progressao.length - 1].carga ? ' kg' : ''
+                              }}</span
+                            >
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Rest info -->
+              @if (p.fasePrincipal.descansoEntreSeriesSegundos) {
+                <p class="rest-info">
+                  ⏱ {{ i18n.t('treino.rest') }}: {{ p.fasePrincipal.descansoEntreSeriesSegundos
+                  }}{{ i18n.t('treino.sec') }}
+                </p>
+              }
+
+              <!-- Stretching -->
+              <div class="phase-section">
+                <h4 class="phase-title">🧘 {{ i18n.t('treino.stretching') }}</h4>
+                <p class="stretch-info">
+                  {{ p.faseFinal.duracaoSegundos }}{{ i18n.t('treino.sec') }}
+                  {{ i18n.t('treino.perExercise') }}
+                </p>
+              </div>
+
+              <!-- Notes -->
+              @if (p.observacoes) {
+                <div class="notes-section">
+                  <p class="notes-label">{{ i18n.t('treino.notes') }}</p>
+                  <p class="notes-text">{{ p.observacoes }}</p>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      }
+    </div>
+  }
 </section>

@@ -1,22 +1,229 @@
 <section class="container page">
   <div class="page-header">
     <h2 class="page-title">{{ i18n.t('nav.avaliacao') }}</h2>
-    <button type="button">{{ i18n.t('avaliacao.nova') }}</button>
   </div>
 
-  <div class="empty-state">
-    <svg
-      viewBox="0 0 48 48"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M6 6v36h36" />
-      <path d="m14 32 8-8 8 8 8-8" />
-    </svg>
-    <p>{{ i18n.t('avaliacao.empty') }}</p>
-  </div>
+  @if (loading()) {
+    <div class="state-row">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="state-text">{{ i18n.t('avaliacao.loading') }}</span>
+    </div>
+  } @else if (error()) {
+    <div class="state-row state-row--error">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        class="state-icon"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <span class="state-text">{{ i18n.t('common.error') }}</span>
+    </div>
+  } @else if (fichas().length === 0) {
+    <div class="empty-state">
+      <svg
+        viewBox="0 0 48 48"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M6 6v36h36" />
+        <path d="m14 32 8-8 8 8 8-8" />
+      </svg>
+      <p>{{ i18n.t('avaliacao.empty') }}</p>
+    </div>
+  } @else {
+    <div class="card-list">
+      @for (f of fichas(); track f._id) {
+        <article class="ficha-card" [class.ficha-card--expanded]="expandedId() === f._id">
+          <!-- Header -->
+          <button
+            type="button"
+            class="ficha-header"
+            (click)="toggle(f._id!)"
+            [attr.aria-expanded]="expandedId() === f._id"
+          >
+            <div class="ficha-meta">
+              <span class="ficha-objective">{{ f.objetivo }}</span>
+              @if (latestEntry(f); as latest) {
+                <span class="ficha-latest">
+                  {{ latest.data | date: 'dd MMM yyyy' }}
+                  @if (latest.peso) {
+                    · {{ latest.peso }} kg
+                  }
+                  @if (latest.percentualMassaGorda) {
+                    · {{ latest.percentualMassaGorda }}% MG
+                  }
+                </span>
+              } @else {
+                <span class="ficha-latest">{{ i18n.t('avaliacao.noEntries') }}</span>
+              }
+            </div>
+            <svg
+              class="expand-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <!-- Body -->
+          @if (expandedId() === f._id) {
+            <div class="ficha-body">
+              <!-- Measurements table -->
+              @if (f.avaliacoes.length > 0) {
+                <div class="entries-scroll">
+                  <table class="entries-table">
+                    <thead>
+                      <tr>
+                        <th>{{ i18n.t('avaliacao.date') }}</th>
+                        <th>{{ i18n.t('avaliacao.peso') }}</th>
+                        <th>{{ i18n.t('avaliacao.imc') }}</th>
+                        <th>{{ i18n.t('avaliacao.mg') }}</th>
+                        <th>{{ i18n.t('avaliacao.mm') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (e of f.avaliacoes.slice().reverse(); track e.data) {
+                        <tr>
+                          <td>{{ e.data | date: 'dd/MM/yy' }}</td>
+                          <td>{{ e.peso ?? '—' }}</td>
+                          <td>{{ e.imc ?? '—' }}</td>
+                          <td>{{ e.percentualMassaGorda ?? '—' }}</td>
+                          <td>{{ e.percentualMassaMagra ?? '—' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+
+              <!-- Success flash -->
+              @if (savedId() === f._id) {
+                <p class="save-confirm">✓ {{ i18n.t('avaliacao.saved') }}</p>
+              }
+
+              <!-- Add entry -->
+              @if (addingEntryFor() === f._id) {
+                <form class="entry-form" (ngSubmit)="saveEntry(f._id!)">
+                  <div class="entry-form-grid">
+                    <div class="form-group">
+                      <label class="form-label" [for]="'date-' + f._id">{{
+                        i18n.t('avaliacao.date')
+                      }}</label>
+                      <input
+                        [id]="'date-' + f._id"
+                        type="date"
+                        [(ngModel)]="entryForm.data"
+                        name="data"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" [for]="'peso-' + f._id">{{
+                        i18n.t('avaliacao.peso')
+                      }}</label>
+                      <input
+                        [id]="'peso-' + f._id"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        [(ngModel)]="entryForm.peso"
+                        name="peso"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" [for]="'imc-' + f._id">{{
+                        i18n.t('avaliacao.imc')
+                      }}</label>
+                      <input
+                        [id]="'imc-' + f._id"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        [(ngModel)]="entryForm.imc"
+                        name="imc"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" [for]="'mg-' + f._id">{{
+                        i18n.t('avaliacao.mg')
+                      }}</label>
+                      <input
+                        [id]="'mg-' + f._id"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        [(ngModel)]="entryForm.percentualMassaGorda"
+                        name="mg"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" [for]="'mm-' + f._id">{{
+                        i18n.t('avaliacao.mm')
+                      }}</label>
+                      <input
+                        [id]="'mm-' + f._id"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="100"
+                        [(ngModel)]="entryForm.percentualMassaMagra"
+                        name="mm"
+                        placeholder="—"
+                      />
+                    </div>
+                  </div>
+                  <div class="entry-form-actions">
+                    <button type="button" class="btn-ghost" (click)="cancelAddEntry()">
+                      {{ i18n.t('avaliacao.cancel') }}
+                    </button>
+                    <button type="submit" [disabled]="saving()">
+                      {{ saving() ? i18n.t('common.saving') : i18n.t('avaliacao.save') }}
+                    </button>
+                  </div>
+                </form>
+              } @else {
+                <button type="button" class="add-entry-btn" (click)="startAddEntry(f._id!)">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  {{ i18n.t('avaliacao.addEntry') }}
+                </button>
+              }
+            </div>
+          }
+        </article>
+      }
+    </div>
+  }
 </section>

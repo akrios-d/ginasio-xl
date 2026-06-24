@@ -8,9 +8,19 @@ interface SessionUser {
   image?: string | null;
 }
 
+const DEV_USER: SessionUser = {
+  id: 'dev-user',
+  name: 'Dev User',
+  email: 'dev@gymdesk.local',
+  image: null,
+};
+
 /**
  * Reads/refreshes the Auth.js session from /api/session.
  * Login/logout post forms with CSRF tokens because that's what Auth.js expects.
+ *
+ * When environment.devBypassAuth is true, skips the real session check
+ * and injects a fake user — useful for local UI development without a backend.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -22,6 +32,11 @@ export class AuthService {
 
   /** Called once at app startup (provideAppInitializer). */
   async load(): Promise<void> {
+    if (environment.devBypassAuth) {
+      this._user.set(DEV_USER);
+      return;
+    }
+
     try {
       const res = await fetch(`${environment.apiUrl}/api/session`, {
         credentials: 'include',
@@ -39,6 +54,10 @@ export class AuthService {
   }
 
   logout(): Promise<void> {
+    if (environment.devBypassAuth) {
+      this._user.set(null);
+      return Promise.resolve();
+    }
     return this.csrfPostForm('/api/auth/signout', { includeCallback: false });
   }
 
