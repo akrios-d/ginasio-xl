@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Ginásio XL pre-merge-commit hook — enforce rebase workflow
+echo ""
+echo "✖ Merge commits are not allowed in this repository."
+echo "  Use rebase instead: git pull --rebase  /  git rebase <branch>"
+echo "  To set rebase as default: git config --global pull.rebase true"
+echo ""
+exit 1

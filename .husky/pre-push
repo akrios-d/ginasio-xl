@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Ginásio XL pre-push hook — bumps version based on conventional commits
+node scripts/bump-version.cjs
