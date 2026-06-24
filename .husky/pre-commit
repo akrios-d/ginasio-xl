@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Ginásio XL pre-commit hook — auto-format staged files
+node node_modules/lint-staged/bin/lint-staged.js

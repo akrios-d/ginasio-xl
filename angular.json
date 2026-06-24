@@ -70,7 +70,8 @@
               "buildTarget": "ginasio-xl-app:build:production"
             },
             "development": {
-              "buildTarget": "ginasio-xl-app:build:development"
+              "buildTarget": "ginasio-xl-app:build:development",
+              "proxyConfig": "proxy.conf.json"
             },
             "vercel": {
               "buildTarget": "ginasio-xl-app:build:vercel"
