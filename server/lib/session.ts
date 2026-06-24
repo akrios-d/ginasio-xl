@@ -11,7 +11,9 @@ export function toWebRequest(req: any): Request {
   const url = new URL(req.url ?? '/', `${proto}://${host}`);
 
   const headers = new Headers();
-  for (const [key, val] of Object.entries(req.headers as Record<string, string | string[] | undefined>)) {
+  for (const [key, val] of Object.entries(
+    req.headers as Record<string, string | string[] | undefined>,
+  )) {
     if (!val) continue;
     if (Array.isArray(val)) val.forEach((v) => headers.append(key, v));
     else headers.set(key, val);
@@ -72,8 +74,7 @@ export async function requireSession(req: any, res: any): Promise<string | null>
   const cookies = parseCookies(req.headers['cookie'] ?? '');
 
   // Auth.js writes either the plain or __Secure-prefixed cookie depending on host
-  const token =
-    cookies['authjs.session-token'] ?? cookies['__Secure-authjs.session-token'];
+  const token = cookies['authjs.session-token'] ?? cookies['__Secure-authjs.session-token'];
 
   if (!token) {
     res.status(401).json({ error: 'Unauthorized' });

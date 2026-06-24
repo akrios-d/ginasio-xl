@@ -1,4 +1,6 @@
-:host { display: block; }
+:host {
+  display: block;
+}
 
 .login-shell {
   min-height: 100dvh;
@@ -18,7 +20,9 @@
   gap: 32px;
 }
 
-.login-brand + .login-lang { margin-top: -16px; }
+.login-brand + .login-lang {
+  margin-top: -16px;
+}
 
 .login-brand {
   text-align: center;
@@ -66,7 +70,9 @@
   border-radius: var(--r-sm);
   background: transparent;
   cursor: pointer;
-  transition: border-color 150ms, background 150ms;
+  transition:
+    border-color 150ms,
+    background 150ms;
   overflow: hidden;
 }
 
@@ -78,9 +84,18 @@
   overflow: hidden;
 }
 
-.login-lang-btn:hover { background: var(--c-surface-alt); border-color: var(--c-border); }
-.login-lang-btn--active { border-color: var(--c-accent); background: var(--c-accent-lt); }
-.login-lang-btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.login-lang-btn:hover {
+  background: var(--c-surface-alt);
+  border-color: var(--c-border);
+}
+.login-lang-btn--active {
+  border-color: var(--c-accent);
+  background: var(--c-accent-lt);
+}
+.login-lang-btn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
 
 .login-providers {
   display: flex;
@@ -106,8 +121,12 @@
   transition: opacity 0.15s;
 }
 
-.login-btn:hover { opacity: 0.88; }
-.login-btn:active { opacity: 0.75; }
+.login-btn:hover {
+  opacity: 0.88;
+}
+.login-btn:active {
+  opacity: 0.75;
+}
 
 .login-btn-icon {
   width: 20px;
@@ -121,4 +140,7 @@
   border: 1px solid var(--c-border);
 }
 
-.login-btn--google:hover { background: var(--c-surface-alt); opacity: 1; }
+.login-btn--google:hover {
+  background: var(--c-surface-alt);
+  opacity: 1;
+}

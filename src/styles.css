@@ -17,31 +17,31 @@
 /* ── Light tokens (default) ───────────────── */
 :root {
   /* Surfaces */
-  --c-bg:            #ffffff;
-  --c-surface:       #f8fafc;
-  --c-surface-alt:   #eef2f7;
-  --c-border:        #e2e8f0;
+  --c-bg: #ffffff;
+  --c-surface: #f8fafc;
+  --c-surface-alt: #eef2f7;
+  --c-border: #e2e8f0;
   --c-border-strong: #94a3b8;
 
   /* Ink (text) */
-  --c-ink:   #0f172a;
+  --c-ink: #0f172a;
   --c-ink-2: #475569;
   --c-ink-3: #94a3b8;
 
   /* Accent — swap for your brand */
-  --c-accent:    #2563eb;
+  --c-accent: #2563eb;
   --c-accent-lt: #dbeafe;
   --c-accent-dk: #1d4ed8;
 
   /* Semantics */
   --c-success: #16a34a;
-  --c-warn:    #d97706;
-  --c-danger:  #dc2626;
+  --c-warn: #d97706;
+  --c-danger: #dc2626;
 
   /* Radii */
-  --r-sm:   6px;
-  --r-md:   10px;
-  --r-lg:   16px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
   --r-pill: 999px;
 
   /* Shadows — only for interactive elevation */
@@ -50,15 +50,15 @@
   --sh-md: 0 6px 20px rgba(15, 23, 42, 0.09), 0 2px 6px rgba(15, 23, 42, 0.05);
 
   /* Fonts */
-  --f-sans:  system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --f-mono:  ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --f-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   /* Type scale — 5 stops only */
-  --t-display:   clamp(2.2rem, 5vw, 3.4rem);
-  --t-section:   1.35rem;
-  --t-body:      1rem;
+  --t-display: clamp(2.2rem, 5vw, 3.4rem);
+  --t-section: 1.35rem;
+  --t-body: 1rem;
   --t-secondary: 0.875rem;
-  --t-meta:      0.75rem;
+  --t-meta: 0.75rem;
 
   /* Layout */
   --max-w: 1060px;
@@ -67,23 +67,23 @@
 
 /* ── Dark tokens — applied when explicitly forced ── */
 :root[data-theme='dark'] {
-  --c-bg:            #0f172a;
-  --c-surface:       #1e293b;
-  --c-surface-alt:   #273449;
-  --c-border:        #334155;
+  --c-bg: #0f172a;
+  --c-surface: #1e293b;
+  --c-surface-alt: #273449;
+  --c-border: #334155;
   --c-border-strong: #64748b;
 
-  --c-ink:   #f1f5f9;
+  --c-ink: #f1f5f9;
   --c-ink-2: #cbd5e1;
   --c-ink-3: #94a3b8;
 
-  --c-accent:    #60a5fa;
+  --c-accent: #60a5fa;
   --c-accent-lt: #1e3a8a;
   --c-accent-dk: #93c5fd;
 
   --c-success: #4ade80;
-  --c-warn:    #fbbf24;
-  --c-danger:  #f87171;
+  --c-warn: #fbbf24;
+  --c-danger: #f87171;
 
   --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
   --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
@@ -93,23 +93,23 @@
 /* ── Dark tokens — follow OS when data-theme is unset or "auto" ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --c-bg:            #0f172a;
-    --c-surface:       #1e293b;
-    --c-surface-alt:   #273449;
-    --c-border:        #334155;
+    --c-bg: #0f172a;
+    --c-surface: #1e293b;
+    --c-surface-alt: #273449;
+    --c-border: #334155;
     --c-border-strong: #64748b;
 
-    --c-ink:   #f1f5f9;
+    --c-ink: #f1f5f9;
     --c-ink-2: #cbd5e1;
     --c-ink-3: #94a3b8;
 
-    --c-accent:    #60a5fa;
+    --c-accent: #60a5fa;
     --c-accent-lt: #1e3a8a;
     --c-accent-dk: #93c5fd;
 
     --c-success: #4ade80;
-    --c-warn:    #fbbf24;
-    --c-danger:  #f87171;
+    --c-warn: #fbbf24;
+    --c-danger: #f87171;
 
     --sh-xs: 0 1px 3px rgba(0, 0, 0, 0.25);
     --sh-sm: 0 2px 8px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.18);
@@ -137,7 +137,9 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 /* ── Inputs ────────────────────────────────── */
@@ -153,7 +155,9 @@ textarea {
   color: var(--c-ink);
   background: var(--c-surface);
   outline: none;
-  transition: border-color 150ms, box-shadow 150ms;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
   appearance: none;
   -webkit-appearance: none;
 }
@@ -186,7 +190,9 @@ button {
   cursor: pointer;
   background: var(--c-accent);
   color: #fff;
-  transition: background 150ms, box-shadow 150ms;
+  transition:
+    background 150ms,
+    box-shadow 150ms;
 }
 
 button:hover {

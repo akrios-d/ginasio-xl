@@ -23,7 +23,9 @@
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
   padding: 20px 22px;
-  transition: border-color 150ms, box-shadow 150ms;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
 }
 
 .feature-card:hover {
