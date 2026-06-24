@@ -1,6 +1,10 @@
 /**
  * Session helpers — bridges Vercel Node-style req/res to Auth.js Web Request/Response,
  * plus a `requireSession()` guard used by /api/* handlers that need authentication.
+ *
+ * Dev bypass: when DEV_BYPASS_TOKEN is set in env, requests carrying matching
+ * X-Dev-Token and X-Dev-User-Id headers skip the real session check.
+ * Only use this for local development; never set DEV_BYPASS_TOKEN in production.
  */
 import { AUTH_DB_NAME, clientPromise } from './auth.config.js';
 
@@ -69,8 +73,25 @@ function parseCookies(header: string): Record<string, string> {
 /**
  * Reads the Auth.js database session from the request cookie.
  * Returns the authenticated userId, or sends 401 + returns null.
+ *
+ * Dev bypass: if DEV_BYPASS_TOKEN env var is set and the request carries
+ * matching X-Dev-Token + X-Dev-User-Id headers, skip the DB session check.
  */
 export async function requireSession(req: any, res: any): Promise<string | null> {
+  // ── Dev bypass — never active in Vercel production ──────────────────────
+  // VERCEL_ENV is 'production' | 'preview' | 'development' (set by Vercel).
+  // Absent locally (ng serve / vercel dev), so the bypass is also allowed then.
+  const isVercelProd = process.env['VERCEL_ENV'] === 'production';
+  const bypassToken = process.env['DEV_BYPASS_TOKEN'];
+  if (!isVercelProd && bypassToken) {
+    const reqToken = req.headers['x-dev-token'] as string | undefined;
+    const reqUserId = req.headers['x-dev-user-id'] as string | undefined;
+    if (reqToken === bypassToken && reqUserId) {
+      return reqUserId;
+    }
+  }
+
+  // ── Normal session check ─────────────────────────────────────────────────
   const cookies = parseCookies(req.headers['cookie'] ?? '');
 
   // Auth.js writes either the plain or __Secure-prefixed cookie depending on host

@@ -15,12 +15,13 @@ import { ThemeService } from './core/theme/theme.service';
 import { UpdateService } from './core/update/update.service';
 import { AuthService } from './core/auth/auth.service';
 import { credentialsInterceptor } from './core/interceptors/credentials.interceptor';
+import { devAuthInterceptor } from './core/interceptors/dev-auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([credentialsInterceptor])),
+    provideHttpClient(withInterceptors([devAuthInterceptor, credentialsInterceptor])),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

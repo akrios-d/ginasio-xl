@@ -9,7 +9,7 @@ interface SessionUser {
 }
 
 const DEV_USER: SessionUser = {
-  id: 'dev-user',
+  id: environment.devUserId || 'dev-user',
   name: 'Dev User',
   email: 'dev@gymdesk.local',
   image: null,
@@ -20,7 +20,7 @@ const DEV_USER: SessionUser = {
  * Login/logout post forms with CSRF tokens because that's what Auth.js expects.
  *
  * When environment.devBypassAuth is true, skips the real session check
- * and injects a fake user — useful for local UI development without a backend.
+ * and injects a fake/real user — useful for local UI development without a backend.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -61,11 +61,6 @@ export class AuthService {
     return this.csrfPostForm('/api/auth/signout', { includeCallback: false });
   }
 
-  /**
-   * Auth.js sign-in/out endpoints require a POST with a CSRF token from /api/auth/csrf.
-   * We synthesise a hidden form, append it to the body, and submit — the browser
-   * follows the OAuth redirect chain and eventually lands back on `callbackUrl`.
-   */
   private async csrfPostForm(
     action: string,
     options: { includeCallback?: boolean } = {},

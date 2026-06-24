@@ -1,9 +1,11 @@
 <section class="container home">
+  <!-- ── Greeting ───────────────────────────────────────────── -->
   <div class="home-greeting">
     <h2 class="home-title">{{ greeting() }}</h2>
     <p class="home-sub">{{ i18n.t('home.sub') }}</p>
   </div>
 
+  <!-- ── Section cards ──────────────────────────────────────── -->
   <div class="section-grid">
     @for (s of sections; track s.key) {
       <a class="section-card" [routerLink]="s.route">
@@ -54,14 +56,222 @@
             }
           }
         </div>
-
         <div class="section-card-body">
           <h3>{{ i18n.t('home.' + s.key + '.title') }}</h3>
           <p>{{ i18n.t('home.' + s.key + '.desc') }}</p>
         </div>
-
         <span class="section-card-arrow" aria-hidden="true">→</span>
       </a>
+    }
+  </div>
+
+  <!-- ── Training log / Calendar ────────────────────────────── -->
+  <div class="cal-block">
+    <div class="cal-header">
+      <h3 class="cal-title">{{ i18n.t('home.checkin.title') }}</h3>
+      <div class="cal-nav">
+        <button
+          type="button"
+          class="cal-nav-btn"
+          (click)="prevMonth()"
+          [attr.aria-label]="i18n.t('common.prevMonth')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span class="cal-month-label">{{ monthLabel() }}</span>
+        <button
+          type="button"
+          class="cal-nav-btn"
+          (click)="nextMonth()"
+          [attr.aria-label]="i18n.t('common.nextMonth')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Day-of-week headers (Mon … Sun) -->
+    <div class="cal-grid">
+      @for (d of ['M', 'T', 'W', 'T', 'F', 'S', 'S']; track $index) {
+        <div class="cal-dow">{{ d }}</div>
+      }
+
+      @for (cell of calendarDays(); track $index) {
+        @if (cell.day === 0) {
+          <div class="cal-cell cal-cell--pad"></div>
+        } @else {
+          <button
+            type="button"
+            class="cal-cell"
+            [class.cal-cell--today]="cell.isToday"
+            [class.cal-cell--selected]="cell.isSelected"
+            [class.cal-cell--has-checkin]="cell.checkins.length > 0"
+            (click)="selectDay(cell)"
+          >
+            <span class="cal-day-num">{{ cell.day }}</span>
+            @if (cell.checkins.length > 0) {
+              <span class="cal-dots">
+                @for (c of cell.checkins.slice(0, 3); track c._id) {
+                  <span class="cal-dot" [title]="c.grupoLetra ?? ''">
+                    {{ c.grupoLetra ?? '✓' }}
+                  </span>
+                }
+              </span>
+            }
+          </button>
+        }
+      }
+    </div>
+
+    <!-- Selected day panel -->
+    @if (selectedDate()) {
+      <div class="day-panel">
+        <div class="day-panel-header">
+          <span class="day-panel-date">
+            {{ selectedDate()! | date: 'EEE, d MMM' }}
+          </span>
+          @if (!addingCheckin()) {
+            <button type="button" class="add-checkin-btn" (click)="startAdd()">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              {{ i18n.t('home.checkin.add') }}
+            </button>
+          }
+        </div>
+
+        <!-- Existing check-ins for this day -->
+        @if (selectedDayCheckins().length > 0) {
+          <ul class="checkin-list">
+            @for (c of selectedDayCheckins(); track c._id) {
+              <li class="checkin-item">
+                <div class="checkin-item-left">
+                  @if (c.grupoLetra) {
+                    <span class="checkin-group">{{ c.grupoLetra }}</span>
+                  }
+                  <div class="checkin-item-text">
+                    @if (programName(c.programaTreinoId)) {
+                      <span class="checkin-program">{{ programName(c.programaTreinoId) }}</span>
+                    }
+                    @if (c.notas) {
+                      <span class="checkin-notes">{{ c.notas }}</span>
+                    }
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="checkin-delete"
+                  (click)="removeCheckin(c._id!)"
+                  [attr.aria-label]="i18n.t('home.checkin.remove')"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else if (!addingCheckin()) {
+          <p class="day-empty">{{ i18n.t('home.checkin.empty') }}</p>
+        }
+
+        <!-- Add form -->
+        @if (addingCheckin()) {
+          <form class="checkin-form" (ngSubmit)="saveCheckin()">
+            <!-- Program picker — always shown; disabled with placeholder when still loading -->
+            <div class="form-group">
+              <label class="form-label">{{ i18n.t('home.checkin.program') }}</label>
+              <select
+                [(ngModel)]="form.programaTreinoId"
+                name="program"
+                (ngModelChange)="form.grupoLetra = ''"
+              >
+                <option value="">{{ i18n.t('home.checkin.noProgram') }}</option>
+                @for (p of programs(); track p._id) {
+                  <option [value]="p._id">
+                    {{ p.objetivos ?? p.ptNome ?? 'treino ' + ($index + 1) }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <!-- Group picker — shown only when the selected program has groups -->
+            @if (selectedProgramGroups().length > 0) {
+              <div class="form-group">
+                <label class="form-label">{{ i18n.t('home.checkin.group') }}</label>
+                <div class="group-chips">
+                  @for (g of selectedProgramGroups(); track g) {
+                    <button
+                      type="button"
+                      class="group-chip-btn"
+                      [class.group-chip-btn--active]="form.grupoLetra === g"
+                      (click)="form.grupoLetra = form.grupoLetra === g ? '' : g"
+                    >
+                      {{ g }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <div class="form-group">
+              <label class="form-label">{{ i18n.t('home.checkin.notes') }}</label>
+              <input
+                type="text"
+                [(ngModel)]="form.notas"
+                name="notas"
+                [placeholder]="i18n.t('home.checkin.notesPlaceholder')"
+              />
+            </div>
+            <div class="checkin-form-actions">
+              <button type="button" class="btn-ghost" (click)="cancelAdd()">
+                {{ i18n.t('home.checkin.cancel') }}
+              </button>
+              <button type="submit" [disabled]="savingCheckin()">
+                {{ savingCheckin() ? i18n.t('common.saving') : i18n.t('home.checkin.save') }}
+              </button>
+            </div>
+          </form>
+        }
+      </div>
     }
   </div>
 </section>
