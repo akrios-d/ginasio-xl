@@ -4,7 +4,6 @@
   "outputDirectory": "dist/ginasio-xl-app/browser",
   "routes": [
     { "src": "/api/auth/(.*)", "dest": "/api/auth" },
-    { "src": "/api/(.*)",      "dest": "/api/$1"   },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/" }
   ]
