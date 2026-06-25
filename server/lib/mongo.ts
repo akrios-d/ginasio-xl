@@ -42,8 +42,8 @@ export function toObjectId(id: string): ObjectId {
   return new ObjectId(id);
 }
 
-/** Converts Mongo's `_id` to a string `id` while preserving the rest of the document. */
+/** Converts Mongo's `_id` ObjectId to a plain string `_id` while preserving the rest of the document. */
 export function mapDocumentId<T extends Record<string, any>>(document: T) {
   const { _id, ...rest } = document;
-  return { id: _id.toString(), ...rest };
+  return { _id: _id.toString(), ...rest };
 }
