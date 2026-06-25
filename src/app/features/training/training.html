@@ -252,8 +252,9 @@
 
     <div class="sheet-top">
       <div class="form-group">
-        <label class="form-label">{{ i18n.t('treino.criar.objetivo') }}</label>
+        <label class="form-label" for="objetivos">{{ i18n.t('treino.criar.objetivo') }}</label>
         <input
+          id="objetivos"
           type="text"
           [(ngModel)]="form.objetivos"
           name="objetivos"
@@ -387,11 +388,14 @@
               />
               <div class="ex-num-row">
                 <div class="ex-num-group">
-                  <label class="ex-num-label">{{ i18n.t('treino.machine') }} #</label>
+                  <label class="ex-num-label" [for]="'m-' + g.letra + '-' + ei"
+                    >{{ i18n.t('treino.machine') }} #</label
+                  >
                   <input
                     type="number"
                     [(ngModel)]="ex.numeroMaquina"
                     [name]="'m-' + g.letra + '-' + ei"
+                    [id]="'m-' + g.letra + '-' + ei"
                     class="ex-num-input ex-machine-input"
                     min="1"
                     max="999"
@@ -400,11 +404,14 @@
                 </div>
                 <span class="ex-sep"></span>
                 <div class="ex-num-group">
-                  <label class="ex-num-label">{{ i18n.t('treino.criar.series') }}</label>
+                  <label class="ex-num-label" [for]="'s-' + g.letra + '-' + ei">{{
+                    i18n.t('treino.criar.series')
+                  }}</label>
                   <input
                     type="number"
                     [(ngModel)]="ex.series"
                     [name]="'s-' + g.letra + '-' + ei"
+                    [id]="'s-' + g.letra + '-' + ei"
                     class="ex-num-input"
                     min="1"
                     max="99"
@@ -412,11 +419,14 @@
                 </div>
                 <span class="ex-sep">×</span>
                 <div class="ex-num-group">
-                  <label class="ex-num-label">{{ i18n.t('treino.criar.repeticoes') }}</label>
+                  <label class="ex-num-label" [for]="'r-' + g.letra + '-' + ei">{{
+                    i18n.t('treino.criar.repeticoes')
+                  }}</label>
                   <input
                     type="number"
                     [(ngModel)]="ex.repeticoes"
                     [name]="'r-' + g.letra + '-' + ei"
+                    [id]="'r-' + g.letra + '-' + ei"
                     class="ex-num-input"
                     min="1"
                     max="999"
@@ -450,8 +460,9 @@
 
     <div class="sheet-bottom">
       <div class="form-group">
-        <label class="form-label">{{ i18n.t('treino.criar.notas') }}</label>
+        <label class="form-label" for="observacoes">{{ i18n.t('treino.criar.notas') }}</label>
         <textarea
+          id="observacoes"
           [(ngModel)]="form.observacoes"
           name="observacoes"
           rows="2"

@@ -56,7 +56,10 @@ export const CreateAvaliacaoSchema = z.object({
 // PUT /api/avaliacao/[id]
 // ---------------------------------------------------------------------------
 
-export const UpdateAvaliacaoSchema = CreateAvaliacaoSchema.partial().omit({ alunoId: true });
+export const UpdateAvaliacaoSchema = CreateAvaliacaoSchema.omit({
+  alunoId: true,
+  avaliacoes: true,
+}).partial();
 
 // ---------------------------------------------------------------------------
 // POST /api/avaliacao/[id]/entrada  — adicionar uma nova medição

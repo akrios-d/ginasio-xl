@@ -122,7 +122,7 @@ export class HomePage {
     this.loadMonth();
     this.treinoSvc.list().subscribe({
       next: (list) => this.programs.set(list.filter((p) => p.ativo)),
-      error: () => {},
+      error: () => undefined,
     });
   }
 
@@ -175,7 +175,6 @@ export class HomePage {
 
   // ── Check-in CRUD ─────────────────────────────────────────────────────────
   protected startAdd(): void {
-    const sel = this.selectedDate() ?? new Date();
     this.form = this.emptyForm();
     this.form.programaTreinoId = this.programs()[0]?._id ?? '';
     this.form.grupoLetra = '';
@@ -230,7 +229,7 @@ export class HomePage {
     this.pendingDeleteId.set(null);
     this.checkinSvc.delete(id).subscribe({
       next: () => this.checkins.update((list) => list.filter((c) => c._id !== id)),
-      error: () => {},
+      error: () => undefined,
     });
   }
 

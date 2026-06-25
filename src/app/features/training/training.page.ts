@@ -219,7 +219,14 @@ export class TrainingPage {
     };
 
     const req = (
-      existing ? this.svc.update(existing._id!, payload as any) : this.svc.create(payload as any)
+      existing
+        ? this.svc.update(existing._id!, payload as Partial<ProgramaTreino>)
+        : this.svc.create(
+            payload as Omit<
+              ProgramaTreino,
+              '_id' | 'criadoPorId' | 'ativo' | 'createdAt' | 'updatedAt'
+            >,
+          )
     ) as import('rxjs').Observable<unknown>;
 
     req.subscribe({

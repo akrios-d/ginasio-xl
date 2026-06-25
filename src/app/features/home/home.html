@@ -252,8 +252,9 @@
     <form class="sheet-body" (ngSubmit)="saveCheckin()">
       <!-- Program picker -->
       <div class="form-group">
-        <label class="form-label">{{ i18n.t('home.checkin.program') }}</label>
+        <label class="form-label" for="program">{{ i18n.t('home.checkin.program') }}</label>
         <select
+          id="program"
           [(ngModel)]="form.programaTreinoId"
           name="program"
           (ngModelChange)="form.grupoLetra = ''"
@@ -270,7 +271,7 @@
       <!-- Group chips — only when selected program has groups -->
       @if (selectedProgramGroups().length > 0) {
         <div class="form-group">
-          <label class="form-label">{{ i18n.t('home.checkin.group') }}</label>
+          <span class="form-label">{{ i18n.t('home.checkin.group') }}</span>
           <div class="group-chips">
             @for (g of selectedProgramGroups(); track g) {
               <button
@@ -287,8 +288,9 @@
       }
 
       <div class="form-group">
-        <label class="form-label">{{ i18n.t('home.checkin.notes') }}</label>
+        <label class="form-label" for="notas">{{ i18n.t('home.checkin.notes') }}</label>
         <input
+          id="notas"
           type="text"
           [(ngModel)]="form.notas"
           name="notas"
