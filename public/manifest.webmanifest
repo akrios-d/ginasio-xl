@@ -1,7 +1,7 @@
 {
-  "name": "Ginásio XL",
-  "short_name": "Ginásio XL",
-  "description": "Ginásio XL — Angular + Vercel skeleton",
+  "name": "GymDesk",
+  "short_name": "GymDesk",
+  "description": "GymDesk",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
