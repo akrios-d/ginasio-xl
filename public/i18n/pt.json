@@ -24,6 +24,8 @@
   "home.checkin.add": "Registar treino",
   "home.checkin.empty": "Nenhum treino registado neste dia.",
   "home.checkin.remove": "Remover registo",
+  "home.checkin.confirmRemoveTitle": "Remover treino?",
+  "home.checkin.confirmRemoveMsg": "Este registo de treino será removido permanentemente.",
   "home.checkin.program": "Programa",
   "home.checkin.noProgram": "Sem programa",
   "home.checkin.group": "Grupo",

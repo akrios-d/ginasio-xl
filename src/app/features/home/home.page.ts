@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { CheckinService } from '../../core/services/checkin.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
+import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 import type { Checkin } from '../../core/models/checkin.model';
 import type { ProgramaTreino } from '../../core/models';
 
@@ -26,7 +27,7 @@ interface CheckinForm {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, ConfirmDialog],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -63,6 +64,7 @@ export class HomePage {
   // Add-checkin form
   protected readonly addingCheckin = signal(false);
   protected readonly savingCheckin = signal(false);
+  protected readonly pendingDeleteId = signal<string | null>(null);
   protected form: CheckinForm = this.emptyForm();
 
   // ── Calendar computed ─────────────────────────────────────────────────────
@@ -201,7 +203,18 @@ export class HomePage {
       });
   }
 
-  protected removeCheckin(id: string): void {
+  protected confirmRemove(id: string): void {
+    this.pendingDeleteId.set(id);
+  }
+
+  protected cancelRemove(): void {
+    this.pendingDeleteId.set(null);
+  }
+
+  protected removeCheckin(): void {
+    const id = this.pendingDeleteId();
+    if (!id) return;
+    this.pendingDeleteId.set(null);
     this.checkinSvc.delete(id).subscribe({
       next: () => this.checkins.update((list) => list.filter((c) => c._id !== id)),
       error: () => {},

@@ -187,7 +187,7 @@
                 <button
                   type="button"
                   class="checkin-delete"
-                  (click)="removeCheckin(c._id!)"
+                  (click)="confirmRemove(c._id!)"
                   [attr.aria-label]="i18n.t('home.checkin.remove')"
                 >
                   <svg
@@ -301,4 +301,17 @@
       </div>
     </form>
   </div>
+}
+
+<!-- ── Confirm delete check-in ────────────────────── -->
+@if (pendingDeleteId()) {
+  <app-confirm-dialog
+    [title]="i18n.t('home.checkin.confirmRemoveTitle')"
+    [message]="i18n.t('home.checkin.confirmRemoveMsg')"
+    [confirmLabel]="i18n.t('home.checkin.remove')"
+    [cancelLabel]="i18n.t('home.checkin.cancel')"
+    [danger]="true"
+    (confirmed)="removeCheckin()"
+    (cancelled)="cancelRemove()"
+  />
 }

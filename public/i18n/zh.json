@@ -24,6 +24,8 @@
   "home.checkin.add": "记录训练",
   "home.checkin.empty": "本日暂无训练记录。",
   "home.checkin.remove": "删除记录",
+  "home.checkin.confirmRemoveTitle": "删除训练记录？",
+  "home.checkin.confirmRemoveMsg": "此训练日志将被永久删除。",
   "home.checkin.program": "计划",
   "home.checkin.noProgram": "无计划",
   "home.checkin.group": "组别",

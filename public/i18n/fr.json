@@ -24,6 +24,8 @@
   "home.checkin.add": "Enregistrer séance",
   "home.checkin.empty": "Aucune séance enregistrée ce jour.",
   "home.checkin.remove": "Supprimer",
+  "home.checkin.confirmRemoveTitle": "Supprimer la séance ?",
+  "home.checkin.confirmRemoveMsg": "Ce journal d'entraînement sera supprimé définitivement.",
   "home.checkin.program": "Programme",
   "home.checkin.noProgram": "Sans programme",
   "home.checkin.group": "Groupe",

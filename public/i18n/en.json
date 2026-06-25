@@ -24,6 +24,8 @@
   "home.checkin.add": "Log workout",
   "home.checkin.empty": "No workouts logged for this day.",
   "home.checkin.remove": "Remove check-in",
+  "home.checkin.confirmRemoveTitle": "Remove workout?",
+  "home.checkin.confirmRemoveMsg": "This workout log will be permanently removed.",
   "home.checkin.program": "Program",
   "home.checkin.noProgram": "No program",
   "home.checkin.group": "Group",
