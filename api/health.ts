@@ -11,7 +11,7 @@ import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection } from '../server/lib/mongo.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
-  setCors(res);
+  setCors(res, req);
 
   if (handleOptions(req, res)) return;
 

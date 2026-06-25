@@ -10,7 +10,7 @@ import { getCollection } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
-  setCors(res);
+  setCors(res, req);
   if (handleOptions(req, res)) return;
 
   if (req.method !== 'GET') {

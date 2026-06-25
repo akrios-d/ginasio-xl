@@ -1,6 +1,21 @@
 <section class="container page">
   <div class="page-header">
     <h2 class="page-title">{{ i18n.t('nav.treino') }}</h2>
+    <button type="button" class="btn-new" (click)="startCreate()">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      {{ i18n.t('treino.novo') }}
+    </button>
   </div>
 
   @if (loading()) {
@@ -42,6 +57,9 @@
         <path d="M12 18h24M12 30h24" />
       </svg>
       <p>{{ i18n.t('treino.empty') }}</p>
+      <button type="button" class="btn-new btn-new--empty" (click)="startCreate()">
+        {{ i18n.t('treino.novo') }}
+      </button>
     </div>
   } @else {
     <div class="card-list">
@@ -185,3 +203,169 @@
     </div>
   }
 </section>
+
+<!-- ── Create plan sheet / modal ─────────────────────── -->
+@if (creating()) {
+  <div class="sheet-backdrop" (click)="cancelCreate()" aria-hidden="true"></div>
+  <div class="plan-sheet" role="dialog" aria-modal="true">
+    <div class="sheet-handle" aria-hidden="true"></div>
+
+    <div class="sheet-header">
+      <h3 class="sheet-title">{{ i18n.t('treino.criar.titulo') }}</h3>
+      <button
+        type="button"
+        class="sheet-close"
+        (click)="cancelCreate()"
+        [attr.aria-label]="i18n.t('treino.criar.cancel')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="sheet-body">
+      <!-- Objetivo -->
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('treino.criar.objetivo') }}</label>
+        <input
+          type="text"
+          [(ngModel)]="form.objetivos"
+          name="objetivos"
+          [placeholder]="i18n.t('treino.criar.objetivoPlaceholder')"
+        />
+      </div>
+
+      <!-- Grupos dinâmicos -->
+      <div class="groups-section">
+        @for (g of form.grupos; track $index; let gi = $index) {
+          <div class="group-block">
+            <div class="group-block-header">
+              <span class="group-block-letter">{{ i18n.t('treino.group') }} {{ g.letra }}</span>
+              @if (form.grupos.length > 1) {
+                <button
+                  type="button"
+                  class="btn-remove-group"
+                  (click)="removeGrupo(gi)"
+                  [attr.aria-label]="i18n.t('treino.criar.removeGrupo')"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              }
+            </div>
+
+            <!-- Exercícios do grupo -->
+            @for (ex of g.exercicios; track $index; let ei = $index) {
+              <div class="exercise-row-form">
+                <input
+                  type="text"
+                  [(ngModel)]="ex.nome"
+                  [name]="'ex-' + gi + '-' + ei + '-nome'"
+                  [placeholder]="i18n.t('treino.criar.exercicioPlaceholder')"
+                  class="ex-name-input"
+                />
+                <div class="ex-num-row">
+                  <div class="ex-num-group">
+                    <label class="ex-num-label">{{ i18n.t('treino.criar.series') }}</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="ex.series"
+                      [name]="'ex-' + gi + '-' + ei + '-series'"
+                      class="ex-num-input"
+                      min="1"
+                      max="99"
+                    />
+                  </div>
+                  <span class="ex-sep">×</span>
+                  <div class="ex-num-group">
+                    <label class="ex-num-label">{{ i18n.t('treino.criar.repeticoes') }}</label>
+                    <input
+                      type="number"
+                      [(ngModel)]="ex.repeticoes"
+                      [name]="'ex-' + gi + '-' + ei + '-reps'"
+                      class="ex-num-input"
+                      min="1"
+                      max="999"
+                    />
+                  </div>
+                  @if (g.exercicios.length > 1) {
+                    <button
+                      type="button"
+                      class="btn-remove-ex"
+                      (click)="removeExercicio(g, ei)"
+                      [attr.aria-label]="i18n.t('treino.criar.removeExercicio')"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <button type="button" class="btn-add-ex" (click)="addExercicio(g)">
+              + {{ i18n.t('treino.criar.addExercicio') }}
+            </button>
+          </div>
+        }
+
+        <button type="button" class="btn-add-group" (click)="addGrupo()">
+          + {{ i18n.t('treino.criar.addGrupo') }}
+        </button>
+      </div>
+
+      <!-- Notas -->
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('treino.criar.notas') }}</label>
+        <textarea
+          [(ngModel)]="form.observacoes"
+          name="observacoes"
+          rows="2"
+          [placeholder]="i18n.t('treino.criar.notasPlaceholder')"
+        ></textarea>
+      </div>
+
+      <!-- Ações -->
+      <div class="sheet-actions">
+        <button type="button" class="btn-ghost" (click)="cancelCreate()">
+          {{ i18n.t('treino.criar.cancel') }}
+        </button>
+        <button type="button" [disabled]="saving()" (click)="save()">
+          {{ saving() ? i18n.t('common.saving') : i18n.t('treino.criar.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -316,6 +316,7 @@
 }
 
 /* ── Desktop tweaks ────────────────────────────── */
+/* ── Desktop tweaks ────────────────────────────── */
 @media (min-width: 600px) {
   .ficha-header {
     padding: 20px 24px;
@@ -323,12 +324,205 @@
   .ficha-body {
     padding: 0 24px 24px;
   }
-
   .entry-form-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-
   .entry-form-grid .form-group:first-child {
-    grid-column: 1;
+    grid-column: span 1;
   }
+}
+
+/* ── New button ──────────────────────────────────── */
+.btn-new {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  min-height: unset;
+  background: var(--c-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms;
+  white-space: nowrap;
+}
+.btn-new svg {
+  width: 14px;
+  height: 14px;
+}
+.btn-new:hover {
+  background: var(--c-accent-dk);
+  box-shadow: none;
+}
+.btn-new--empty {
+  margin-top: 16px;
+}
+
+/* ── Create sheet ────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  animation: fadeIn 200ms ease;
+}
+
+.ficha-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 201;
+  background: var(--c-surface);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.18);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (min-width: 600px) {
+  .ficha-sheet {
+    bottom: auto;
+    left: 50%;
+    top: 50%;
+    right: auto;
+    width: min(460px, 94vw);
+    border-radius: var(--r-lg);
+    transform: translate(-50%, -50%);
+    animation: scaleIn 200ms ease;
+    max-height: 85vh;
+  }
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--c-border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+@media (min-width: 600px) {
+  .sheet-handle {
+    display: none;
+  }
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 4px;
+}
+
+.sheet-title {
+  margin: 0;
+  font-size: var(--t-body);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.sheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  min-height: unset;
+  background: var(--c-surface-alt);
+  border: none;
+  border-radius: 50%;
+  color: var(--c-ink-2);
+  cursor: pointer;
+  transition:
+    background 120ms,
+    color 120ms;
+}
+.sheet-close svg {
+  width: 16px;
+  height: 16px;
+}
+.sheet-close:hover {
+  background: var(--c-border);
+  color: var(--c-ink);
+  box-shadow: none;
+}
+
+.sheet-body {
+  padding: 12px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+.sheet-actions button {
+  flex: 1;
+}
+
+/* ── Objetivo options ────────────────────────────── */
+.objetivo-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.objetivo-btn {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--c-surface-alt);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  cursor: pointer;
+  min-height: unset;
+  transition:
+    border-color 120ms,
+    background 120ms;
+}
+.objetivo-btn:hover {
+  border-color: var(--c-accent);
+  box-shadow: none;
+}
+.objetivo-btn--active {
+  border-color: var(--c-accent);
+  background: var(--c-accent-lt);
+  color: var(--c-accent);
+  font-weight: 600;
 }

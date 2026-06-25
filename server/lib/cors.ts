@@ -1,27 +1,23 @@
 /**
  * CORS + security headers for Vercel Serverless Functions.
  *
- * Call `setCors(res, { origin: 'https://yourdomain.com' })` at the top of each handler.
- * In production, prefer an explicit origin over '*' so credentialled requests work.
+ * Call `setCors(res, req)` at the top of each handler.
+ * The request Origin is echoed back so credentialled requests work from any
+ * allowed client (local dev on localhost:4200, Vercel preview URLs, etc.).
+ * Session auth provides the real access control.
  */
-interface CorsOptions {
-  origin?: string;
-  methods?: string[];
-  headers?: string[];
-}
-
-export function setCors(res: any, options?: CorsOptions): void {
-  const {
-    origin = '*',
-    methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    headers = ['Content-Type'],
-  } = options || {};
+export function setCors(res: any, req?: any): void {
+  const origin = req?.headers?.origin ?? '*';
 
   res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Methods', methods.join(','));
-  res.setHeader('Access-Control-Allow-Headers', headers.join(','));
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type,Authorization,X-Dev-Token,X-Dev-User-Id',
+  );
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // Security headers — cheap defence in depth.
+  // Security headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');

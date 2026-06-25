@@ -7,7 +7,7 @@ import { requireSession } from '../../server/lib/session.js';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req: any, res: any): Promise<void> {
-  setCors(res);
+  setCors(res, req);
   if (handleOptions(req, res)) return;
 
   const userId = await requireSession(req, res);

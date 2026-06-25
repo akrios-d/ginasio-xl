@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AvaliacaoService } from '../../core/services/avaliacao.service';
-import type { FichaAvaliacao, EntradaAvaliacao } from '../../core/models';
+import { AuthService } from '../../core/auth/auth.service';
+import type { FichaAvaliacao, EntradaAvaliacao, ObjetivoTreino } from '../../core/models';
 
 interface EntryForm {
   data: string;
@@ -12,6 +13,19 @@ interface EntryForm {
   percentualMassaGorda: string;
   percentualMassaMagra: string;
 }
+
+interface FichaForm {
+  objetivo: ObjetivoTreino;
+  outrosObjetivos: string;
+}
+
+const OBJETIVOS: ObjetivoTreino[] = [
+  'Hipertrofia',
+  'Perda Massa Gorda',
+  'Reabilitação / Corretivo',
+  'Performance',
+  'Saúde e Bem-Estar',
+];
 
 @Component({
   selector: 'app-assessment',
@@ -23,6 +37,7 @@ interface EntryForm {
 export class AssessmentPage {
   protected readonly i18n = inject(I18nService);
   private readonly svc = inject(AvaliacaoService);
+  private readonly auth = inject(AuthService);
 
   protected readonly fichas = signal<FichaAvaliacao[]>([]);
   protected readonly loading = signal(true);
@@ -31,10 +46,17 @@ export class AssessmentPage {
   protected readonly addingEntryFor = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly savedId = signal<string | null>(null);
+  protected readonly creatingFicha = signal(false);
 
-  protected entryForm: EntryForm = this.emptyForm();
+  protected readonly objetivos = OBJETIVOS;
+  protected entryForm: EntryForm = this.emptyEntryForm();
+  protected fichaForm: FichaForm = this.emptyFichaForm();
 
   constructor() {
+    this.loadFichas();
+  }
+
+  private loadFichas(): void {
     this.svc.list().subscribe({
       next: (list) => {
         this.fichas.set(list);
@@ -52,8 +74,45 @@ export class AssessmentPage {
     if (this.addingEntryFor() === id) this.addingEntryFor.set(null);
   }
 
+  // ── Create ficha ──────────────────────────────────────────────────────────
+
+  protected startCreateFicha(): void {
+    this.fichaForm = this.emptyFichaForm();
+    this.creatingFicha.set(true);
+  }
+
+  protected cancelCreateFicha(): void {
+    this.creatingFicha.set(false);
+  }
+
+  protected saveFicha(): void {
+    if (this.saving()) return;
+    const userId = this.auth.userId();
+    if (!userId) return;
+
+    this.saving.set(true);
+    const payload = {
+      alunoId: userId,
+      objetivo: this.fichaForm.objetivo,
+      outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+      avaliacoes: [],
+    };
+
+    this.svc.create(payload).subscribe({
+      next: () => {
+        this.creatingFicha.set(false);
+        this.saving.set(false);
+        this.loading.set(true);
+        this.loadFichas();
+      },
+      error: () => this.saving.set(false),
+    });
+  }
+
+  // ── Add entry ─────────────────────────────────────────────────────────────
+
   protected startAddEntry(id: string): void {
-    this.entryForm = this.emptyForm();
+    this.entryForm = this.emptyEntryForm();
     this.addingEntryFor.set(id);
     if (this.expandedId() !== id) this.expandedId.set(id);
   }
@@ -80,7 +139,6 @@ export class AssessmentPage {
 
     this.svc.addEntrada(fichaId, entrada).subscribe({
       next: () => {
-        // Optimistically update local state
         this.fichas.update((list) =>
           list.map((f) =>
             f._id === fichaId ? { ...f, avaliacoes: [...f.avaliacoes, entrada] } : f,
@@ -100,7 +158,7 @@ export class AssessmentPage {
     return ficha.avaliacoes[ficha.avaliacoes.length - 1];
   }
 
-  private emptyForm(): EntryForm {
+  private emptyEntryForm(): EntryForm {
     return {
       data: new Date().toISOString().slice(0, 10),
       peso: '',
@@ -108,5 +166,9 @@ export class AssessmentPage {
       percentualMassaGorda: '',
       percentualMassaMagra: '',
     };
+  }
+
+  private emptyFichaForm(): FichaForm {
+    return { objetivo: 'Saúde e Bem-Estar', outrosObjetivos: '' };
   }
 }

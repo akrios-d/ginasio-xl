@@ -1,6 +1,21 @@
 <section class="container page">
   <div class="page-header">
     <h2 class="page-title">{{ i18n.t('nav.avaliacao') }}</h2>
+    <button type="button" class="btn-new" (click)="startCreateFicha()">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      {{ i18n.t('avaliacao.nova') }}
+    </button>
   </div>
 
   @if (loading()) {
@@ -41,6 +56,9 @@
         <path d="m14 32 8-8 8 8 8-8" />
       </svg>
       <p>{{ i18n.t('avaliacao.empty') }}</p>
+      <button type="button" class="btn-new btn-new--empty" (click)="startCreateFicha()">
+        {{ i18n.t('avaliacao.nova') }}
+      </button>
     </div>
   } @else {
     <div class="card-list">
@@ -227,3 +245,67 @@
     </div>
   }
 </section>
+
+<!-- ── Create ficha sheet ──────────────────────── -->
+@if (creatingFicha()) {
+  <div class="sheet-backdrop" (click)="cancelCreateFicha()" aria-hidden="true"></div>
+  <div class="ficha-sheet" role="dialog" aria-modal="true">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-title">{{ i18n.t('avaliacao.criar.titulo') }}</h3>
+      <button
+        type="button"
+        class="sheet-close"
+        (click)="cancelCreateFicha()"
+        [attr.aria-label]="i18n.t('avaliacao.criar.cancel')"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('avaliacao.criar.objetivo') }}</label>
+        <div class="objetivo-options">
+          @for (obj of objetivos; track obj) {
+            <button
+              type="button"
+              class="objetivo-btn"
+              [class.objetivo-btn--active]="fichaForm.objetivo === obj"
+              (click)="fichaForm.objetivo = obj"
+            >
+              {{ obj }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('avaliacao.criar.outros') }}</label>
+        <input
+          type="text"
+          [(ngModel)]="fichaForm.outrosObjetivos"
+          name="outrosObjetivos"
+          [placeholder]="i18n.t('avaliacao.criar.outrosPlaceholder')"
+        />
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="btn-ghost" (click)="cancelCreateFicha()">
+          {{ i18n.t('avaliacao.criar.cancel') }}
+        </button>
+        <button type="button" [disabled]="saving()" (click)="saveFicha()">
+          {{ saving() ? i18n.t('common.saving') : i18n.t('avaliacao.criar.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
