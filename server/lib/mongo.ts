@@ -9,7 +9,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import { attachDatabasePool } from '@vercel/functions';
 
 const uri = process.env['MONGODB_URI'];
-const dbName = process.env['MONGODB_DB_NAME'] || 'ginasio-xl';
+const dbName = process.env['MONGODB_DB_NAME'] || 'gymdesk';
 
 if (!uri) {
   throw new Error('MONGODB_URI is not defined — set it in .env.local or Vercel env settings');
