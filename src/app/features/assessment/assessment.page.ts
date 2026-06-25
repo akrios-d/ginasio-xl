@@ -59,6 +59,7 @@ export class AssessmentPage {
   protected readonly saving = signal(false);
   protected readonly savedId = signal<string | null>(null);
   protected readonly creatingFicha = signal(false);
+  protected readonly editingFicha = signal<FichaAvaliacao | null>(null);
 
   protected readonly objetivos = OBJETIVOS;
   protected entryForm: EntryForm = this.emptyEntryForm();
@@ -99,6 +100,12 @@ export class AssessmentPage {
 
   protected cancelCreateFicha(): void {
     this.creatingFicha.set(false);
+    this.editingFicha.set(null);
+  }
+
+  protected startEditFicha(f: FichaAvaliacao): void {
+    this.fichaForm = { objetivo: f.objetivo, outrosObjetivos: f.outrosObjetivos ?? '' };
+    this.editingFicha.set(f);
   }
 
   protected saveFicha(): void {
@@ -106,22 +113,28 @@ export class AssessmentPage {
     const userId = this.auth.userId();
     if (!userId) return;
     this.saving.set(true);
-    this.svc
-      .create({
-        alunoId: userId,
-        objetivo: this.fichaForm.objetivo,
-        outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
-        avaliacoes: [],
-      })
-      .subscribe({
-        next: () => {
-          this.creatingFicha.set(false);
-          this.saving.set(false);
-          this.loading.set(true);
-          this.loadFichas();
-        },
-        error: () => this.saving.set(false),
-      });
+    const existing = this.editingFicha();
+    const req = existing
+      ? (this.svc.update(existing._id!, {
+          objetivo: this.fichaForm.objetivo,
+          outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+        }) as import('rxjs').Observable<unknown>)
+      : (this.svc.create({
+          alunoId: userId,
+          objetivo: this.fichaForm.objetivo,
+          outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+          avaliacoes: [],
+        }) as import('rxjs').Observable<unknown>);
+    req.subscribe({
+      next: () => {
+        this.creatingFicha.set(false);
+        this.editingFicha.set(null);
+        this.saving.set(false);
+        this.loading.set(true);
+        this.loadFichas();
+      },
+      error: () => this.saving.set(false),
+    });
   }
 
   // ── Add entry ─────────────────────────────────────────────────────────────

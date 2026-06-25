@@ -104,6 +104,8 @@
   "treino.criar.velocidadePlaceholder": "速度（如：90-120）",
   "treino.criar.cancel": "取消",
   "treino.criar.save": "保存",
+  "avaliacao.editar": "编辑",
+  "avaliacao.editar.titulo": "编辑评估表",
   "avaliacao.criar.titulo": "新评估表",
   "avaliacao.criar.objetivo": "目标",
   "avaliacao.criar.outros": "其他目标",

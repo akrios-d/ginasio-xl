@@ -526,7 +526,7 @@
   color: var(--c-accent);
   font-weight: 600;
 }
-                                                                                                                                                                                                                      .ficha-outros {
+.ficha-outros {
   margin: 12px 0 0;
   font-size: var(--t-secondary);
   color: var(--c-ink-2);
@@ -547,5 +547,45 @@
 }
 .btn-add-entry:hover {
   text-decoration: underline;
+  box-shadow: none;
+}
+
+/* ── Card actions ──────────────────────────────── */
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-border);
+}
+
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  min-height: unset;
+  font-size: var(--t-meta);
+  font-weight: 600;
+  background: transparent;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-ink-2);
+  cursor: pointer;
+  transition:
+    color 120ms,
+    border-color 120ms,
+    background 120ms;
+}
+.btn-edit svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.btn-edit:hover {
+  color: var(--c-accent);
+  border-color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
   box-shadow: none;
 }

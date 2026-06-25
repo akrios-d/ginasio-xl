@@ -104,6 +104,8 @@
   "treino.criar.velocidadePlaceholder": "Vitesse (ex : 90-120)",
   "treino.criar.cancel": "Annuler",
   "treino.criar.save": "Enregistrer",
+  "avaliacao.editar": "Modifier",
+  "avaliacao.editar.titulo": "Modifier la fiche d'évaluation",
   "avaliacao.criar.titulo": "Nouvelle fiche d'évaluation",
   "avaliacao.criar.objetivo": "Objectif",
   "avaliacao.criar.outros": "Autres objectifs",
