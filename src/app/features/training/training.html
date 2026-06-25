@@ -1,21 +1,36 @@
 <section class="container page">
   <div class="page-header">
-    <h2 class="page-title">{{ i18n.t('nav.treino') }}</h2>
-    <button type="button" class="btn-new" (click)="startCreate()">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
+    <h2 class="page-title">
+      {{ i18n.t('nav.treino') }}
+      @if (ptMode()) {
+        <span class="pt-mode-badge">PT</span>
+      }
+    </h2>
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-pt-toggle"
+        [class.btn-pt-toggle--active]="ptMode()"
+        (click)="togglePtMode()"
       >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      {{ i18n.t('treino.novo') }}
-    </button>
+        {{ ptMode() ? i18n.t('treino.modoPt.desativar') : i18n.t('treino.modoPt.ativar') }}
+      </button>
+      <button type="button" class="btn-new" (click)="startCreate()">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        {{ i18n.t('treino.novo') }}
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
@@ -210,6 +225,14 @@
                   </svg>
                   {{ i18n.t('treino.editar') }}
                 </button>
+                <button
+                  type="button"
+                  class="btn-toggle-active"
+                  [class.btn-toggle-active--off]="p.ativo"
+                  (click)="toggleActive(p)"
+                >
+                  {{ p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar') }}
+                </button>
               </div>
             </div>
           }
@@ -251,6 +274,19 @@
     </div>
 
     <div class="sheet-top">
+      @if (ptMode()) {
+        <div class="form-group">
+          <label class="form-label" for="alunoId">{{ i18n.t('treino.alunoId') }}</label>
+          <input
+            id="alunoId"
+            type="text"
+            [(ngModel)]="form.alunoId"
+            name="alunoId"
+            [placeholder]="i18n.t('treino.alunoIdPlaceholder')"
+            class="aluno-id-input"
+          />
+        </div>
+      }
       <div class="form-group">
         <label class="form-label" for="objetivos">{{ i18n.t('treino.criar.objetivo') }}</label>
         <input

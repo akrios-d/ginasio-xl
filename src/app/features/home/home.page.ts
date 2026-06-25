@@ -121,7 +121,7 @@ export class HomePage {
   constructor() {
     this.loadMonth();
     this.treinoSvc.list().subscribe({
-      next: (list) => this.programs.set(list.filter((p) => p.ativo)),
+      next: (list) => this.programs.set(list.filter((p) => p.ativo ?? true)),
       error: () => undefined,
     });
   }

@@ -27,6 +27,7 @@ interface GrupoForm {
 
 interface PlanForm {
   objetivos: string;
+  alunoId: string; // só usado em modo PT
   cardio: CardioForm[];
   grupos: GrupoForm[];
   observacoes: string;
@@ -60,6 +61,8 @@ export class TrainingPage {
   private readonly svc = inject(ProgramaTreinoService);
   private readonly auth = inject(AuthService);
 
+  private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
+
   protected readonly programs = signal<ProgramaTreino[]>([]);
   protected readonly loading = signal(true);
   protected readonly error = signal(false);
@@ -68,6 +71,9 @@ export class TrainingPage {
   protected readonly editing = signal<ProgramaTreino | null>(null);
   protected readonly saving = signal(false);
   protected readonly activeTab = signal<ActiveTab>(0);
+  protected readonly ptMode = signal<boolean>(
+    localStorage.getItem(TrainingPage.PT_MODE_KEY) === 'true',
+  );
 
   protected form: PlanForm = this.emptyForm();
 
@@ -75,8 +81,16 @@ export class TrainingPage {
     this.loadPrograms();
   }
 
+  protected togglePtMode(): void {
+    const next = !this.ptMode();
+    this.ptMode.set(next);
+    localStorage.setItem(TrainingPage.PT_MODE_KEY, String(next));
+    this.loading.set(true);
+    this.loadPrograms();
+  }
+
   private loadPrograms(): void {
-    this.svc.list().subscribe({
+    this.svc.list({ showAll: true, asPt: this.ptMode() }).subscribe({
       next: (list) => {
         this.programs.set([...list].sort((a, b) => (b.ativo ? 1 : 0) - (a.ativo ? 1 : 0)));
         this.loading.set(false);
@@ -85,6 +99,21 @@ export class TrainingPage {
         this.error.set(true);
         this.loading.set(false);
       },
+    });
+  }
+
+  protected toggleActive(p: ProgramaTreino): void {
+    if (!p._id) return;
+    const next = !p.ativo;
+    this.svc.update(p._id, { ativo: next }).subscribe({
+      next: () => {
+        this.programs.update((list) =>
+          [...list]
+            .map((x) => (x._id === p._id ? { ...x, ativo: next } : x))
+            .sort((a, b) => (b.ativo ? 1 : 0) - (a.ativo ? 1 : 0)),
+        );
+      },
+      error: () => undefined,
     });
   }
 
@@ -106,6 +135,7 @@ export class TrainingPage {
   protected startEdit(p: ProgramaTreino): void {
     this.form = {
       objetivos: p.objetivos ?? '',
+      alunoId: p.alunoId ?? '',
       observacoes: p.observacoes ?? '',
       cardio: p.faseInicial.exercicios.map((c) => ({
         equipamento: c.equipamento,
@@ -181,8 +211,9 @@ export class TrainingPage {
     this.saving.set(true);
 
     const existing = this.editing();
+    const targetId = this.ptMode() && this.form.alunoId.trim() ? this.form.alunoId.trim() : userId;
     const payload = {
-      alunoId: userId,
+      alunoId: targetId,
       data: existing ? existing.data : new Date(),
       objetivos: this.form.objetivos.trim() || undefined,
       observacoes: this.form.observacoes.trim() || undefined,
@@ -242,6 +273,6 @@ export class TrainingPage {
   }
 
   private emptyForm(): PlanForm {
-    return { objetivos: '', cardio: [], grupos: [emptyGrupo(0)], observacoes: '' };
+    return { objetivos: '', alunoId: '', cardio: [], grupos: [emptyGrupo(0)], observacoes: '' };
   }
 }

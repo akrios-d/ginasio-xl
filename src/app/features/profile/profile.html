@@ -43,5 +43,38 @@
         }
       </div>
     </form>
+
+    <!-- ── Modo Personal Trainer ── -->
+    <div class="pt-section">
+      <div class="pt-section-header">
+        <div>
+          <p class="pt-section-title">{{ i18n.t('perfil.ptMode') }}</p>
+          <p class="pt-section-desc">{{ i18n.t('perfil.ptModeDesc') }}</p>
+        </div>
+        <button
+          type="button"
+          class="pt-mode-toggle"
+          [class.pt-mode-toggle--on]="ptMode()"
+          (click)="togglePtMode()"
+        >
+          <span class="pt-mode-knob"></span>
+        </button>
+      </div>
+      <p class="pt-mode-status">
+        {{ ptMode() ? i18n.t('perfil.ptModeOn') : i18n.t('perfil.ptModeOff') }}
+      </p>
+    </div>
+
+    <!-- ── O meu ID ── -->
+    <div class="user-id-section">
+      <p class="user-id-label">{{ i18n.t('perfil.meuId') }}</p>
+      <p class="user-id-desc">{{ i18n.t('perfil.meuIdDesc') }}</p>
+      <div class="user-id-row">
+        <code class="user-id-value">{{ auth.userId() }}</code>
+        <button type="button" class="btn-copy" (click)="copyId()">
+          {{ idCopied() ? '✓' : i18n.t('perfil.copiar') }}
+        </button>
+      </div>
+    </div>
   }
 </section>

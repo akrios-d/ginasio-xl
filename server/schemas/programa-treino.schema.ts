@@ -60,14 +60,16 @@ export const CreateProgramaTreinoSchema = z.object({
 // PUT /api/programa-treino/[id]  (body — todos os campos opcionais)
 // ---------------------------------------------------------------------------
 
-export const UpdateProgramaTreinoSchema = CreateProgramaTreinoSchema.partial().omit({
-  alunoId: true,
-});
+export const UpdateProgramaTreinoSchema = CreateProgramaTreinoSchema.partial()
+  .omit({ alunoId: true })
+  .extend({ ativo: z.boolean().optional() });
 
 // ---------------------------------------------------------------------------
 // GET /api/programa-treino  (query params)
 // ---------------------------------------------------------------------------
 
 export const ListProgramaTreinoSchema = z.object({
-  alunoId: z.string().optional(), // professores podem filtrar por aluno
+  alunoId: z.string().optional(), // PT pode filtrar por aluno específico
+  asPt: z.coerce.boolean().optional(), // true → devolve programas criados pelo userId (visão PT)
+  showAll: z.coerce.boolean().optional(), // true → inclui programas inactivos
 });

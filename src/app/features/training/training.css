@@ -413,6 +413,89 @@
   }
 }
 
+/* ── Toggle active button ──────────────────────── */
+.btn-toggle-active {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-success, #22c55e);
+  border-radius: var(--r-pill);
+  color: var(--c-success, #22c55e);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    color 120ms;
+}
+.btn-toggle-active:hover {
+  background: var(--c-success, #22c55e);
+  color: #fff;
+  box-shadow: none;
+}
+.btn-toggle-active--off {
+  border-color: var(--c-ink-3, #94a3b8);
+  color: var(--c-ink-3, #94a3b8);
+}
+.btn-toggle-active--off:hover {
+  background: var(--c-ink-3, #94a3b8);
+  color: #fff;
+}
+
+/* ── PT mode badge & toggle ────────────────────── */
+.pt-mode-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--c-accent);
+  color: #fff;
+  border-radius: var(--r-pill);
+  font-size: var(--t-meta);
+  font-weight: 700;
+  vertical-align: middle;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn-pt-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 13px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-pill);
+  color: var(--c-ink-2);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 120ms,
+    color 120ms,
+    background 120ms;
+}
+.btn-pt-toggle--active {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 8%, transparent);
+}
+.btn-pt-toggle:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  box-shadow: none;
+}
+.aluno-id-input {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--t-meta);
+  letter-spacing: 0.03em;
+}
+
 /* ── New button ────────────────────────────────── */
 .btn-new {
   display: inline-flex;

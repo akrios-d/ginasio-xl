@@ -23,11 +23,17 @@ export default async function handler(req: any, res: any): Promise<void> {
   try {
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
-      const { alunoId } = ListProgramaTreinoSchema.parse(req.query);
+      const { alunoId, asPt, showAll } = ListProgramaTreinoSchema.parse(req.query);
 
-      // Por padrão devolve os programas do próprio utilizador;
-      // um professor pode passar ?alunoId=<outro id>
-      const filter = { alunoId: alunoId ?? userId, ativo: true };
+      // asPt=true  → visão personal trainer: lista programas criados por este utilizador
+      // alunoId    → filtra por aluno específico (combinável com asPt)
+      // showAll    → inclui programas inactivos
+      const filter: Record<string, unknown> = asPt
+        ? { criadoPorId: userId }
+        : { alunoId: alunoId ?? userId };
+
+      if (alunoId && asPt) filter.alunoId = alunoId;
+      if (!showAll) filter.ativo = true;
 
       const docs = await col.find(filter).sort({ data: -1 }).toArray();
       res.status(200).json(docs.map(mapDocumentId));

@@ -9,8 +9,15 @@ export class ProgramaTreinoService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/programa-treino`;
 
-  list(alunoId?: string): Observable<ProgramaTreino[]> {
-    const params: Record<string, string> | undefined = alunoId ? { alunoId } : undefined;
+  list(opts?: {
+    alunoId?: string;
+    asPt?: boolean;
+    showAll?: boolean;
+  }): Observable<ProgramaTreino[]> {
+    const params: Record<string, string> = {};
+    if (opts?.alunoId) params['alunoId'] = opts.alunoId;
+    if (opts?.asPt) params['asPt'] = 'true';
+    if (opts?.showAll) params['showAll'] = 'true';
     return this.http.get<ProgramaTreino[]>(this.base, { params, withCredentials: true });
   }
 
