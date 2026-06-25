@@ -66,7 +66,7 @@ export const FichaAvaliacaoSchema = z.object({
   _id: z.string().optional(),
   alunoId: z.string(), // userId do aluno (session.user.id)
   criadoPorId: z.string(), // userId de quem criou — pode ser o próprio aluno ou um professor
-  objetivo: ObjetivoTreinoSchema,
+  objetivo: ObjetivoTreinoSchema.optional(),
   outrosObjetivos: z.string().optional(), // ex: "Reduzir peso."
   metas: MetasAvaliacaoSchema.optional(),
   avaliacoes: z.array(EntradaAvaliacaoSchema).default([]),

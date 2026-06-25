@@ -6,13 +6,15 @@ import { z } from 'zod';
 
 export const CreateAvaliacaoSchema = z.object({
   alunoId: z.string().min(1),
-  objetivo: z.enum([
-    'Hipertrofia',
-    'Perda Massa Gorda',
-    'Reabilitação / Corretivo',
-    'Performance',
-    'Saúde e Bem-Estar',
-  ]),
+  objetivo: z
+    .enum([
+      'Hipertrofia',
+      'Perda Massa Gorda',
+      'Reabilitação / Corretivo',
+      'Performance',
+      'Saúde e Bem-Estar',
+    ])
+    .optional(),
   outrosObjetivos: z.string().optional(),
   metas: z
     .object({

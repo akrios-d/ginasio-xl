@@ -6,7 +6,25 @@ import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
+import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
 import { UpsertPerfilSchema } from '../server/schemas/perfil.schema.js';
+
+/** Reads the display name and email for a userId from Auth.js users collection. */
+async function getAuthUser(userId: string): Promise<{ name: string | null; email: string | null }> {
+  try {
+    const client = await clientPromise;
+    const user = await client
+      .db(AUTH_DB_NAME)
+      .collection('users')
+      .findOne({ _id: userId as unknown as import('mongodb').ObjectId });
+    return {
+      name: (user?.['name'] as string | null) ?? null,
+      email: (user?.['email'] as string | null) ?? null,
+    };
+  } catch {
+    return { name: null, email: null };
+  }
+}
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);
@@ -34,11 +52,20 @@ export default async function handler(req: any, res: any): Promise<void> {
       const body = UpsertPerfilSchema.parse(req.body);
       const now = new Date();
 
+      // Auto-populate nome from Google on first insert
+      const authUser = await getAuthUser(userId);
+
       await col.updateOne(
         { userId },
         {
           $set: { ...body, updatedAt: now },
-          $setOnInsert: { userId, role: 'aluno', createdAt: now },
+          $setOnInsert: {
+            userId,
+            role: 'aluno',
+            nome: authUser.name ?? authUser.email ?? userId,
+            email: authUser.email ?? '',
+            createdAt: now,
+          },
         },
         { upsert: true },
       );

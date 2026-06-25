@@ -80,49 +80,82 @@
     <div class="card-list">
       @for (p of programs(); track p._id) {
         <article class="program-card" [class.program-card--expanded]="expandedId() === p._id">
-          <!-- Card header — always visible -->
-          <button
-            type="button"
-            class="program-header"
-            (click)="toggle(p._id!)"
-            [attr.aria-expanded]="expandedId() === p._id"
-          >
-            <div class="program-meta">
-              <span class="program-objective">{{
-                p.objetivos ?? i18n.t('treino.semObjetivo')
-              }}</span>
-              <span class="program-date">{{ p.data | date: 'dd MMM yyyy' }}</span>
-              @if (p.ptNome) {
-                <span class="program-pt">PT: {{ p.ptNome }}</span>
-              }
-            </div>
-            <div class="program-badges">
-              <span
-                class="badge"
-                [class.badge--active]="p.ativo"
-                [class.badge--inactive]="!p.ativo"
-              >
-                {{ p.ativo ? i18n.t('treino.active') : i18n.t('treino.inactive') }}
-              </span>
-              <span class="groups-preview">
-                @for (g of p.fasePrincipal.grupos; track g.letra) {
-                  <span class="group-chip">{{ g.letra }}</span>
+          <!-- Card top row — header + action buttons always visible -->
+          <div class="card-top">
+            <button
+              type="button"
+              class="program-header"
+              (click)="toggle(p._id!)"
+              [attr.aria-expanded]="expandedId() === p._id"
+            >
+              <div class="program-meta">
+                <span class="program-objective">{{
+                  p.objetivos ?? i18n.t('treino.semObjetivo')
+                }}</span>
+                <span class="program-date">{{ p.data | date: 'dd MMM yyyy' }}</span>
+                @if (p.ptNome) {
+                  <span class="program-pt">PT: {{ p.ptNome }}</span>
                 }
-              </span>
-              <svg
-                class="expand-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
+              </div>
+              <div class="program-badges">
+                <span
+                  class="badge"
+                  [class.badge--active]="p.ativo"
+                  [class.badge--inactive]="!p.ativo"
+                >
+                  {{ p.ativo ? i18n.t('treino.active') : i18n.t('treino.inactive') }}
+                </span>
+                <span class="groups-preview">
+                  @for (g of p.fasePrincipal.grupos; track g.letra) {
+                    <span class="group-chip">{{ g.letra }}</span>
+                  }
+                </span>
+                <svg
+                  class="expand-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </div>
+            </button>
+
+            <!-- Always-visible action buttons -->
+            <div class="card-top-actions">
+              <button
+                type="button"
+                class="btn-card-edit"
+                [title]="i18n.t('treino.editar')"
+                (click)="startEdit(p)"
               >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="btn-card-toggle"
+                [class.btn-card-toggle--active]="p.ativo"
+                (click)="toggleActive(p)"
+              >
+                {{ p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar') }}
+              </button>
             </div>
-          </button>
+          </div>
 
           <!-- Card body — shown when expanded -->
           @if (expandedId() === p._id) {
@@ -208,32 +241,6 @@
                   <p class="notes-text">{{ p.observacoes }}</p>
                 </div>
               }
-
-              <div class="card-actions">
-                <button type="button" class="btn-edit" (click)="startEdit(p)">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                  {{ i18n.t('treino.editar') }}
-                </button>
-                <button
-                  type="button"
-                  class="btn-toggle-active"
-                  [class.btn-toggle-active--off]="p.ativo"
-                  (click)="toggleActive(p)"
-                >
-                  {{ p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar') }}
-                </button>
-              </div>
             </div>
           }
         </article>

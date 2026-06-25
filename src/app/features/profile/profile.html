@@ -6,43 +6,55 @@
   @if (loading()) {
     <p class="text-muted">{{ i18n.t('perfil.loading') }}</p>
   } @else {
-    <form class="perfil-form" (ngSubmit)="save()">
-      <div class="form-group">
-        <label class="form-label" for="nome">{{ i18n.t('perfil.nome') }}</label>
-        <input
-          id="nome"
-          type="text"
-          class="form-input"
-          [ngModel]="nome()"
-          (ngModelChange)="nome.set($event)"
-          name="nome"
-          autocomplete="name"
-        />
-      </div>
+    <!-- ── Associar Professor (só para alunos) ── -->
+    @if (!ptMode()) {
+      <div class="prof-section">
+        <h3 class="prof-section-title">{{ i18n.t('perfil.associarProf') }}</h3>
 
-      <div class="form-group">
-        <label class="form-label" for="numeroAluno">{{ i18n.t('perfil.numeroAluno') }}</label>
-        <input
-          id="numeroAluno"
-          type="text"
-          class="form-input"
-          [ngModel]="numeroAluno()"
-          (ngModelChange)="numeroAluno.set($event)"
-          name="numeroAluno"
-          autocomplete="off"
-        />
-      </div>
+        @if (professorId()) {
+          <div class="prof-current">
+            <span class="prof-current-label">{{ i18n.t('perfil.professorAtual') }}:</span>
+            @for (p of professors(); track p.userId) {
+              @if (p.userId === professorId()) {
+                <span class="prof-current-name">{{ p.nome || p.email }}</span>
+              }
+            }
+          </div>
+        }
 
-      <div class="form-footer">
-        <button type="submit" [disabled]="saving()">
-          {{ saving() ? i18n.t('common.loading') : i18n.t('perfil.save') }}
-        </button>
-
-        @if (saved()) {
-          <span class="save-confirm">✓ {{ i18n.t('perfil.saved') }}</span>
+        @if (loadingProfs()) {
+          <p class="text-muted">{{ i18n.t('common.loading') }}</p>
+        } @else if (professors().length === 0) {
+          <p class="text-muted">{{ i18n.t('perfil.semProfessores') }}</p>
+        } @else {
+          <ul class="prof-list">
+            @for (p of professors(); track p.userId) {
+              <li class="prof-item" [class.prof-item--selected]="professorId() === p.userId">
+                <div class="prof-info">
+                  <span class="prof-name">{{ p.nome || p.email }}</span>
+                  @if (p.nome && p.email) {
+                    <span class="prof-email">{{ p.email }}</span>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="btn-assoc"
+                  [class.btn-assoc--remove]="professorId() === p.userId"
+                  [disabled]="assocSaving()"
+                  (click)="associate(p)"
+                >
+                  {{
+                    professorId() === p.userId
+                      ? i18n.t('perfil.desassociar')
+                      : i18n.t('perfil.associate')
+                  }}
+                </button>
+              </li>
+            }
+          </ul>
         }
       </div>
-    </form>
+    }
 
     <!-- ── Modo Personal Trainer ── -->
     <div class="pt-section">

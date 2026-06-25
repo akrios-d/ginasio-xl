@@ -127,5 +127,12 @@
   "avaliacao.criar.outros": "Other goals",
   "avaliacao.criar.outrosPlaceholder": "e.g. Reduce cholesterol…",
   "avaliacao.criar.cancel": "Cancel",
-  "avaliacao.criar.save": "Create sheet"
+  "avaliacao.criar.save": "Create sheet",
+  "avaliacao.editar.save": "Save changes",
+  "perfil.associarProf": "Associate trainer",
+  "perfil.professores": "Available trainers",
+  "perfil.semProfessores": "No trainers found.",
+  "perfil.professorAtual": "Current trainer",
+  "perfil.associar": "Associate",
+  "perfil.desassociar": "Remove"
 }

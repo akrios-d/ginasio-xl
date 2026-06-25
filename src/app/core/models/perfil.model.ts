@@ -15,10 +15,12 @@ export type Role = z.infer<typeof RoleSchema>;
 export const PerfilSchema = z.object({
   _id: z.string().optional(),
   userId: z.string(), // id do user no @auth/core
-  email: z.string().email(),
-  nome: z.string().min(1),
+  email: z.string().optional(),
+  nome: z.string().optional(),
   role: RoleSchema.default('aluno'),
   numeroAluno: z.string().optional(), // atribuído pela academia
+  isProfessor: z.boolean().optional(), // activo como Personal Trainer
+  professorId: z.string().optional(), // userId do PT associado
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

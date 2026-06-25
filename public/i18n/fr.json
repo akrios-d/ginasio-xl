@@ -127,5 +127,12 @@
   "avaliacao.criar.outros": "Autres objectifs",
   "avaliacao.criar.outrosPlaceholder": "ex : Réduire le cholestérol…",
   "avaliacao.criar.cancel": "Annuler",
-  "avaliacao.criar.save": "Créer la fiche"
+  "avaliacao.criar.save": "Créer la fiche",
+  "avaliacao.editar.save": "Enregistrer les modifications",
+  "perfil.associarProf": "Associer un professeur",
+  "perfil.professores": "Professeurs disponibles",
+  "perfil.semProfessores": "Aucun professeur trouvé.",
+  "perfil.professorAtual": "Professeur associé",
+  "perfil.associar": "Associer",
+  "perfil.desassociar": "Retirer"
 }

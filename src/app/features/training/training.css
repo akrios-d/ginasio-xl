@@ -108,7 +108,8 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 16px;
   background: transparent;
   border: none;
@@ -362,44 +363,83 @@
   line-height: 1.5;
 }
 
-/* ── Card actions ──────────────────────────────── */
-.card-actions {
+/* ── Card top row (header + actions) ───────────── */
+.card-top {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--c-border);
+  align-items: stretch;
 }
 
-.btn-edit {
+.card-top-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px 10px 4px;
+  flex-shrink: 0;
+}
+
+/* Edit icon button */
+.btn-card-edit {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   min-height: unset;
-  font-size: var(--t-meta);
-  font-weight: 600;
   background: transparent;
   border: 1.5px solid var(--c-border);
   border-radius: var(--r-sm);
-  color: var(--c-ink-2);
+  color: var(--c-ink-3);
   cursor: pointer;
+  flex-shrink: 0;
   transition:
     color 120ms,
     border-color 120ms,
     background 120ms;
 }
-.btn-edit svg {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
+.btn-card-edit svg {
+  width: 14px;
+  height: 14px;
 }
-.btn-edit:hover {
+.btn-card-edit:hover {
   color: var(--c-accent);
   border-color: var(--c-accent);
   background: color-mix(in srgb, var(--c-accent) 6%, transparent);
   box-shadow: none;
+}
+
+/* Activate / deactivate pill */
+.btn-card-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-success, #22c55e);
+  border-radius: var(--r-pill);
+  color: var(--c-success, #22c55e);
+  font-size: var(--t-meta);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    color 120ms;
+}
+.btn-card-toggle:hover {
+  background: var(--c-success, #22c55e);
+  color: #fff;
+  box-shadow: none;
+}
+.btn-card-toggle--active {
+  border-color: var(--c-ink-3, #94a3b8);
+  color: var(--c-ink-3, #94a3b8);
+}
+.btn-card-toggle--active:hover {
+  background: var(--c-ink-3, #94a3b8);
+  color: #fff;
 }
 
 /* ── Desktop tweaks ────────────────────────────── */

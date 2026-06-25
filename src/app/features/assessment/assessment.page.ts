@@ -22,7 +22,7 @@ interface EntryForm {
 }
 
 interface FichaForm {
-  objetivo: ObjetivoTreino;
+  objetivo: string;
   outrosObjetivos: string;
 }
 
@@ -104,7 +104,7 @@ export class AssessmentPage {
   }
 
   protected startEditFicha(f: FichaAvaliacao): void {
-    this.fichaForm = { objetivo: f.objetivo, outrosObjetivos: f.outrosObjetivos ?? '' };
+    this.fichaForm = { objetivo: f.objetivo ?? '', outrosObjetivos: f.outrosObjetivos ?? '' };
     this.editingFicha.set(f);
   }
 
@@ -114,15 +114,17 @@ export class AssessmentPage {
     if (!userId) return;
     this.saving.set(true);
     const existing = this.editingFicha();
+    const obj = (this.fichaForm.objetivo || undefined) as FichaAvaliacao['objetivo'];
+    const outros = this.fichaForm.outrosObjetivos.trim() || undefined;
     const req = existing
       ? (this.svc.update(existing._id!, {
-          objetivo: this.fichaForm.objetivo,
-          outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+          objetivo: obj,
+          outrosObjetivos: outros,
         }) as import('rxjs').Observable<unknown>)
       : (this.svc.create({
           alunoId: userId,
-          objetivo: this.fichaForm.objetivo,
-          outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+          objetivo: obj,
+          outrosObjetivos: outros,
           avaliacoes: [],
         }) as import('rxjs').Observable<unknown>);
     req.subscribe({
@@ -202,6 +204,6 @@ export class AssessmentPage {
   }
 
   private emptyFichaForm(): FichaForm {
-    return { objetivo: 'Hipertrofia', outrosObjetivos: '' };
+    return { objetivo: '', outrosObjetivos: '' };
   }
 }

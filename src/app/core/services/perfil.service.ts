@@ -4,16 +4,32 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { Perfil } from '../models';
 
+export interface ProfessorInfo {
+  _id: string;
+  userId: string;
+  nome: string;
+  email: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/perfil`;
+  private readonly baseMulti = `${environment.apiUrl}/api/perfis`;
 
   get(): Observable<Perfil> {
     return this.http.get<Perfil>(this.base, { withCredentials: true });
   }
 
-  save(payload: Pick<Perfil, 'nome' | 'numeroAluno'>): Observable<{ saved: boolean }> {
+  save(
+    payload: Partial<Pick<Perfil, 'numeroAluno' | 'isProfessor' | 'professorId'>>,
+  ): Observable<{ saved: boolean }> {
     return this.http.put<{ saved: boolean }>(this.base, payload, { withCredentials: true });
+  }
+
+  listProfessores(): Observable<ProfessorInfo[]> {
+    return this.http.get<ProfessorInfo[]>(`${this.baseMulti}?isProfessor=true`, {
+      withCredentials: true,
+    });
   }
 }
