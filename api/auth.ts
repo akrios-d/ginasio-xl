@@ -12,7 +12,18 @@ import { authConfig } from '../server/lib/auth.config.js';
 import { fromWebResponse, toWebRequest } from '../server/lib/session.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
-  const request = toWebRequest(req);
-  const response = await Auth(request, authConfig);
-  await fromWebResponse(response, res);
+  console.log('[auth] method=%s url=%s', req.method, req.url);
+  try {
+    const request = toWebRequest(req);
+    const response = await Auth(request, authConfig);
+    console.log(
+      '[auth] response status=%s location=%s',
+      response.status,
+      response.headers.get('location'),
+    );
+    await fromWebResponse(response, res);
+  } catch (err) {
+    console.error('[auth] error', err);
+    res.status(500).json({ error: 'Internal auth error' });
+  }
 }

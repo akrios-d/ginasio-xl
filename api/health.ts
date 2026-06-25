@@ -8,6 +8,7 @@
  *   4. return JSON, handle ZodError → 400, everything else → 500
  */
 import { setCors, handleOptions } from '../server/lib/cors.js';
+import { getCollection } from '../server/lib/mongo.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res);
@@ -19,9 +20,17 @@ export default async function handler(req: any, res: any): Promise<void> {
     return;
   }
 
+  let db = 'ok';
+  try {
+    await getCollection('_health_ping');
+  } catch (e: any) {
+    db = e?.message ?? 'error';
+  }
+
   res.status(200).json({
     status: 'ok',
     service: 'ginasio-xl',
     timestamp: new Date().toISOString(),
+    db,
   });
 }
