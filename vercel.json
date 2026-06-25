@@ -2,9 +2,8 @@
   "framework": "angular",
   "buildCommand": "ng build",
   "outputDirectory": "dist/ginasio-xl-app/browser",
-  "routes": [
-    { "src": "/api/auth/(.*)", "dest": "/api/auth" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/" }
+  "rewrites": [
+    { "source": "/api/auth/:path*", "destination": "/api/auth" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
