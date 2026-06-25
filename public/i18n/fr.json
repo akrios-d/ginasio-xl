@@ -100,6 +100,8 @@
   "treino.criar.aquecimentoHint": "Cardio avant la séance (optionnel).",
   "treino.criar.addCardio": "Ajouter cardio",
   "treino.criar.equipamentoPlaceholder": "Appareil (ex : Elliptique, Tapis…)",
+  "treino.criar.nivelPlaceholder": "Niveau (ex : 3-4)",
+  "treino.criar.velocidadePlaceholder": "Vitesse (ex : 90-120)",
   "treino.criar.cancel": "Annuler",
   "treino.criar.save": "Enregistrer",
   "avaliacao.criar.titulo": "Nouvelle fiche d'évaluation",

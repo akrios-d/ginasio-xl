@@ -668,17 +668,31 @@
 /* ── Cardio form row ───────────────────────────── */
 .cardio-row-form {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   background: var(--c-surface-alt);
   border-radius: var(--r-sm);
   padding: 8px;
+  flex-wrap: wrap;
 }
 .cardio-eq-input {
-  flex: 1;
+  flex: 1 1 100%;
   min-width: 0;
   padding: 8px 10px !important;
   font-size: var(--t-secondary) !important;
+}
+.cardio-extra-row {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cardio-extra-input {
+  flex: 1;
+  min-width: 80px;
+  padding: 6px 10px !important;
+  font-size: var(--t-meta) !important;
 }
 .cardio-tempo-group {
   display: flex;

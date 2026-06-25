@@ -304,16 +304,32 @@
                 [placeholder]="i18n.t('treino.criar.equipamentoPlaceholder')"
                 class="cardio-eq-input"
               />
-              <div class="cardio-tempo-group">
+              <div class="cardio-extra-row">
+                <div class="cardio-tempo-group">
+                  <input
+                    type="number"
+                    [(ngModel)]="c.tempo"
+                    [name]="'ctm-' + ci"
+                    class="cardio-tempo-input"
+                    min="1"
+                    max="120"
+                  />
+                  <span class="cardio-tempo-label">{{ i18n.t('treino.min') }}</span>
+                </div>
                 <input
-                  type="number"
-                  [(ngModel)]="c.tempo"
-                  [name]="'ctm-' + ci"
-                  class="cardio-tempo-input"
-                  min="1"
-                  max="120"
+                  type="text"
+                  [(ngModel)]="c.nivel"
+                  [name]="'cnv-' + ci"
+                  [placeholder]="i18n.t('treino.criar.nivelPlaceholder')"
+                  class="cardio-extra-input"
                 />
-                <span class="cardio-tempo-label">{{ i18n.t('treino.min') }}</span>
+                <input
+                  type="text"
+                  [(ngModel)]="c.velocidade"
+                  [name]="'cvl-' + ci"
+                  [placeholder]="i18n.t('treino.criar.velocidadePlaceholder')"
+                  class="cardio-extra-input"
+                />
               </div>
               <button type="button" class="btn-remove-ex" (click)="removeCardio(ci)">
                 <svg

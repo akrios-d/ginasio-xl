@@ -100,6 +100,8 @@
   "treino.criar.aquecimentoHint": "Cardio inicial antes do treino (opcional).",
   "treino.criar.addCardio": "Adicionar cardio",
   "treino.criar.equipamentoPlaceholder": "Equipamento (ex: Elíptica, Tapete…)",
+  "treino.criar.nivelPlaceholder": "Nível (ex: 3-4)",
+  "treino.criar.velocidadePlaceholder": "Velocidade (ex: 90-120)",
   "treino.criar.cancel": "Cancelar",
   "treino.criar.save": "Guardar",
   "avaliacao.criar.titulo": "Nova ficha de avaliação",

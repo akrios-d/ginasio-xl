@@ -9,6 +9,8 @@ import type { ProgramaTreino } from '../../core/models';
 interface CardioForm {
   equipamento: string;
   tempo: number;
+  nivel: string;
+  velocidade: string;
 }
 
 interface ExercicioForm {
@@ -34,7 +36,7 @@ type ActiveTab = 'aquecimento' | number;
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function emptyCardio(): CardioForm {
-  return { equipamento: '', tempo: 10 };
+  return { equipamento: '', tempo: 10, nivel: '', velocidade: '' };
 }
 
 function emptyExercicio(): ExercicioForm {
@@ -104,7 +106,12 @@ export class TrainingPage {
     this.form = {
       objetivos: p.objetivos ?? '',
       observacoes: p.observacoes ?? '',
-      cardio: p.faseInicial.exercicios.map((c) => ({ equipamento: c.equipamento, tempo: c.tempo })),
+      cardio: p.faseInicial.exercicios.map((c) => ({
+        equipamento: c.equipamento,
+        tempo: c.tempo,
+        nivel: c.nivel ?? '',
+        velocidade: c.velocidade ?? '',
+      })),
       grupos: p.fasePrincipal.grupos.map((g) => ({
         letra: g.letra,
         exercicios: g.exercicios.map((e) => ({
@@ -181,7 +188,12 @@ export class TrainingPage {
       faseInicial: {
         exercicios: this.form.cardio
           .filter((c) => c.equipamento.trim())
-          .map((c) => ({ equipamento: c.equipamento.trim(), tempo: c.tempo })),
+          .map((c) => ({
+            equipamento: c.equipamento.trim(),
+            tempo: c.tempo,
+            nivel: c.nivel.trim() || undefined,
+            velocidade: c.velocidade.trim() || undefined,
+          })),
       },
       fasePrincipal: {
         grupos: this.form.grupos
