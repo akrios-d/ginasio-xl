@@ -15,6 +15,7 @@ interface CardioForm {
 
 interface ExercicioForm {
   nome: string;
+  numeroMaquina: number | null;
   series: number;
   repeticoes: number;
 }
@@ -40,7 +41,7 @@ function emptyCardio(): CardioForm {
 }
 
 function emptyExercicio(): ExercicioForm {
-  return { nome: '', series: 3, repeticoes: 10 };
+  return { nome: '', numeroMaquina: null, series: 3, repeticoes: 10 };
 }
 
 function emptyGrupo(index: number): GrupoForm {
@@ -116,6 +117,7 @@ export class TrainingPage {
         letra: g.letra,
         exercicios: g.exercicios.map((e) => ({
           nome: e.nome,
+          numeroMaquina: e.numeroMaquina ?? null,
           series: e.series,
           repeticoes: e.repeticoes,
         })),
@@ -205,6 +207,7 @@ export class TrainingPage {
               .filter((e) => e.nome.trim())
               .map((e) => ({
                 nome: e.nome.trim(),
+                numeroMaquina: e.numeroMaquina ?? undefined,
                 series: e.series,
                 repeticoes: e.repeticoes,
                 progressao: [],

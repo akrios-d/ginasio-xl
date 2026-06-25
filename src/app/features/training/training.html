@@ -387,6 +387,19 @@
               />
               <div class="ex-num-row">
                 <div class="ex-num-group">
+                  <label class="ex-num-label">{{ i18n.t('treino.machine') }} #</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="ex.numeroMaquina"
+                    [name]="'m-' + g.letra + '-' + ei"
+                    class="ex-num-input ex-machine-input"
+                    min="1"
+                    max="999"
+                    placeholder="–"
+                  />
+                </div>
+                <span class="ex-sep"></span>
+                <div class="ex-num-group">
                   <label class="ex-num-label">{{ i18n.t('treino.criar.series') }}</label>
                   <input
                     type="number"
