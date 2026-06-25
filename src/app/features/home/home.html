@@ -89,6 +89,11 @@
           </svg>
         </button>
         <span class="cal-month-label">{{ monthLabel() }}</span>
+        @if (!isCurrentMonth()) {
+          <button type="button" class="cal-today-btn" (click)="goToday()">
+            {{ i18n.t('common.today') }}
+          </button>
+        }
         <button
           type="button"
           class="cal-nav-btn"

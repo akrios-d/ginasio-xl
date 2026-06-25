@@ -194,6 +194,26 @@
   box-shadow: none;
 }
 
+.cal-today-btn {
+  font-size: var(--t-meta);
+  font-weight: 600;
+  padding: 3px 10px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-accent);
+  border-radius: var(--r-pill);
+  color: var(--c-accent);
+  cursor: pointer;
+  transition:
+    background 120ms,
+    color 120ms;
+}
+.cal-today-btn:hover {
+  background: var(--c-accent);
+  color: var(--btn-primary-text, #fff);
+  box-shadow: none;
+}
+
 /* ── Calendar grid ─────────────────────────────── */
 .cal-grid {
   display: grid;

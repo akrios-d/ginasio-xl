@@ -127,6 +127,19 @@ export class HomePage {
   }
 
   // ── Calendar navigation ───────────────────────────────────────────────────
+  protected isCurrentMonth(): boolean {
+    return (
+      this.viewYear() === this.today.getFullYear() && this.viewMonth() === this.today.getMonth()
+    );
+  }
+
+  protected goToday(): void {
+    this.viewYear.set(this.today.getFullYear());
+    this.viewMonth.set(this.today.getMonth());
+    this.selectedDate.set(null);
+    this.loadMonth();
+  }
+
   protected prevMonth(): void {
     if (this.viewMonth() === 0) {
       this.viewYear.update((y) => y - 1);
