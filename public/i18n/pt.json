@@ -48,6 +48,8 @@
   "treino.perExercise": "por exercício",
   "treino.stretching": "Alongamentos finais",
   "treino.notes": "Observações",
+  "treino.editar": "Editar",
+  "treino.editar.titulo": "Editar plano de treino",
   "avaliacao.nova": "Nova ficha",
   "avaliacao.empty": "Sem fichas de avaliação. Cria a primeira!",
   "avaliacao.loading": "A carregar fichas…",

@@ -48,6 +48,8 @@
   "treino.perExercise": "per exercise",
   "treino.stretching": "Cool-down stretching",
   "treino.notes": "Notes",
+  "treino.editar": "Edit",
+  "treino.editar.titulo": "Edit training plan",
   "avaliacao.nova": "New sheet",
   "avaliacao.empty": "No assessment sheets yet. Create the first one!",
   "avaliacao.loading": "Loading records…",

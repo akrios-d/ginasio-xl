@@ -48,6 +48,8 @@
   "treino.perExercise": "par exercice",
   "treino.stretching": "Étirements finaux",
   "treino.notes": "Notes",
+  "treino.editar": "Modifier",
+  "treino.editar.titulo": "Modifier le plan d'entraînement",
   "avaliacao.nova": "Nouvelle fiche",
   "avaliacao.empty": "Aucune fiche d'évaluation. Créez la première !",
   "avaliacao.loading": "Chargement…",

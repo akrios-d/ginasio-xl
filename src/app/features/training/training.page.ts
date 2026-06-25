@@ -62,6 +62,7 @@ export class TrainingPage {
   protected readonly error = signal(false);
   protected readonly expandedId = signal<string | null>(null);
   protected readonly creating = signal(false);
+  protected readonly editing = signal<ProgramaTreino | null>(null);
   protected readonly saving = signal(false);
   protected readonly activeTab = signal<ActiveTab>(0);
 
@@ -96,6 +97,25 @@ export class TrainingPage {
 
   protected cancelCreate(): void {
     this.creating.set(false);
+    this.editing.set(null);
+  }
+
+  protected startEdit(p: ProgramaTreino): void {
+    this.form = {
+      objetivos: p.objetivos ?? '',
+      observacoes: p.observacoes ?? '',
+      cardio: p.faseInicial.exercicios.map((c) => ({ equipamento: c.equipamento, tempo: c.tempo })),
+      grupos: p.fasePrincipal.grupos.map((g) => ({
+        letra: g.letra,
+        exercicios: g.exercicios.map((e) => ({
+          nome: e.nome,
+          series: e.series,
+          repeticoes: e.repeticoes,
+        })),
+      })),
+    };
+    this.activeTab.set(0);
+    this.editing.set(p);
   }
 
   protected selectTab(tab: ActiveTab): void {
@@ -150,12 +170,14 @@ export class TrainingPage {
     const userId = this.auth.userId();
     if (!userId) return;
     this.saving.set(true);
+
+    const existing = this.editing();
     const payload = {
       alunoId: userId,
-      data: new Date(),
+      data: existing ? existing.data : new Date(),
       objetivos: this.form.objetivos.trim() || undefined,
       observacoes: this.form.observacoes.trim() || undefined,
-      aulasRecomendadas: [],
+      aulasRecomendadas: existing?.aulasRecomendadas ?? [],
       faseInicial: {
         exercicios: this.form.cardio
           .filter((c) => c.equipamento.trim())
@@ -176,13 +198,19 @@ export class TrainingPage {
                 progressao: [],
               })),
           })),
-        descansoEntreSeriesSegundos: 60,
+        descansoEntreSeriesSegundos: existing?.fasePrincipal.descansoEntreSeriesSegundos ?? 60,
       },
-      faseFinal: { duracaoSegundos: 15, todosGruposMusculares: true },
+      faseFinal: existing?.faseFinal ?? { duracaoSegundos: 15, todosGruposMusculares: true },
     };
-    this.svc.create(payload as any).subscribe({
+
+    const req = existing
+      ? this.svc.update(existing._id!, payload as any)
+      : this.svc.create(payload as any);
+
+    req.subscribe({
       next: () => {
         this.creating.set(false);
+        this.editing.set(null);
         this.saving.set(false);
         this.loading.set(true);
         this.loadPrograms();

@@ -48,6 +48,8 @@
   "treino.perExercise": "每个动作",
   "treino.stretching": "拉伸放松",
   "treino.notes": "备注",
+  "treino.editar": "编辑",
+  "treino.editar.titulo": "编辑训练计划",
   "avaliacao.nova": "新评估表",
   "avaliacao.empty": "暂无评估表。创建第一个吧！",
   "avaliacao.loading": "加载中…",
