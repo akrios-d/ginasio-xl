@@ -203,9 +203,9 @@ export class TrainingPage {
       faseFinal: existing?.faseFinal ?? { duracaoSegundos: 15, todosGruposMusculares: true },
     };
 
-    const req = existing
-      ? this.svc.update(existing._id!, payload as any)
-      : this.svc.create(payload as any);
+    const req = (
+      existing ? this.svc.update(existing._id!, payload as any) : this.svc.create(payload as any)
+    ) as import('rxjs').Observable<unknown>;
 
     req.subscribe({
       next: () => {
