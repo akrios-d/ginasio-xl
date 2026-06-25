@@ -548,7 +548,12 @@
   box-shadow: none;
 }
 
-.sheet-body {
+/* ── Sheet sections ───────────────────────────── */
+.sheet-top {
+  padding: 12px 20px 0;
+}
+
+.sheet-bottom {
   padding: 12px 20px 28px;
   display: flex;
   flex-direction: column;
@@ -567,45 +572,133 @@
   color: var(--c-ink-2);
 }
 
-.sheet-body input,
-.sheet-body select,
-.sheet-body textarea {
+.sheet-top input,
+.sheet-bottom input,
+.sheet-top textarea,
+.sheet-bottom textarea {
   padding: 10px 12px;
   font-size: var(--t-secondary);
 }
 
-.sheet-body textarea {
+.sheet-bottom textarea {
   resize: vertical;
-  min-height: 60px;
+  min-height: 56px;
 }
 
-/* ── Groups ────────────────────────────────────── */
-.groups-section {
+/* ── Tab bar ────────────────────────────────────── */
+.tab-bar {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px 0;
+  border-bottom: 1px solid var(--c-border);
 }
 
-.group-block {
-  background: var(--c-surface-alt);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-md);
-  padding: 12px;
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  min-height: unset;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  font-size: var(--t-secondary);
+  font-weight: 700;
+  color: var(--c-ink-3);
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition:
+    color 120ms,
+    border-color 120ms;
+}
+
+.tab-btn:hover {
+  color: var(--c-ink);
+  box-shadow: none;
+}
+
+.tab-btn--active {
+  color: var(--c-accent);
+  border-bottom-color: var(--c-accent);
+}
+
+.tab-btn--add {
+  font-size: 1.1rem;
+  color: var(--c-ink-3);
+  margin-left: 2px;
+}
+
+/* ── Tab content ────────────────────────────────── */
+.tab-content {
+  min-height: 200px;
+}
+
+.tab-panel {
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.group-block-header {
+.tab-hint {
+  margin: 0 0 4px;
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+}
+
+/* ── Group tab header ───────────────────────────── */
+.group-tab-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 4px;
 }
 
-.group-block-letter {
+.group-tab-title {
   font-size: var(--t-secondary);
   font-weight: 700;
   color: var(--c-accent);
+}
+
+/* ── Cardio form row ────────────────────────────── */
+.cardio-row-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--c-surface-alt);
+  border-radius: var(--r-sm);
+  padding: 8px;
+}
+
+.cardio-eq-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px !important;
+  font-size: var(--t-secondary) !important;
+}
+
+.cardio-tempo-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.cardio-tempo-input {
+  width: 50px;
+  text-align: center;
+  padding: 8px 6px !important;
+  font-size: var(--t-secondary) !important;
+}
+
+.cardio-tempo-label {
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  white-space: nowrap;
 }
 
 .btn-remove-group {

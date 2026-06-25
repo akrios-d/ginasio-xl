@@ -6,6 +6,11 @@ import { ProgramaTreinoService } from '../../core/services/programa-treino.servi
 import { AuthService } from '../../core/auth/auth.service';
 import type { ProgramaTreino } from '../../core/models';
 
+interface CardioForm {
+  equipamento: string;
+  tempo: number;
+}
+
 interface ExercicioForm {
   nome: string;
   series: number;
@@ -19,11 +24,19 @@ interface GrupoForm {
 
 interface PlanForm {
   objetivos: string;
+  cardio: CardioForm[];
   grupos: GrupoForm[];
   observacoes: string;
 }
 
+// Tab: 'aquecimento' | group index
+type ActiveTab = 'aquecimento' | number;
+
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+function emptyCardio(): CardioForm {
+  return { equipamento: '', tempo: 10 };
+}
 
 function emptyExercicio(): ExercicioForm {
   return { nome: '', series: 3, repeticoes: 10 };
@@ -51,6 +64,7 @@ export class TrainingPage {
   protected readonly expandedId = signal<string | null>(null);
   protected readonly creating = signal(false);
   protected readonly saving = signal(false);
+  protected readonly activeTab = signal<ActiveTab>(0);
 
   protected form: PlanForm = this.emptyForm();
 
@@ -75,8 +89,11 @@ export class TrainingPage {
     this.expandedId.update((cur) => (cur === id ? null : id));
   }
 
+  // ── Sheet ─────────────────────────────────────────────────────────────────
+
   protected startCreate(): void {
     this.form = this.emptyForm();
+    this.activeTab.set(0);
     this.creating.set(true);
   }
 
@@ -84,22 +101,58 @@ export class TrainingPage {
     this.creating.set(false);
   }
 
+  protected selectTab(tab: ActiveTab): void {
+    this.activeTab.set(tab);
+  }
+
+  protected isTab(tab: ActiveTab): boolean {
+    return this.activeTab() === tab;
+  }
+
+  // ── Aquecimento ───────────────────────────────────────────────────────────
+
+  protected addCardio(): void {
+    this.form.cardio.push(emptyCardio());
+  }
+
+  protected removeCardio(i: number): void {
+    this.form.cardio.splice(i, 1);
+  }
+
+  // ── Grupos ────────────────────────────────────────────────────────────────
+
   protected addGrupo(): void {
-    this.form.grupos.push(emptyGrupo(this.form.grupos.length));
+    const idx = this.form.grupos.length;
+    this.form.grupos.push(emptyGrupo(idx));
+    this.activeTab.set(idx);
   }
 
-  protected removeGrupo(i: number): void {
-    this.form.grupos.splice(i, 1);
-    this.form.grupos.forEach((g, idx) => (g.letra = LETTERS[idx] ?? String(idx + 1)));
+  protected removeCurrentGrupo(): void {
+    const tab = this.activeTab();
+    if (typeof tab !== 'number') return;
+    this.form.grupos.splice(tab, 1);
+    this.form.grupos.forEach((g, i) => (g.letra = LETTERS[i] ?? String(i + 1)));
+    this.activeTab.set(Math.max(0, tab - 1));
   }
 
-  protected addExercicio(grupo: GrupoForm): void {
-    grupo.exercicios.push(emptyExercicio());
+  protected addExercicio(): void {
+    const tab = this.activeTab();
+    if (typeof tab !== 'number') return;
+    this.form.grupos[tab]?.exercicios.push(emptyExercicio());
   }
 
-  protected removeExercicio(grupo: GrupoForm, i: number): void {
-    grupo.exercicios.splice(i, 1);
+  protected removeExercicio(i: number): void {
+    const tab = this.activeTab();
+    if (typeof tab !== 'number') return;
+    this.form.grupos[tab]?.exercicios.splice(i, 1);
   }
+
+  protected currentGrupo(): GrupoForm | null {
+    const tab = this.activeTab();
+    return typeof tab === 'number' ? (this.form.grupos[tab] ?? null) : null;
+  }
+
+  // ── Save ──────────────────────────────────────────────────────────────────
 
   protected save(): void {
     if (this.saving()) return;
@@ -114,7 +167,11 @@ export class TrainingPage {
       objetivos: this.form.objetivos.trim() || undefined,
       observacoes: this.form.observacoes.trim() || undefined,
       aulasRecomendadas: [],
-      faseInicial: { exercicios: [] },
+      faseInicial: {
+        exercicios: this.form.cardio
+          .filter((c) => c.equipamento.trim())
+          .map((c) => ({ equipamento: c.equipamento.trim(), tempo: c.tempo })),
+      },
       fasePrincipal: {
         grupos: this.form.grupos
           .filter((g) => g.exercicios.some((e) => e.nome.trim()))
@@ -142,13 +199,11 @@ export class TrainingPage {
         this.loading.set(true);
         this.loadPrograms();
       },
-      error: () => {
-        this.saving.set(false);
-      },
+      error: () => this.saving.set(false),
     });
   }
 
   private emptyForm(): PlanForm {
-    return { objetivos: '', grupos: [emptyGrupo(0)], observacoes: '' };
+    return { objetivos: '', cardio: [], grupos: [emptyGrupo(0)], observacoes: '' };
   }
 }
