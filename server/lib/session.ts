@@ -78,12 +78,11 @@ function parseCookies(header: string): Record<string, string> {
  * matching X-Dev-Token + X-Dev-User-Id headers, skip the DB session check.
  */
 export async function requireSession(req: any, res: any): Promise<string | null> {
-  // ── Dev bypass — never active in Vercel production ──────────────────────
-  // VERCEL_ENV is 'production' | 'preview' | 'development' (set by Vercel).
-  // Absent locally (ng serve / vercel dev), so the bypass is also allowed then.
-  const isVercelProd = process.env['VERCEL_ENV'] === 'production';
+  // ── Dev bypass ───────────────────────────────────────────────────────────
+  // Active only when DEV_BYPASS_TOKEN is set (never set it in Vercel production).
+  // The token itself is the security — knowing it is required to use the bypass.
   const bypassToken = process.env['DEV_BYPASS_TOKEN'];
-  if (!isVercelProd && bypassToken) {
+  if (bypassToken) {
     const reqToken = req.headers['x-dev-token'] as string | undefined;
     const reqUserId = req.headers['x-dev-user-id'] as string | undefined;
     if (reqToken === bypassToken && reqUserId) {

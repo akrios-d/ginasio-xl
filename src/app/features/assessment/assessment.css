@@ -526,3 +526,26 @@
   color: var(--c-accent);
   font-weight: 600;
 }
+                                                                                                                                                                                                                      .ficha-outros {
+  margin: 12px 0 0;
+  font-size: var(--t-secondary);
+  color: var(--c-ink-2);
+  font-style: italic;
+}
+
+.btn-add-entry {
+  display: block;
+  margin-top: 16px;
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  color: var(--c-accent);
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  min-height: unset;
+}
+.btn-add-entry:hover {
+  text-decoration: underline;
+  box-shadow: none;
+}

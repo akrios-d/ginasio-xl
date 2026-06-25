@@ -12,6 +12,13 @@ interface EntryForm {
   imc: string;
   percentualMassaGorda: string;
   percentualMassaMagra: string;
+  kcal: string;
+  glicemiaVejuno: string;
+  paSistolica: string;
+  paDiastolica: string;
+  fcRepouso: string;
+  perimetroAbdominal: string;
+  perimetroCintura: string;
 }
 
 interface FichaForm {
@@ -26,6 +33,11 @@ const OBJETIVOS: ObjetivoTreino[] = [
   'Performance',
   'Saúde e Bem-Estar',
 ];
+
+function n(v: string): number | undefined {
+  const x = parseFloat(v);
+  return isNaN(x) ? undefined : x;
+}
 
 @Component({
   selector: 'app-assessment',
@@ -74,6 +86,10 @@ export class AssessmentPage {
     if (this.addingEntryFor() === id) this.addingEntryFor.set(null);
   }
 
+  protected latestEntry(f: FichaAvaliacao): EntradaAvaliacao | null {
+    return f.avaliacoes.length > 0 ? f.avaliacoes[f.avaliacoes.length - 1] : null;
+  }
+
   // ── Create ficha ──────────────────────────────────────────────────────────
 
   protected startCreateFicha(): void {
@@ -89,32 +105,30 @@ export class AssessmentPage {
     if (this.saving()) return;
     const userId = this.auth.userId();
     if (!userId) return;
-
     this.saving.set(true);
-    const payload = {
-      alunoId: userId,
-      objetivo: this.fichaForm.objetivo,
-      outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
-      avaliacoes: [],
-    };
-
-    this.svc.create(payload).subscribe({
-      next: () => {
-        this.creatingFicha.set(false);
-        this.saving.set(false);
-        this.loading.set(true);
-        this.loadFichas();
-      },
-      error: () => this.saving.set(false),
-    });
+    this.svc
+      .create({
+        alunoId: userId,
+        objetivo: this.fichaForm.objetivo,
+        outrosObjetivos: this.fichaForm.outrosObjetivos.trim() || undefined,
+        avaliacoes: [],
+      })
+      .subscribe({
+        next: () => {
+          this.creatingFicha.set(false);
+          this.saving.set(false);
+          this.loading.set(true);
+          this.loadFichas();
+        },
+        error: () => this.saving.set(false),
+      });
   }
 
   // ── Add entry ─────────────────────────────────────────────────────────────
 
-  protected startAddEntry(id: string): void {
+  protected startAddEntry(fichaId: string): void {
     this.entryForm = this.emptyEntryForm();
-    this.addingEntryFor.set(id);
-    if (this.expandedId() !== id) this.expandedId.set(id);
+    this.addingEntryFor.set(fichaId);
   }
 
   protected cancelAddEntry(): void {
@@ -124,38 +138,37 @@ export class AssessmentPage {
   protected saveEntry(fichaId: string): void {
     if (this.saving()) return;
     this.saving.set(true);
-
-    const entrada: EntradaAvaliacao = {
-      data: new Date(this.entryForm.data),
-      peso: this.entryForm.peso ? Number(this.entryForm.peso) : undefined,
-      imc: this.entryForm.imc ? Number(this.entryForm.imc) : undefined,
-      percentualMassaGorda: this.entryForm.percentualMassaGorda
-        ? Number(this.entryForm.percentualMassaGorda)
-        : undefined,
-      percentualMassaMagra: this.entryForm.percentualMassaMagra
-        ? Number(this.entryForm.percentualMassaMagra)
-        : undefined,
+    const f = this.entryForm;
+    const pa =
+      n(f.paSistolica) !== undefined && n(f.paDiastolica) !== undefined
+        ? { sistolica: n(f.paSistolica)!, diastolica: n(f.paDiastolica)! }
+        : undefined;
+    const per =
+      n(f.perimetroAbdominal) !== undefined || n(f.perimetroCintura) !== undefined
+        ? { abdominal: n(f.perimetroAbdominal), cintura: n(f.perimetroCintura) }
+        : undefined;
+    const entry: EntradaAvaliacao = {
+      data: new Date(f.data),
+      peso: n(f.peso),
+      imc: n(f.imc),
+      percentualMassaGorda: n(f.percentualMassaGorda),
+      percentualMassaMagra: n(f.percentualMassaMagra),
+      kcal: n(f.kcal),
+      glicemiaVejuno: n(f.glicemiaVejuno),
+      pressaoArterial: pa,
+      fcRepouso: n(f.fcRepouso) !== undefined ? Math.round(n(f.fcRepouso)!) : undefined,
+      perimetros: per,
     };
-
-    this.svc.addEntrada(fichaId, entrada).subscribe({
+    this.svc.addEntrada(fichaId, entry).subscribe({
       next: () => {
-        this.fichas.update((list) =>
-          list.map((f) =>
-            f._id === fichaId ? { ...f, avaliacoes: [...f.avaliacoes, entrada] } : f,
-          ),
-        );
-        this.saving.set(false);
         this.addingEntryFor.set(null);
+        this.saving.set(false);
         this.savedId.set(fichaId);
-        setTimeout(() => this.savedId.set(null), 3000);
+        setTimeout(() => this.savedId.set(null), 2500);
+        this.loadFichas();
       },
       error: () => this.saving.set(false),
     });
-  }
-
-  protected latestEntry(ficha: FichaAvaliacao): EntradaAvaliacao | null {
-    if (!ficha.avaliacoes.length) return null;
-    return ficha.avaliacoes[ficha.avaliacoes.length - 1];
   }
 
   private emptyEntryForm(): EntryForm {
@@ -165,10 +178,17 @@ export class AssessmentPage {
       imc: '',
       percentualMassaGorda: '',
       percentualMassaMagra: '',
+      kcal: '',
+      glicemiaVejuno: '',
+      paSistolica: '',
+      paDiastolica: '',
+      fcRepouso: '',
+      perimetroAbdominal: '',
+      perimetroCintura: '',
     };
   }
 
   private emptyFichaForm(): FichaForm {
-    return { objetivo: 'Saúde e Bem-Estar', outrosObjetivos: '' };
+    return { objetivo: 'Hipertrofia', outrosObjetivos: '' };
   }
 }

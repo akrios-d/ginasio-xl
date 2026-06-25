@@ -29,7 +29,6 @@ interface PlanForm {
   observacoes: string;
 }
 
-// Tab: 'aquecimento' | group index
 type ActiveTab = 'aquecimento' | number;
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -89,8 +88,6 @@ export class TrainingPage {
     this.expandedId.update((cur) => (cur === id ? null : id));
   }
 
-  // ── Sheet ─────────────────────────────────────────────────────────────────
-
   protected startCreate(): void {
     this.form = this.emptyForm();
     this.activeTab.set(0);
@@ -109,8 +106,6 @@ export class TrainingPage {
     return this.activeTab() === tab;
   }
 
-  // ── Aquecimento ───────────────────────────────────────────────────────────
-
   protected addCardio(): void {
     this.form.cardio.push(emptyCardio());
   }
@@ -118,8 +113,6 @@ export class TrainingPage {
   protected removeCardio(i: number): void {
     this.form.cardio.splice(i, 1);
   }
-
-  // ── Grupos ────────────────────────────────────────────────────────────────
 
   protected addGrupo(): void {
     const idx = this.form.grupos.length;
@@ -152,15 +145,11 @@ export class TrainingPage {
     return typeof tab === 'number' ? (this.form.grupos[tab] ?? null) : null;
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────────
-
   protected save(): void {
     if (this.saving()) return;
     const userId = this.auth.userId();
     if (!userId) return;
-
     this.saving.set(true);
-
     const payload = {
       alunoId: userId,
       data: new Date(),
@@ -191,7 +180,6 @@ export class TrainingPage {
       },
       faseFinal: { duracaoSegundos: 15, todosGruposMusculares: true },
     };
-
     this.svc.create(payload as any).subscribe({
       next: () => {
         this.creating.set(false);

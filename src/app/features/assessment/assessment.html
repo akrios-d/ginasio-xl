@@ -104,7 +104,10 @@
           <!-- Body -->
           @if (expandedId() === f._id) {
             <div class="ficha-body">
-              <!-- Measurements table -->
+              @if (f.outrosObjetivos) {
+                <p class="ficha-outros">{{ f.outrosObjetivos }}</p>
+              }
+
               @if (f.avaliacoes.length > 0) {
                 <div class="entries-scroll">
                   <table class="entries-table">
@@ -115,6 +118,13 @@
                         <th>{{ i18n.t('avaliacao.imc') }}</th>
                         <th>{{ i18n.t('avaliacao.mg') }}</th>
                         <th>{{ i18n.t('avaliacao.mm') }}</th>
+                        <th>{{ i18n.t('avaliacao.kcal') }}</th>
+                        <th>{{ i18n.t('avaliacao.gv') }}</th>
+                        <th>{{ i18n.t('avaliacao.pas') }}</th>
+                        <th>{{ i18n.t('avaliacao.pad') }}</th>
+                        <th>{{ i18n.t('avaliacao.fc') }}</th>
+                        <th>{{ i18n.t('avaliacao.abd') }}</th>
+                        <th>{{ i18n.t('avaliacao.cint') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -125,6 +135,13 @@
                           <td>{{ e.imc ?? '—' }}</td>
                           <td>{{ e.percentualMassaGorda ?? '—' }}</td>
                           <td>{{ e.percentualMassaMagra ?? '—' }}</td>
+                          <td>{{ e.kcal ?? '—' }}</td>
+                          <td>{{ e.glicemiaVejuno ?? '—' }}</td>
+                          <td>{{ e.pressaoArterial?.sistolica ?? '—' }}</td>
+                          <td>{{ e.pressaoArterial?.diastolica ?? '—' }}</td>
+                          <td>{{ e.fcRepouso ?? '—' }}</td>
+                          <td>{{ e.perimetros?.abdominal ?? '—' }}</td>
+                          <td>{{ e.perimetros?.cintura ?? '—' }}</td>
                         </tr>
                       }
                     </tbody>
@@ -132,33 +149,20 @@
                 </div>
               }
 
-              <!-- Success flash -->
               @if (savedId() === f._id) {
                 <p class="save-confirm">✓ {{ i18n.t('avaliacao.saved') }}</p>
               }
 
-              <!-- Add entry -->
               @if (addingEntryFor() === f._id) {
                 <form class="entry-form" (ngSubmit)="saveEntry(f._id!)">
                   <div class="entry-form-grid">
                     <div class="form-group">
-                      <label class="form-label" [for]="'date-' + f._id">{{
-                        i18n.t('avaliacao.date')
-                      }}</label>
-                      <input
-                        [id]="'date-' + f._id"
-                        type="date"
-                        [(ngModel)]="entryForm.data"
-                        name="data"
-                        required
-                      />
+                      <label class="form-label">{{ i18n.t('avaliacao.date') }}</label>
+                      <input type="date" [(ngModel)]="entryForm.data" name="data" required />
                     </div>
                     <div class="form-group">
-                      <label class="form-label" [for]="'peso-' + f._id">{{
-                        i18n.t('avaliacao.peso')
-                      }}</label>
+                      <label class="form-label">{{ i18n.t('avaliacao.peso') }}</label>
                       <input
-                        [id]="'peso-' + f._id"
                         type="number"
                         step="0.1"
                         min="0"
@@ -168,11 +172,8 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label class="form-label" [for]="'imc-' + f._id">{{
-                        i18n.t('avaliacao.imc')
-                      }}</label>
+                      <label class="form-label">{{ i18n.t('avaliacao.imc') }}</label>
                       <input
-                        [id]="'imc-' + f._id"
                         type="number"
                         step="0.1"
                         min="0"
@@ -182,11 +183,8 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label class="form-label" [for]="'mg-' + f._id">{{
-                        i18n.t('avaliacao.mg')
-                      }}</label>
+                      <label class="form-label">{{ i18n.t('avaliacao.mg') }}</label>
                       <input
-                        [id]="'mg-' + f._id"
                         type="number"
                         step="0.1"
                         min="0"
@@ -197,17 +195,87 @@
                       />
                     </div>
                     <div class="form-group">
-                      <label class="form-label" [for]="'mm-' + f._id">{{
-                        i18n.t('avaliacao.mm')
-                      }}</label>
+                      <label class="form-label">{{ i18n.t('avaliacao.mm') }}</label>
                       <input
-                        [id]="'mm-' + f._id"
                         type="number"
                         step="0.1"
                         min="0"
                         max="100"
                         [(ngModel)]="entryForm.percentualMassaMagra"
                         name="mm"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.kcal') }}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="entryForm.kcal"
+                        name="kcal"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.gv') }}</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        [(ngModel)]="entryForm.glicemiaVejuno"
+                        name="gv"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.pas') }}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="entryForm.paSistolica"
+                        name="pas"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.pad') }}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="entryForm.paDiastolica"
+                        name="pad"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.fc') }}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="entryForm.fcRepouso"
+                        name="fc"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.abd') }}</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        [(ngModel)]="entryForm.perimetroAbdominal"
+                        name="abd"
+                        placeholder="—"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">{{ i18n.t('avaliacao.cint') }}</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        [(ngModel)]="entryForm.perimetroCintura"
+                        name="cint"
                         placeholder="—"
                       />
                     </div>
@@ -222,20 +290,8 @@
                   </div>
                 </form>
               } @else {
-                <button type="button" class="add-entry-btn" (click)="startAddEntry(f._id!)">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  {{ i18n.t('avaliacao.addEntry') }}
+                <button type="button" class="btn-add-entry" (click)="startAddEntry(f._id!)">
+                  + {{ i18n.t('avaliacao.addEntry') }}
                 </button>
               }
             </div>
@@ -246,19 +302,14 @@
   }
 </section>
 
-<!-- ── Create ficha sheet ──────────────────────── -->
+<!-- ── Create ficha sheet ────────────────────────── -->
 @if (creatingFicha()) {
   <div class="sheet-backdrop" (click)="cancelCreateFicha()" aria-hidden="true"></div>
   <div class="ficha-sheet" role="dialog" aria-modal="true">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-header">
       <h3 class="sheet-title">{{ i18n.t('avaliacao.criar.titulo') }}</h3>
-      <button
-        type="button"
-        class="sheet-close"
-        (click)="cancelCreateFicha()"
-        [attr.aria-label]="i18n.t('avaliacao.criar.cancel')"
-      >
+      <button type="button" class="sheet-close" (click)="cancelCreateFicha()">
         <svg
           viewBox="0 0 24 24"
           fill="none"

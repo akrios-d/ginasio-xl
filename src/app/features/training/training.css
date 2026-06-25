@@ -390,44 +390,19 @@
   transition: background 120ms;
   white-space: nowrap;
 }
-
 .btn-new svg {
   width: 14px;
   height: 14px;
 }
-
 .btn-new:hover {
   background: var(--c-accent-dk);
   box-shadow: none;
 }
-
 .btn-new--empty {
   margin-top: 16px;
 }
 
-/* ── Empty state ───────────────────────────────── */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 60px 20px;
-  color: var(--c-ink-3);
-}
-
-.empty-state svg {
-  width: 48px;
-  height: 48px;
-  opacity: 0.35;
-}
-
-.empty-state p {
-  margin: 0;
-  font-size: var(--t-secondary);
-  text-align: center;
-}
-
-/* ── Create sheet / modal ──────────────────────── */
+/* ── Sheet animations ──────────────────────────── */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -499,7 +474,6 @@
   border-radius: 2px;
   margin: 12px auto 0;
 }
-
 @media (min-width: 600px) {
   .sheet-handle {
     display: none;
@@ -512,7 +486,6 @@
   justify-content: space-between;
   padding: 16px 20px 4px;
 }
-
 .sheet-title {
   margin: 0;
   font-size: var(--t-body);
@@ -537,7 +510,6 @@
     background 120ms,
     color 120ms;
 }
-
 .sheet-close svg {
   width: 16px;
   height: 16px;
@@ -548,11 +520,10 @@
   box-shadow: none;
 }
 
-/* ── Sheet sections ───────────────────────────── */
+/* ── Sheet sections ────────────────────────────── */
 .sheet-top {
   padding: 12px 20px 0;
 }
-
 .sheet-bottom {
   padding: 12px 20px 28px;
   display: flex;
@@ -565,7 +536,6 @@
   flex-direction: column;
   gap: 6px;
 }
-
 .form-label {
   font-size: var(--t-meta);
   font-weight: 500;
@@ -579,13 +549,12 @@
   padding: 10px 12px;
   font-size: var(--t-secondary);
 }
-
 .sheet-bottom textarea {
   resize: vertical;
   min-height: 56px;
 }
 
-/* ── Tab bar ────────────────────────────────────── */
+/* ── Tab bar ───────────────────────────────────── */
 .tab-bar {
   display: flex;
   align-items: center;
@@ -615,56 +584,48 @@
     color 120ms,
     border-color 120ms;
 }
-
 .tab-btn:hover {
   color: var(--c-ink);
   box-shadow: none;
 }
-
 .tab-btn--active {
   color: var(--c-accent);
   border-bottom-color: var(--c-accent);
 }
-
 .tab-btn--add {
   font-size: 1.1rem;
-  color: var(--c-ink-3);
   margin-left: 2px;
 }
 
-/* ── Tab content ────────────────────────────────── */
+/* ── Tab content ───────────────────────────────── */
 .tab-content {
   min-height: 200px;
 }
-
 .tab-panel {
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
 .tab-hint {
   margin: 0 0 4px;
   font-size: var(--t-meta);
   color: var(--c-ink-3);
 }
 
-/* ── Group tab header ───────────────────────────── */
 .group-tab-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
 }
-
 .group-tab-title {
   font-size: var(--t-secondary);
   font-weight: 700;
   color: var(--c-accent);
 }
 
-/* ── Cardio form row ────────────────────────────── */
+/* ── Cardio form row ───────────────────────────── */
 .cardio-row-form {
   display: flex;
   align-items: center;
@@ -673,88 +634,52 @@
   border-radius: var(--r-sm);
   padding: 8px;
 }
-
 .cardio-eq-input {
   flex: 1;
   min-width: 0;
   padding: 8px 10px !important;
   font-size: var(--t-secondary) !important;
 }
-
 .cardio-tempo-group {
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
 }
-
 .cardio-tempo-input {
   width: 50px;
   text-align: center;
   padding: 8px 6px !important;
   font-size: var(--t-secondary) !important;
 }
-
 .cardio-tempo-label {
   font-size: var(--t-meta);
   color: var(--c-ink-3);
   white-space: nowrap;
 }
 
-.btn-remove-group {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  min-height: unset;
-  background: transparent;
-  border: none;
-  border-radius: var(--r-sm);
-  color: var(--c-ink-3);
-  cursor: pointer;
-  transition:
-    color 120ms,
-    background 120ms;
-}
-
-.btn-remove-group svg {
-  width: 14px;
-  height: 14px;
-}
-.btn-remove-group:hover {
-  color: var(--c-danger);
-  background: color-mix(in srgb, var(--c-danger) 10%, transparent);
-  box-shadow: none;
-}
-
-/* ── Exercise rows ─────────────────────────────── */
+/* ── Exercise rows (form) ──────────────────────── */
 .exercise-row-form {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: var(--c-surface);
+  background: var(--c-surface-alt);
   border-radius: var(--r-sm);
   padding: 8px;
 }
-
 .ex-name-input {
   width: 100%;
 }
-
 .ex-num-row {
   display: flex;
   align-items: flex-end;
   gap: 8px;
 }
-
 .ex-num-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 .ex-num-label {
   font-size: 0.68rem;
   font-weight: 500;
@@ -762,13 +687,11 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-
 .ex-num-input {
   width: 64px;
   text-align: center;
   padding: 8px 6px !important;
 }
-
 .ex-sep {
   font-size: var(--t-body);
   font-weight: 600;
@@ -794,7 +717,6 @@
     color 120ms,
     background 120ms;
 }
-
 .btn-remove-ex svg {
   width: 14px;
   height: 14px;
@@ -802,6 +724,70 @@
 .btn-remove-ex:hover {
   color: var(--c-danger);
   background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+  box-shadow: none;
+}
+
+.btn-remove-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  min-height: unset;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--c-ink-3);
+  cursor: pointer;
+  transition:
+    color 120ms,
+    background 120ms;
+}
+.btn-remove-group svg {
+  width: 14px;
+  height: 14px;
+}
+.btn-remove-group:hover {
+  color: var(--c-danger);
+  background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+  box-shadow: none;
+}
+
+.btn-add-ex {
+  font-size: var(--t-meta);
+  font-weight: 600;
+  color: var(--c-accent);
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+  min-height: unset;
+}
+.btn-add-ex:hover {
+  text-decoration: underline;
+  box-shadow: none;
+}
+
+/* ── Sheet actions ─────────────────────────────── */
+.sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+.sheet-actions button {
+  flex: 1;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-ink-2);
+  border: 1.5px solid var(--c-border);
+}
+.btn-ghost:hover {
+  background: var(--c-surface-alt);
+  border-color: var(--c-border-strong);
+  color: var(--c-ink);
   box-shadow: none;
 }
 
