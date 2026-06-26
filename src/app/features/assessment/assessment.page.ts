@@ -356,7 +356,7 @@ export class AssessmentPage {
   private entryToForm(e: EntradaAvaliacao): EntryForm {
     const d = e.data instanceof Date ? e.data : new Date(e.data);
     return {
-      data: d.toISOString().slice(0, 10),
+      data: toLocalDateString(d),
       peso: e.peso?.toString() ?? '',
       imc: e.imc?.toString() ?? '',
       percentualMassaGorda: e.percentualMassaGorda?.toString() ?? '',
@@ -373,7 +373,7 @@ export class AssessmentPage {
 
   private emptyEntryForm(): EntryForm {
     return {
-      data: new Date().toISOString().slice(0, 10),
+      data: toLocalDateString(new Date()),
       peso: '',
       imc: '',
       percentualMassaGorda: '',

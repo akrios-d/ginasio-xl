@@ -183,7 +183,10 @@
   "profile.saveNameBtn": "Enregistrer",
   "profile.cancelBtn": "Annuler",
   "profile.manageStudents": "Gérer les élèves",
-  "profile.meusTrainadores": "Mes entraîneurs",
+  "app.goodMorning": "Bonjour",
+  "app.goodAfternoon": "Bon après-midi",
+  "app.goodEvening": "Bonsoir",
+  "profile.meusTrainadores": "Mes coachs",
   "treino.alunoNaoEncontrado": "Élève introuvable",
   "profile.removeTrainador": "Retirer",
   "profile.confirmRemoveTrainador": "Retirer ce coach ?"

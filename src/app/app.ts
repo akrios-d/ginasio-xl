@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -20,10 +20,15 @@ export class App {
   protected readonly auth = inject(AuthService);
   private readonly perfilSvc = inject(PerfilService);
 
+  private readonly profileName = signal<string>('');
+
   constructor() {
     effect(() => {
       if (this.auth.isAuthenticated()) {
-        this.perfilSvc.get().subscribe({ error: () => undefined });
+        this.perfilSvc.get().subscribe({
+          next: (p) => this.profileName.set(p.name ?? ''),
+          error: () => undefined,
+        });
       }
     });
   }
@@ -38,8 +43,13 @@ export class App {
 
   protected readonly greeting = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return this.i18n.t('app.goodMorning');
-    if (hour < 18) return this.i18n.t('app.goodAfternoon');
-    return this.i18n.t('app.goodEvening');
+    const base =
+      hour < 12
+        ? this.i18n.t('app.goodMorning')
+        : hour < 18
+          ? this.i18n.t('app.goodAfternoon')
+          : this.i18n.t('app.goodEvening');
+    const name = this.profileName();
+    return name ? `${base}, ${name.split(' ')[0]}!` : base;
   });
 }
