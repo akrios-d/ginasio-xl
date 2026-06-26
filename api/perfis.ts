@@ -6,6 +6,21 @@
 import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
+import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
+
+/** Look up display name from Auth.js users collection */
+async function getAuthName(userId: string): Promise<string | null> {
+  try {
+    const client = await clientPromise;
+    const user = await client
+      .db(AUTH_DB_NAME)
+      .collection('users')
+      .findOne({ _id: userId as unknown as import('mongodb').ObjectId });
+    return (user?.['name'] as string | null) ?? (user?.['email'] as string | null) ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);
@@ -22,11 +37,40 @@ export default async function handler(req: any, res: any): Promise<void> {
       const role = (req.query as any).role as string | undefined;
 
       let docs: any[];
-      if (role === 'student') {
+      if (role === 'myteachers') {
+        // Return the teachers associated with the current user (student view)
+        const myPerfil = await col.findOne({ userId });
+        const teacherIds: string[] = Array.isArray(myPerfil?.teacherIds) ? myPerfil.teacherIds : [];
+        if (teacherIds.length === 0) {
+          res.status(200).json([]);
+          return;
+        }
+        docs = await col
+          .find({ userId: { $in: teacherIds } })
+          .project({ userId: 1, name: 1, email: 1 })
+          .toArray();
+        res.status(200).json(docs.map(mapDocumentId));
+        return;
+      } else if (role === 'student') {
         docs = await col
           .find({ teacherIds: userId })
           .project({ userId: 1, name: 1, email: 1 })
           .toArray();
+
+        // Enrich name from Auth.js for students whose name is missing or equals their userId
+        docs = await Promise.all(
+          docs.map(async (d) => {
+            if (!d.name || d.name === d.userId) {
+              const authName = await getAuthName(d.userId);
+              if (authName) {
+                // Persist the fix so next call is fast
+                await col.updateOne({ userId: d.userId }, { $set: { name: authName } });
+                return { ...d, name: authName };
+              }
+            }
+            return d;
+          }),
+        );
       } else {
         docs = await col
           .find({ roles: 'teacher' })
@@ -65,7 +109,22 @@ export default async function handler(req: any, res: any): Promise<void> {
         { $addToSet: { teacherIds: userId }, $set: { updatedAt: new Date() } },
       );
 
-      res.status(200).json({ linked: true, name: student.name, email: student.email });
+      // Resolve name from Auth.js if missing/bad
+      let displayName = student.name && student.name !== studentUserId ? student.name : null;
+      if (!displayName) {
+        displayName = await getAuthName(studentUserId);
+        if (displayName) {
+          await col.updateOne({ userId: studentUserId }, { $set: { name: displayName } });
+        }
+      }
+
+      res
+        .status(200)
+        .json({
+          linked: true,
+          name: displayName ?? student.email ?? studentUserId,
+          email: student.email,
+        });
       return;
     }
 

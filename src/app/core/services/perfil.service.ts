@@ -29,7 +29,7 @@ export class PerfilService {
     return this.http.get<Perfil>(this.base, { withCredentials: true });
   }
 
-  save(payload: { teacherIds: string[] }): Observable<{ saved: boolean }> {
+  save(payload: { name?: string; teacherIds?: string[] }): Observable<{ saved: boolean }> {
     return this.http.put<{ saved: boolean }>(this.base, payload, { withCredentials: true });
   }
 
@@ -41,6 +41,12 @@ export class PerfilService {
 
   listStudents(): Observable<StudentInfo[]> {
     return this.http.get<StudentInfo[]>(`${this.baseMulti}?role=student`, {
+      withCredentials: true,
+    });
+  }
+
+  listMyTeachers(): Observable<TeacherInfo[]> {
+    return this.http.get<TeacherInfo[]>(`${this.baseMulti}?role=myteachers`, {
       withCredentials: true,
     });
   }

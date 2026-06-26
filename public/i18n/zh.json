@@ -172,9 +172,16 @@
   "avaliacao.todos": "全部",
   "profile.meusAlunos": "我的学生",
   "profile.addAluno": "关联",
-  "profile.alunoIdPlaceholder": "粘贴学生ID",
-  "profile.semAlunos": "暂无关联学生",
+  "profile.alunoIdPlaceholder": "粘贴学生ID到这里",
+  "profile.semAlunos": "暂无关联学生。",
   "profile.removeAluno": "移除",
-  "profile.alunoNotFound": "未找到学生",
-  "profile.forbidden": "权限不足"
+  "profile.alunoNotFound": "找不到学生。",
+  "profile.forbidden": "操作不被允许。",
+  "profile.verAlunos": "查看学生",
+  "profile.displayName": "显示名称",
+  "profile.editName": "编辑",
+  "profile.saveNameBtn": "保存",
+  "profile.cancelBtn": "取消",
+  "profile.manageStudents": "管理学生",
+  "profile.meusTrainadores": "我的教练"
 }

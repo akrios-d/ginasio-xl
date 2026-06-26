@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
@@ -7,7 +6,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { CheckinService } from '../../core/services/checkin.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
-import { Icon, type IconName } from '../../shared/components/icon/icon';
+import { Icon } from '../../shared/components/icon/icon';
 import type { Checkin } from '../../core/models/checkin.model';
 import type { ProgramaTreino } from '../../core/models';
 
@@ -28,7 +27,7 @@ interface CheckinForm {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, ConfirmDialog, Icon],
+  imports: [FormsModule, DatePipe, ConfirmDialog, Icon],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -37,11 +36,6 @@ export class HomePage {
   protected readonly i18n = inject(I18nService);
   private readonly checkinSvc = inject(CheckinService);
   private readonly treinoSvc = inject(ProgramaTreinoService);
-  protected readonly sections: { key: string; route: string; icon: IconName }[] = [
-    { key: 'treino', route: '/training', icon: 'dumbbell' },
-    { key: 'avaliacao', route: '/assessment', icon: 'chart' },
-    { key: 'perfil', route: '/profile', icon: 'person' },
-  ] as const;
 
   // ── Calendar state ────────────────────────────────────────────────────────
   private readonly today = new Date();

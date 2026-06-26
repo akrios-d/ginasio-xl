@@ -62,22 +62,6 @@
       }
     </div>
   </div>
-
-  <!-- ── Section cards ──────────────────────────────────────── -->
-  <div class="section-grid">
-    @for (s of sections; track s.key) {
-      <a class="section-card" [routerLink]="s.route">
-        <div class="section-card-icon">
-          <app-icon [name]="s.icon" [size]="22" />
-        </div>
-        <div class="section-card-body">
-          <h3>{{ i18n.t('home.' + s.key + '.title') }}</h3>
-          <p>{{ i18n.t('home.' + s.key + '.desc') }}</p>
-        </div>
-        <span class="section-card-arrow" aria-hidden="true">→</span>
-      </a>
-    }
-  </div>
 </section>
 
 <!-- ── Day popup / Check-in sheet ────────────────────────── -->

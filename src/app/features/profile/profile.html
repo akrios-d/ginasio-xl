@@ -6,100 +6,181 @@
   @if (loading()) {
     <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
   } @else {
-    <!-- ── Teacher: manage students ──────────────────── -->
-    @if (isTeacher()) {
-      <div class="prof-section">
-        <h3 class="prof-section-title">{{ i18n.t('profile.meusAlunos') }}</h3>
-
-        <!-- Link input -->
-        <div class="link-row">
-          <input
-            class="link-input"
-            type="text"
-            [ngModel]="studentIdInput()"
-            (ngModelChange)="studentIdInput.set($event); linkError.set('')"
-            name="studentId"
-            [placeholder]="i18n.t('profile.alunoIdPlaceholder')"
-          />
-          <button
-            type="button"
-            class="btn-assoc"
-            [disabled]="!studentIdInput().trim() || linkSaving()"
-            (click)="linkStudent()"
-          >
-            {{ linkSaving() ? i18n.t('common.saving') : i18n.t('profile.addAluno') }}
-          </button>
-        </div>
-        @if (linkError()) {
-          <p class="link-error">{{ linkError() }}</p>
-        }
-
-        <!-- Students list -->
-        @if (students().length > 0) {
-          <ul class="prof-list">
-            @for (s of students(); track s.userId) {
-              <li class="prof-item">
-                <div class="prof-info">
-                  <span class="prof-name">{{ s.name || s.email || s.userId }}</span>
-                  @if (s.name && s.email) {
-                    <span class="prof-email">{{ s.email }}</span>
-                  }
-                </div>
-                <button
-                  type="button"
-                  class="btn-assoc btn-assoc--remove"
-                  [disabled]="unlinkingId() === s.userId"
-                  (click)="unlinkStudent(s)"
-                >
-                  {{ i18n.t('profile.removeAluno') }}
-                </button>
-              </li>
-            }
-          </ul>
-        } @else {
-          <p class="text-muted">{{ i18n.t('profile.semAlunos') }}</p>
-        }
-      </div>
-    }
-
-    <!-- ── My ID ─────────────────────────────────────── -->
-    <div class="user-id-section">
-      <p class="user-id-label">{{ i18n.t('profile.myId') }}</p>
-      <p class="user-id-desc">{{ i18n.t('profile.myIdDesc') }}</p>
-      <div class="user-id-row">
-        <code class="user-id-value">{{ auth.userId() }}</code>
-        <button type="button" class="btn-copy" (click)="copyId()">
-          {{ idCopied() ? '✓' : i18n.t('profile.copy') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- ── Settings ──────────────────────────────────── -->
-    <div class="settings-section">
-      <div class="settings-row">
-        <span class="settings-label">{{ i18n.t('app.themeLabel') }}</span>
-        <app-theme-toggle />
-      </div>
-      <div class="settings-row">
-        <span class="settings-label">{{ i18n.t('app.languageLabel') }}</span>
-        <div class="lang-flags">
-          @for (opt of i18n.languageOptions; track opt.code) {
-            <button
-              type="button"
-              class="lang-flag-btn"
-              [class.lang-flag-btn--active]="i18n.language() === opt.code"
-              [attr.aria-label]="opt.label"
-              (click)="pickLanguage(opt.code)"
-            >
-              <app-flag [lang]="opt.code" />
-            </button>
+    <div class="profile-grid">
+      <!-- ── Left column ──────────────────────────────── -->
+      <div class="profile-col">
+        <!-- Display name -->
+        <div class="profile-card name-section">
+          @if (!nameEditing()) {
+            <div class="name-row">
+              <span class="name-value">{{ displayName() }}</span>
+              <button type="button" class="btn-name-edit" (click)="startEditName()">
+                <app-icon name="edit" [size]="15" />
+                {{ i18n.t('profile.editName') }}
+              </button>
+            </div>
+          } @else {
+            <div class="name-edit-row">
+              <input
+                class="name-input"
+                type="text"
+                [ngModel]="displayName()"
+                (ngModelChange)="displayName.set($event)"
+                name="displayName"
+                [placeholder]="i18n.t('profile.displayName')"
+              />
+              <button
+                type="button"
+                class="btn-assoc"
+                [disabled]="!displayName().trim() || nameSaving()"
+                (click)="saveName()"
+              >
+                {{ nameSaving() ? i18n.t('common.saving') : i18n.t('profile.saveNameBtn') }}
+              </button>
+              <button type="button" class="btn-cancel" (click)="cancelEditName()">
+                {{ i18n.t('profile.cancelBtn') }}
+              </button>
+            </div>
           }
         </div>
+
+        <!-- Teacher: open students sheet -->
+        @if (isTeacher()) {
+          <div class="prof-section">
+            <button type="button" class="btn-students-open" (click)="openStudentsSheet()">
+              <app-icon name="person" [size]="16" />
+              {{ i18n.t('profile.meusAlunos') }}
+              @if (students().length > 0) {
+                <span class="students-badge">{{ students().length }}</span>
+              }
+              <app-icon name="arrow-right" [size]="16" />
+            </button>
+          </div>
+        }
+
+        <!-- My teachers (student view) -->
+        @if (myTeachers().length > 0) {
+          <div class="profile-card">
+            <h3 class="card-section-title">{{ i18n.t('profile.meusTrainadores') }}</h3>
+            <ul class="prof-list">
+              @for (t of myTeachers(); track t.userId) {
+                <li class="prof-item">
+                  <div class="prof-info">
+                    <span class="prof-name">{{ t.name || t.email || t.userId }}</span>
+                    @if (t.name && t.email) {
+                      <span class="prof-email">{{ t.email }}</span>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        }
       </div>
-      <button type="button" class="btn-signout" (click)="auth.logout()">
-        <app-icon name="logout" [size]="16" />
-        {{ i18n.t('app.signOut') }}
-      </button>
+
+      <!-- ── Right column ─────────────────────────────── -->
+      <div class="profile-col">
+        <!-- My ID -->
+        <div class="profile-card user-id-section">
+          <p class="user-id-label">{{ i18n.t('profile.myId') }}</p>
+          <p class="user-id-desc">{{ i18n.t('profile.myIdDesc') }}</p>
+          <div class="user-id-row">
+            <code class="user-id-value">{{ auth.userId() }}</code>
+            <button type="button" class="btn-copy" (click)="copyId()">
+              {{ idCopied() ? '✓' : i18n.t('profile.copy') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="profile-card settings-section">
+          <div class="settings-row">
+            <span class="settings-label">{{ i18n.t('app.themeLabel') }}</span>
+            <app-theme-toggle />
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">{{ i18n.t('app.languageLabel') }}</span>
+            <div class="lang-flags">
+              @for (opt of i18n.languageOptions; track opt.code) {
+                <button
+                  type="button"
+                  class="lang-flag-btn"
+                  [class.lang-flag-btn--active]="i18n.language() === opt.code"
+                  [attr.aria-label]="opt.label"
+                  (click)="pickLanguage(opt.code)"
+                >
+                  <app-flag [lang]="opt.code" />
+                </button>
+              }
+            </div>
+          </div>
+          <button type="button" class="btn-signout" (click)="auth.logout()">
+            <app-icon name="logout" [size]="16" />
+            {{ i18n.t('app.signOut') }}
+          </button>
+        </div>
+      </div>
     </div>
   }
 </section>
+
+<!-- ── Students bottom sheet ─────────────────────── -->
+@if (studentsSheetOpen()) {
+  <div class="sheet-backdrop" (click)="closeStudentsSheet()"></div>
+  <div class="students-sheet">
+    <div class="sheet-header">
+      <span class="sheet-title">{{ i18n.t('profile.meusAlunos') }}</span>
+      <button type="button" class="sheet-close" (click)="closeStudentsSheet()">
+        <app-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    <!-- Link input -->
+    <div class="link-row">
+      <input
+        class="link-input"
+        type="text"
+        [ngModel]="studentIdInput()"
+        (ngModelChange)="studentIdInput.set($event); linkError.set('')"
+        name="studentId"
+        [placeholder]="i18n.t('profile.alunoIdPlaceholder')"
+      />
+      <button
+        type="button"
+        class="btn-assoc"
+        [disabled]="!studentIdInput().trim() || linkSaving()"
+        (click)="linkStudent()"
+      >
+        {{ linkSaving() ? i18n.t('common.saving') : i18n.t('profile.addAluno') }}
+      </button>
+    </div>
+    @if (linkError()) {
+      <p class="link-error">{{ linkError() }}</p>
+    }
+
+    @if (students().length > 0) {
+      <ul class="prof-list">
+        @for (s of students(); track s.userId) {
+          <li class="prof-item">
+            <div class="prof-info">
+              <span class="prof-name">{{ s.name || s.email || s.userId }}</span>
+              @if (s.name && s.email) {
+                <span class="prof-email">{{ s.email }}</span>
+              }
+            </div>
+            <button
+              type="button"
+              class="btn-assoc btn-assoc--remove"
+              [disabled]="unlinkingId() === s.userId"
+              (click)="unlinkStudent(s)"
+            >
+              {{ i18n.t('profile.removeAluno') }}
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted">{{ i18n.t('profile.semAlunos') }}</p>
+    }
+  </div>
+}

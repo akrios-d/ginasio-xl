@@ -173,8 +173,15 @@
   "profile.meusAlunos": "Os meus alunos",
   "profile.addAluno": "Associar",
   "profile.alunoIdPlaceholder": "Cola o ID do aluno aqui",
-  "profile.semAlunos": "Sem alunos associados",
+  "profile.semAlunos": "Nenhum aluno associado.",
   "profile.removeAluno": "Remover",
-  "profile.alunoNotFound": "Aluno não encontrado",
-  "profile.forbidden": "Sem permissão"
+  "profile.alunoNotFound": "Aluno não encontrado.",
+  "profile.forbidden": "Ação não permitida.",
+  "profile.verAlunos": "Ver alunos",
+  "profile.displayName": "Nome de exibição",
+  "profile.editName": "Editar",
+  "profile.saveNameBtn": "Guardar",
+  "profile.cancelBtn": "Cancelar",
+  "profile.manageStudents": "Gerir alunos",
+  "profile.meusTrainadores": "Os meus treinadores"
 }

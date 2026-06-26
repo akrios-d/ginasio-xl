@@ -173,8 +173,15 @@
   "profile.meusAlunos": "Mes élèves",
   "profile.addAluno": "Associer",
   "profile.alunoIdPlaceholder": "Collez l'ID de l'élève ici",
-  "profile.semAlunos": "Aucun élève associé",
-  "profile.removeAluno": "Supprimer",
-  "profile.alunoNotFound": "Élève introuvable",
-  "profile.forbidden": "Permission refusée"
+  "profile.semAlunos": "Aucun élève associé.",
+  "profile.removeAluno": "Retirer",
+  "profile.alunoNotFound": "Élève introuvable.",
+  "profile.forbidden": "Action non autorisée.",
+  "profile.verAlunos": "Voir les élèves",
+  "profile.displayName": "Nom affiché",
+  "profile.editName": "Modifier",
+  "profile.saveNameBtn": "Enregistrer",
+  "profile.cancelBtn": "Annuler",
+  "profile.manageStudents": "Gérer les élèves",
+  "profile.meusTrainadores": "Mes entraîneurs"
 }

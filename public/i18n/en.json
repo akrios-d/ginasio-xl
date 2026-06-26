@@ -173,8 +173,15 @@
   "profile.meusAlunos": "My students",
   "profile.addAluno": "Associate",
   "profile.alunoIdPlaceholder": "Paste student ID here",
-  "profile.semAlunos": "No students associated",
+  "profile.semAlunos": "No students associated.",
   "profile.removeAluno": "Remove",
-  "profile.alunoNotFound": "Student not found",
-  "profile.forbidden": "Permission denied"
+  "profile.alunoNotFound": "Student not found.",
+  "profile.forbidden": "Action not permitted.",
+  "profile.verAlunos": "View students",
+  "profile.displayName": "Display name",
+  "profile.editName": "Edit",
+  "profile.saveNameBtn": "Save",
+  "profile.cancelBtn": "Cancel",
+  "profile.manageStudents": "Manage students",
+  "profile.meusTrainadores": "My trainers"
 }
