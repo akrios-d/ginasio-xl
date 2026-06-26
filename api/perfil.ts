@@ -38,10 +38,21 @@ export default async function handler(req: any, res: any): Promise<void> {
   try {
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
-      const doc = await col.findOne({ userId });
+      let doc = await col.findOne({ userId });
       if (!doc) {
-        res.status(404).json({ error: 'Perfil não encontrado' });
-        return;
+        // Auto-create profile on first access
+        const authUser = await getAuthUser(userId);
+        const now = new Date();
+        await col.insertOne({
+          userId,
+          roles: ['student'],
+          name: authUser.name ?? authUser.email ?? userId,
+          email: authUser.email ?? '',
+          teacherIds: [],
+          createdAt: now,
+          updatedAt: now,
+        });
+        doc = await col.findOne({ userId });
       }
       res.status(200).json(mapDocumentId(doc));
       return;
