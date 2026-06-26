@@ -22,6 +22,7 @@
           type="button"
           class="cal-nav-btn"
           (click)="nextMonth()"
+          [disabled]="isCurrentMonth()"
           [attr.aria-label]="i18n.t('common.nextMonth')"
         >
           <app-icon name="arrow-right" [size]="16" />
@@ -45,6 +46,8 @@
             [class.cal-cell--today]="cell.isToday"
             [class.cal-cell--selected]="cell.isSelected"
             [class.cal-cell--has-checkin]="cell.checkins.length > 0"
+            [class.cal-cell--future]="cell.isFuture"
+            [disabled]="cell.isFuture"
             (click)="selectDay(cell)"
           >
             <span class="cal-day-num">{{ cell.day }}</span>

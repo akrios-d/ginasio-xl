@@ -338,6 +338,12 @@
   background: color-mix(in srgb, var(--c-accent) 5%, var(--c-surface));
 }
 
+.cal-cell--future {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
 .cal-dots {
   display: flex;
   flex-wrap: wrap;

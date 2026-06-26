@@ -15,6 +15,7 @@ interface CalendarDay {
   date: Date | null;
   isToday: boolean;
   isSelected: boolean;
+  isFuture: boolean;
   checkins: Checkin[];
 }
 
@@ -69,6 +70,11 @@ export class HomePage {
     const todayStr = this.today.toDateString();
     const selectedStr = this.selectedDate()?.toDateString() ?? '';
     const checkinMap = this.buildCheckinMap(this.checkins(), year, month);
+    const todayMidnight = new Date(
+      this.today.getFullYear(),
+      this.today.getMonth(),
+      this.today.getDate(),
+    );
 
     const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -77,7 +83,14 @@ export class HomePage {
 
     const cells: CalendarDay[] = [];
     for (let i = 0; i < startPad; i++) {
-      cells.push({ day: 0, date: null, isToday: false, isSelected: false, checkins: [] });
+      cells.push({
+        day: 0,
+        date: null,
+        isToday: false,
+        isSelected: false,
+        isFuture: false,
+        checkins: [],
+      });
     }
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(year, month, d);
@@ -86,6 +99,7 @@ export class HomePage {
         date,
         isToday: date.toDateString() === todayStr,
         isSelected: date.toDateString() === selectedStr,
+        isFuture: date > todayMidnight,
         checkins: checkinMap[d] ?? [],
       });
     }
@@ -139,6 +153,7 @@ export class HomePage {
   }
 
   protected nextMonth(): void {
+    if (this.isCurrentMonth()) return; // never navigate into the future
     if (this.viewMonth() === 11) {
       this.viewYear.update((y) => y + 1);
       this.viewMonth.set(0);
@@ -150,7 +165,7 @@ export class HomePage {
   }
 
   protected selectDay(day: CalendarDay): void {
-    if (!day.date) return;
+    if (!day.date || day.isFuture) return;
     if (this.selectedDate()?.toDateString() === day.date.toDateString()) {
       this.selectedDate.set(null);
       this.addingCheckin.set(false);
