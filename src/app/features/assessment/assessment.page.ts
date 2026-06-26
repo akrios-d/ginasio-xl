@@ -356,7 +356,7 @@ export class AssessmentPage {
   private entryToForm(e: EntradaAvaliacao): EntryForm {
     const d = e.data instanceof Date ? e.data : new Date(e.data);
     return {
-      data: toLocalDateString(d),
+      data: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
       peso: e.peso?.toString() ?? '',
       imc: e.imc?.toString() ?? '',
       percentualMassaGorda: e.percentualMassaGorda?.toString() ?? '',
@@ -373,7 +373,10 @@ export class AssessmentPage {
 
   private emptyEntryForm(): EntryForm {
     return {
-      data: toLocalDateString(new Date()),
+      data: (() => {
+        const n = new Date();
+        return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+      })(),
       peso: '',
       imc: '',
       percentualMassaGorda: '',
