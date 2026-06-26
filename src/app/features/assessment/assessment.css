@@ -494,37 +494,44 @@
 /* ── Entry row edit button ───────────────────────── */
 .entry-edit-cell {
   padding: 0 4px !important;
-  width: 28px;
+  width: 32px;
 }
 .btn-entry-edit {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   min-height: unset;
-  background: transparent;
-  border: none;
+  background: var(--c-surface-alt, var(--c-surface));
+  border: 1.5px solid var(--c-border);
   border-radius: var(--r-sm);
-  color: var(--c-ink-3);
+  color: var(--c-ink-2);
   cursor: pointer;
-  opacity: 0;
+  opacity: 1;
   transition:
     opacity 120ms,
     color 120ms,
-    background 120ms;
+    background 120ms,
+    border-color 120ms;
 }
 .btn-entry-edit svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
 }
 @media (hover: hover) {
   .btn-entry-edit:hover {
     color: var(--c-accent);
+    border-color: var(--c-accent);
     background: color-mix(in srgb, var(--c-accent) 10%, transparent);
     box-shadow: none;
   }
+}
+.entry-row--editing .btn-entry-edit {
+  color: var(--c-accent);
+  border-color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 10%, transparent);
 }
 .entry-row--editing {
   background: color-mix(in srgb, var(--c-accent) 6%, transparent);

@@ -1,12 +1,13 @@
 /**
  * POST /api/avaliacao/:id/entrada
- * Adiciona uma nova medição (linha) a uma ficha de avaliação existente.
+ * Adiciona uma nova medicao (linha) a uma ficha de avaliacao existente.
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../../../server/lib/cors.js';
 import { getCollection, toObjectId } from '../../../server/lib/mongo.js';
 import { requireSession } from '../../../server/lib/session.js';
 import { AddEntradaAvaliacaoSchema } from '../../../server/schemas/avaliacao.schema.js';
+import { auditLog } from '../../../server/lib/audit.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);
@@ -27,11 +28,19 @@ export default async function handler(req: any, res: any): Promise<void> {
     const _id = toObjectId(id);
     const entrada = AddEntradaAvaliacaoSchema.parse(req.body);
 
+    // Snapshot the current avaliacoes array before pushing
+    const before = await col.findOne({ _id }, { projection: { avaliacoes: 1 } });
+    if (!before) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+
+    const now = new Date();
     const result = await col.updateOne(
       { _id },
       {
         $push: { avaliacoes: entrada } as any,
-        $set: { updatedAt: new Date() },
+        $set: { updatedAt: now },
       },
     );
 
@@ -39,6 +48,16 @@ export default async function handler(req: any, res: any): Promise<void> {
       res.status(404).json({ error: 'Not found' });
       return;
     }
+
+    await auditLog({
+      timestamp: now,
+      userId,
+      collection: 'avaliacoes',
+      documentId: id,
+      action: 'add_entrada',
+      before: { avaliacoes: before['avaliacoes'] ?? [] } as Record<string, unknown>,
+      payload: entrada as Record<string, unknown>,
+    });
 
     res.status(201).json({ added: true });
   } catch (err) {

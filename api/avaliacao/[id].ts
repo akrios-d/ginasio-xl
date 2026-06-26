@@ -1,14 +1,14 @@
 /**
- * GET    /api/avaliacao/:id           — detalhe
- * PUT    /api/avaliacao/:id           — actualiza ficha (metas, objetivo, etc.)
- * DELETE /api/avaliacao/:id           — remove
- * POST   /api/avaliacao/:id/entrada   — adiciona uma nova medição  →  ver [id]/entrada.ts
+ * GET    /api/avaliacao/:id  -- detalhe
+ * PUT    /api/avaliacao/:id  -- actualiza ficha (metas, objetivo, sharedWithTeacherIds)
+ * DELETE /api/avaliacao/:id  -- remove
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../../server/lib/cors.js';
 import { getCollection, toObjectId, mapDocumentId } from '../../server/lib/mongo.js';
 import { requireSession } from '../../server/lib/session.js';
 import { UpdateAvaliacaoSchema } from '../../server/schemas/avaliacao.schema.js';
+import { auditLog } from '../../server/lib/audit.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);
@@ -24,7 +24,6 @@ export default async function handler(req: any, res: any): Promise<void> {
     const _id = toObjectId(id);
 
     if (req.method === 'GET') {
-      // Accessible to: student owner, teacher in sharedWithTeacherIds, or creator
       const doc = await col.findOne({
         _id,
         $or: [{ studentId: userId }, { createdById: userId }, { sharedWithTeacherIds: userId }],
@@ -39,29 +38,60 @@ export default async function handler(req: any, res: any): Promise<void> {
 
     if (req.method === 'PUT') {
       const body = UpdateAvaliacaoSchema.parse(req.body);
-      // Only student owner or creator can update
-      const result = await col.updateOne(
-        { _id, $or: [{ studentId: userId }, { createdById: userId }] },
-        { $set: { ...body, updatedAt: new Date() } },
-      );
-      if (result.matchedCount === 0) {
+
+      // Snapshot before changing (for audit recovery)
+      const before = await col.findOne({
+        _id,
+        $or: [{ studentId: userId }, { createdById: userId }],
+      });
+      if (!before) {
         res.status(404).json({ error: 'Not found' });
         return;
       }
+
+      const now = new Date();
+      await col.updateOne({ _id }, { $set: { ...body, updatedAt: now } });
+
+      // Determine action label: share update vs generic update
+      const action =
+        Object.keys(body).length === 1 && 'sharedWithTeacherIds' in body ? 'share' : 'update';
+
+      await auditLog({
+        timestamp: now,
+        userId,
+        collection: 'avaliacoes',
+        documentId: id,
+        action,
+        before: before as Record<string, unknown>,
+        payload: body as Record<string, unknown>,
+      });
+
       res.status(200).json({ updated: true });
       return;
     }
 
     if (req.method === 'DELETE') {
-      // Only student owner or creator can delete
-      const result = await col.deleteOne({
+      // Snapshot before deleting
+      const before = await col.findOne({
         _id,
         $or: [{ studentId: userId }, { createdById: userId }],
       });
-      if (result.deletedCount === 0) {
+      if (!before) {
         res.status(404).json({ error: 'Not found' });
         return;
       }
+
+      await col.deleteOne({ _id });
+
+      await auditLog({
+        timestamp: new Date(),
+        userId,
+        collection: 'avaliacoes',
+        documentId: id,
+        action: 'delete',
+        before: before as Record<string, unknown>,
+      });
+
       res.status(200).json({ deleted: true });
       return;
     }

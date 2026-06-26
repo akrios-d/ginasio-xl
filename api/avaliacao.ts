@@ -1,5 +1,5 @@
 /**
- * GET  /api/avaliacao   — lista fichas de avaliação
+ * GET  /api/avaliacao   — lista fichas de avaliacao
  * POST /api/avaliacao   — cria nova ficha
  */
 import { ZodError } from 'zod';
@@ -7,6 +7,7 @@ import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
 import { CreateAvaliacaoSchema } from '../server/schemas/avaliacao.schema.js';
+import { auditLog } from '../server/lib/audit.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);
@@ -18,12 +19,11 @@ export default async function handler(req: any, res: any): Promise<void> {
   const col = await getCollection('avaliacoes');
 
   try {
-    // ── GET ──────────────────────────────────────────────────────────────────
+    // GET
     if (req.method === 'GET') {
       const studentId = (req.query as any).studentId as string | undefined;
 
       if (studentId) {
-        // Teacher viewing a specific student — verify the student is actually associated
         const perfisCol = await getCollection('perfis');
         const studentPerfil = await perfisCol.findOne({ userId: studentId });
         const isAssociated =
@@ -44,7 +44,7 @@ export default async function handler(req: any, res: any): Promise<void> {
       return;
     }
 
-    // ── POST ─────────────────────────────────────────────────────────────────
+    // POST
     if (req.method === 'POST') {
       const body = CreateAvaliacaoSchema.parse(req.body);
 
@@ -54,6 +54,15 @@ export default async function handler(req: any, res: any): Promise<void> {
         createdById: userId,
         createdAt: now,
         updatedAt: now,
+      });
+
+      await auditLog({
+        timestamp: now,
+        userId,
+        collection: 'avaliacoes',
+        documentId: result.insertedId.toString(),
+        action: 'create',
+        payload: body as Record<string, unknown>,
       });
 
       res.status(201).json({ id: result.insertedId.toString() });

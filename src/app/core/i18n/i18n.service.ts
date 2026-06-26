@@ -23,6 +23,8 @@ const LOADED_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   readonly language = signal<AppLanguage>(this.detectInitialLanguage());
+  // Apply lang attribute immediately so date inputs use the right format from the start.
+  private readonly _langInit = this.applyHtmlLang(this.language());
 
   /**
    * `label` is the language's *autonym* — what speakers call it themselves.
@@ -53,11 +55,31 @@ export class I18nService {
     return Promise.all(requests).then(() => void 0);
   }
 
+  /** BCP-47 locale used for date/number formatting (drives <input type="date"> display format). */
+  private static readonly LOCALE_MAP: Record<AppLanguage, string> = {
+    pt: 'pt-BR',
+    en: 'en-GB',
+    fr: 'fr-FR',
+    zh: 'zh-TW',
+  };
+
   setLanguage(language: AppLanguage): void {
     this.language.set(language);
+    this.applyHtmlLang(language);
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, language);
+    }
+  }
+
+  /** Returns the BCP-47 locale for the current language (e.g. 'pt-BR'). */
+  get locale(): string {
+    return I18nService.LOCALE_MAP[this.language()];
+  }
+
+  private applyHtmlLang(language: AppLanguage): void {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = I18nService.LOCALE_MAP[language];
     }
   }
 
