@@ -6,16 +6,18 @@
 import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
+import { ObjectId } from 'mongodb';
 import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
 
 /** Look up display name from Auth.js users collection */
 async function getAuthName(userId: string): Promise<string | null> {
   try {
     const client = await clientPromise;
+    const oid = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
     const user = await client
       .db(AUTH_DB_NAME)
       .collection('users')
-      .findOne({ _id: userId as unknown as import('mongodb').ObjectId });
+      .findOne({ _id: oid as any });
     return (user?.['name'] as string | null) ?? (user?.['email'] as string | null) ?? null;
   } catch {
     return null;
