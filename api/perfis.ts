@@ -19,10 +19,22 @@ export default async function handler(req: any, res: any): Promise<void> {
 
   try {
     const col = await getCollection('perfis');
-    const docs = await col
-      .find({ roles: 'teacher' })
-      .project({ userId: 1, name: 1, email: 1 })
-      .toArray();
+    const role = (req.query as any).role as string | undefined;
+
+    let docs: any[];
+    if (role === 'student') {
+      // List students associated with this teacher
+      docs = await col
+        .find({ teacherIds: userId })
+        .project({ userId: 1, name: 1, email: 1 })
+        .toArray();
+    } else {
+      // Default: list all teachers
+      docs = await col
+        .find({ roles: 'teacher' })
+        .project({ userId: 1, name: 1, email: 1 })
+        .toArray();
+    }
 
     res.status(200).json(docs.map(mapDocumentId));
   } catch (err) {

@@ -125,6 +125,7 @@
   "avaliacao.editar.titulo": "Editar ficha de avaliação",
   "avaliacao.criar.titulo": "Nova ficha de avaliação",
   "avaliacao.criar.objetivo": "Objetivo",
+  "avaliacao.criar.objetivoPlaceholder": "ex: Hipertrofia, Perda de gordura…",
   "avaliacao.criar.outros": "Outros objetivos",
   "avaliacao.criar.outrosPlaceholder": "ex: Reduzir colesterol…",
   "avaliacao.criar.cancel": "Cancelar",
@@ -165,5 +166,8 @@
   "avaliacao.studentId": "ID do Aluno",
   "avaliacao.studentIdPlaceholder": "ID do aluno (partilhado pelo aluno no perfil)",
   "avaliacao.shareWithTeachers": "Partilhar com treinadores",
-  "avaliacao.sharedByStudent": "Partilhado pelo aluno"
+  "avaliacao.sharedByStudent": "Partilhado pelo aluno",
+  "avaliacao.meusAlunos": "Os meus alunos",
+  "avaliacao.semAlunos": "Sem alunos associados",
+  "avaliacao.todos": "Todos"
 }

@@ -12,6 +12,13 @@ export interface TeacherInfo {
   teacherProfile?: TeacherProfile;
 }
 
+export interface StudentInfo {
+  _id: string;
+  userId: string;
+  name?: string;
+  email?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
   private readonly http = inject(HttpClient);
@@ -28,6 +35,12 @@ export class PerfilService {
 
   listTeachers(): Observable<TeacherInfo[]> {
     return this.http.get<TeacherInfo[]>(`${this.baseMulti}?role=teacher`, {
+      withCredentials: true,
+    });
+  }
+
+  listStudents(): Observable<StudentInfo[]> {
+    return this.http.get<StudentInfo[]>(`${this.baseMulti}?role=student`, {
       withCredentials: true,
     });
   }

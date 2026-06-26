@@ -1,12 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
-import { I18nService } from '../../core/i18n/i18n.service';
+import { I18nService, type AppLanguage } from '../../core/i18n/i18n.service';
 import { PerfilService, type TeacherInfo } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { Flag } from '../../shared/components/flag/flag';
+import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
+import { Icon } from '../../shared/components/icon/icon';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [],
+  imports: [Flag, ThemeToggle, Icon],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -72,5 +75,9 @@ export class ProfilePage {
       this.idCopied.set(true);
       setTimeout(() => this.idCopied.set(false), 2000);
     });
+  }
+
+  protected pickLanguage(code: AppLanguage): void {
+    this.i18n.setLanguage(code);
   }
 }

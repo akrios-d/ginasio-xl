@@ -1,70 +1,4 @@
 <section class="container home">
-  <!-- ── Greeting ───────────────────────────────────────────── -->
-  <div class="home-greeting">
-    <h2 class="home-title">{{ greeting() }}</h2>
-    <p class="home-sub">{{ i18n.t('home.sub') }}</p>
-  </div>
-
-  <!-- ── Section cards ──────────────────────────────────────── -->
-  <div class="section-grid">
-    @for (s of sections; track s.key) {
-      <a class="section-card" [routerLink]="s.route">
-        <div class="section-card-icon">
-          @switch (s.icon) {
-            @case ('dumbbell') {
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M6 5v14M18 5v14" />
-                <path d="M2 9h4M18 9h4M2 15h4M18 15h4" />
-                <path d="M6 9h12M6 15h12" />
-              </svg>
-            }
-            @case ('chart') {
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 3v18h18" />
-                <path d="m7 16 4-4 4 4 4-4" />
-              </svg>
-            }
-            @case ('person') {
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-              </svg>
-            }
-          }
-        </div>
-        <div class="section-card-body">
-          <h3>{{ i18n.t('home.' + s.key + '.title') }}</h3>
-          <p>{{ i18n.t('home.' + s.key + '.desc') }}</p>
-        </div>
-        <span class="section-card-arrow" aria-hidden="true">→</span>
-      </a>
-    }
-  </div>
-
   <!-- ── Training log / Calendar ────────────────────────────── -->
   <div class="cal-block">
     <div class="cal-header">
@@ -76,17 +10,7 @@
           (click)="prevMonth()"
           [attr.aria-label]="i18n.t('common.prevMonth')"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <app-icon name="arrow-left" [size]="16" />
         </button>
         <span class="cal-month-label">{{ monthLabel() }}</span>
         @if (!isCurrentMonth()) {
@@ -100,17 +24,7 @@
           (click)="nextMonth()"
           [attr.aria-label]="i18n.t('common.nextMonth')"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <app-icon name="arrow-right" [size]="16" />
         </button>
       </div>
     </div>
@@ -147,79 +61,26 @@
         }
       }
     </div>
+  </div>
 
-    <!-- Selected day panel — shows existing check-ins only -->
-    @if (selectedDate()) {
-      <div class="day-panel">
-        <div class="day-panel-header">
-          <span class="day-panel-date">
-            {{ selectedDate()! | date: 'EEE, d MMM' }}
-          </span>
-          <button type="button" class="add-checkin-btn" (click)="startAdd()">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            {{ i18n.t('home.checkin.add') }}
-          </button>
+  <!-- ── Section cards ──────────────────────────────────────── -->
+  <div class="section-grid">
+    @for (s of sections; track s.key) {
+      <a class="section-card" [routerLink]="s.route">
+        <div class="section-card-icon">
+          <app-icon [name]="s.icon" [size]="22" />
         </div>
-
-        @if (selectedDayCheckins().length > 0) {
-          <ul class="checkin-list">
-            @for (c of selectedDayCheckins(); track c._id) {
-              <li class="checkin-item">
-                <div class="checkin-item-left">
-                  @if (c.grupoLetra) {
-                    <span class="checkin-group">{{ c.grupoLetra }}</span>
-                  }
-                  <div class="checkin-item-text">
-                    @if (programName(c.programaTreinoId)) {
-                      <span class="checkin-program">{{ programName(c.programaTreinoId) }}</span>
-                    }
-                    @if (c.notas) {
-                      <span class="checkin-notes">{{ c.notas }}</span>
-                    }
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  class="checkin-delete"
-                  (click)="confirmRemove(c._id!)"
-                  [attr.aria-label]="i18n.t('home.checkin.remove')"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </li>
-            }
-          </ul>
-        } @else {
-          <p class="day-empty">{{ i18n.t('home.checkin.empty') }}</p>
-        }
-      </div>
+        <div class="section-card-body">
+          <h3>{{ i18n.t('home.' + s.key + '.title') }}</h3>
+          <p>{{ i18n.t('home.' + s.key + '.desc') }}</p>
+        </div>
+        <span class="section-card-arrow" aria-hidden="true">→</span>
+      </a>
     }
   </div>
 </section>
 
-<!-- ── Check-in bottom sheet / modal ──────────────────────── -->
+<!-- ── Day popup / Check-in sheet ────────────────────────── -->
 @if (addingCheckin()) {
   <div class="sheet-backdrop" (click)="cancelAdd()" aria-hidden="true"></div>
   <div class="checkin-sheet" role="dialog" aria-modal="true">
@@ -234,20 +95,40 @@
         (click)="cancelAdd()"
         [attr.aria-label]="i18n.t('home.checkin.cancel')"
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <app-icon name="close" [size]="18" />
       </button>
     </div>
+
+    <!-- Existing check-ins for this day -->
+    @if (selectedDayCheckins().length > 0) {
+      <ul class="checkin-list">
+        @for (c of selectedDayCheckins(); track c._id) {
+          <li class="checkin-item">
+            <div class="checkin-item-left">
+              @if (c.grupoLetra) {
+                <span class="checkin-group">{{ c.grupoLetra }}</span>
+              }
+              <div class="checkin-item-text">
+                @if (programName(c.programaTreinoId)) {
+                  <span class="checkin-program">{{ programName(c.programaTreinoId) }}</span>
+                }
+                @if (c.notas) {
+                  <span class="checkin-notes">{{ c.notas }}</span>
+                }
+              </div>
+            </div>
+            <button
+              type="button"
+              class="checkin-delete"
+              (click)="confirmRemove(c._id!)"
+              [attr.aria-label]="i18n.t('home.checkin.remove')"
+            >
+              <app-icon name="close" [size]="14" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
 
     <form class="sheet-body" (ngSubmit)="saveCheckin()">
       <!-- Program picker -->
@@ -257,7 +138,7 @@
           id="program"
           [(ngModel)]="form.programaTreinoId"
           name="program"
-          (ngModelChange)="form.grupoLetra = ''"
+          (ngModelChange)="form.grupoLetra = ''; selectedProgramId.set($event)"
         >
           <option value="">{{ i18n.t('home.checkin.noProgram') }}</option>
           @for (p of programs(); track p._id) {

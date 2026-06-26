@@ -125,6 +125,7 @@
   "avaliacao.editar.titulo": "Modifier la fiche d'évaluation",
   "avaliacao.criar.titulo": "Nouvelle fiche d'évaluation",
   "avaliacao.criar.objetivo": "Objectif",
+  "avaliacao.criar.objetivoPlaceholder": "ex : Hypertrophie, Perte de graisse…",
   "avaliacao.criar.outros": "Autres objectifs",
   "avaliacao.criar.outrosPlaceholder": "ex : Réduire le cholestérol…",
   "avaliacao.criar.cancel": "Annuler",
@@ -165,5 +166,8 @@
   "avaliacao.studentId": "ID de l'élève",
   "avaliacao.studentIdPlaceholder": "ID de l'élève (partagé depuis son profil)",
   "avaliacao.shareWithTeachers": "Partager avec les coachs",
-  "avaliacao.sharedByStudent": "Partagé par l'élève"
+  "avaliacao.sharedByStudent": "Partagé par l'élève",
+  "avaliacao.meusAlunos": "Mes élèves",
+  "avaliacao.semAlunos": "Aucun élève associé",
+  "avaliacao.todos": "Tous"
 }

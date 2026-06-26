@@ -3,9 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AvaliacaoService } from '../../core/services/avaliacao.service';
-import { PerfilService, type TeacherInfo } from '../../core/services/perfil.service';
+import {
+  PerfilService,
+  type TeacherInfo,
+  type StudentInfo,
+} from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
-import type { FichaAvaliacao, EntradaAvaliacao, ObjetivoTreino } from '../../core/models';
+import type { FichaAvaliacao, EntradaAvaliacao } from '../../core/models';
+import { OBJETIVO_OPTIONS } from '../../core/models';
 
 interface EntryForm {
   data: string;
@@ -24,17 +29,10 @@ interface EntryForm {
 
 interface FichaForm {
   objetivo: string;
-  outrosObjetivos: string;
   studentId: string; // used in PT mode to create for a specific student
 }
 
-const OBJETIVOS: ObjetivoTreino[] = [
-  'Hipertrofia',
-  'Perda Massa Gorda',
-  'Reabilitação / Corretivo',
-  'Performance',
-  'Saúde e Bem-Estar',
-];
+const OBJETIVOS = [...OBJETIVO_OPTIONS];
 
 function n(v: string): number | undefined {
   const x = parseFloat(v);
@@ -72,6 +70,11 @@ export class AssessmentPage {
   );
   protected readonly isTeacher = signal(false);
 
+  // Students (PT mode: list my students + select one to view their fichas)
+  protected readonly students = signal<StudentInfo[]>([]);
+  protected readonly selectedStudentId = signal<string | null>(null);
+  protected readonly studentsLoading = signal(false);
+
   // Teachers available for sharing (the student's associated teachers)
   protected readonly myTeacherIds = signal<string[]>([]);
   protected readonly teachers = signal<TeacherInfo[]>([]);
@@ -90,8 +93,12 @@ export class AssessmentPage {
     // Load own profile: roles + teacherIds
     this.perfilSvc.get().subscribe({
       next: (p) => {
-        this.isTeacher.set(p.roles?.includes('teacher') ?? false);
+        const isT = p.roles?.includes('teacher') ?? false;
+        this.isTeacher.set(isT);
         this.myTeacherIds.set(p.teacherIds ?? []);
+        if (isT) {
+          this.loadStudents();
+        }
       },
     });
 
@@ -103,8 +110,8 @@ export class AssessmentPage {
     this.loadFichas();
   }
 
-  private loadFichas(): void {
-    this.svc.list().subscribe({
+  private loadFichas(studentId?: string): void {
+    this.svc.list(studentId).subscribe({
       next: (list) => {
         this.fichas.set(list);
         this.loading.set(false);
@@ -114,6 +121,33 @@ export class AssessmentPage {
         this.loading.set(false);
       },
     });
+  }
+
+  private loadStudents(): void {
+    this.studentsLoading.set(true);
+    this.perfilSvc.listStudents().subscribe({
+      next: (list) => {
+        this.students.set(list);
+        this.studentsLoading.set(false);
+      },
+      error: () => this.studentsLoading.set(false),
+    });
+  }
+
+  protected selectStudent(id: string | null): void {
+    this.selectedStudentId.set(id);
+    this.expandedId.set(null);
+    this.addingEntryFor.set(null);
+    this.loading.set(true);
+    this.loadFichas(id ?? undefined);
+    // Pre-fill studentId in create form
+    this.fichaForm.studentId = id ?? '';
+  }
+
+  protected studentName(id: string | null): string {
+    if (!id) return '';
+    const s = this.students().find((st) => st.userId === id);
+    return s?.name || s?.email || id;
   }
 
   protected togglePtMode(): void {
@@ -151,7 +185,6 @@ export class AssessmentPage {
   protected startEditFicha(f: FichaAvaliacao): void {
     this.fichaForm = {
       objetivo: f.objetivo ?? '',
-      outrosObjetivos: f.outrosObjetivos ?? '',
       studentId: f.studentId,
     };
     this.editingFicha.set(f);
@@ -163,22 +196,23 @@ export class AssessmentPage {
     if (!userId) return;
     this.saving.set(true);
     const existing = this.editingFicha();
-    const obj = (this.fichaForm.objetivo || undefined) as FichaAvaliacao['objetivo'];
-    const outros = this.fichaForm.outrosObjetivos.trim() || undefined;
+    const obj = this.fichaForm.objetivo.trim() || undefined;
 
     // In PT mode a teacher can create for a different student
     const targetStudentId =
-      this.ptMode() && this.fichaForm.studentId.trim() ? this.fichaForm.studentId.trim() : userId;
+      this.ptMode() && this.fichaForm.studentId.trim()
+        ? this.fichaForm.studentId.trim()
+        : this.ptMode() && this.selectedStudentId()
+          ? this.selectedStudentId()!
+          : userId;
 
     const req = existing
       ? (this.svc.update(existing._id!, {
           objetivo: obj,
-          outrosObjetivos: outros,
         }) as import('rxjs').Observable<unknown>)
       : (this.svc.create({
           studentId: targetStudentId,
           objetivo: obj,
-          outrosObjetivos: outros,
           avaliacoes: [],
         }) as import('rxjs').Observable<unknown>);
 
@@ -355,6 +389,6 @@ export class AssessmentPage {
   }
 
   private emptyFichaForm(): FichaForm {
-    return { objetivo: '', outrosObjetivos: '', studentId: '' };
+    return { objetivo: '', studentId: '' };
   }
 }

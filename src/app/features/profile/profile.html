@@ -70,5 +70,33 @@
         </button>
       </div>
     </div>
+
+    <!-- ── Settings ── -->
+    <div class="settings-section">
+      <div class="settings-row">
+        <span class="settings-label">{{ i18n.t('app.themeLabel') }}</span>
+        <app-theme-toggle />
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">{{ i18n.t('app.languageLabel') }}</span>
+        <div class="lang-flags">
+          @for (opt of i18n.languageOptions; track opt.code) {
+            <button
+              type="button"
+              class="lang-flag-btn"
+              [class.lang-flag-btn--active]="i18n.language() === opt.code"
+              [attr.aria-label]="opt.label"
+              (click)="pickLanguage(opt.code)"
+            >
+              <app-flag [lang]="opt.code" />
+            </button>
+          }
+        </div>
+      </div>
+      <button type="button" class="btn-signout" (click)="auth.logout()">
+        <app-icon name="logout" [size]="16" />
+        {{ i18n.t('app.signOut') }}
+      </button>
+    </div>
   }
 </section>

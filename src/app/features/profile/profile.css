@@ -192,3 +192,88 @@
   color: var(--c-accent);
   box-shadow: none;
 }
+
+/* ── Settings section ────────────────────────────── */
+.settings-section {
+  margin-top: 28px;
+  padding: 16px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.settings-label {
+  font-size: var(--t-secondary);
+  font-weight: 500;
+  color: var(--c-ink-2);
+}
+.lang-flags {
+  display: flex;
+  gap: 6px;
+}
+.lang-flag-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  border: 1.5px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  cursor: pointer;
+  min-height: unset;
+  transition:
+    border-color 120ms,
+    background 120ms;
+  overflow: hidden;
+}
+.lang-flag-btn app-flag {
+  width: 24px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.lang-flag-btn:hover {
+  background: var(--c-surface-alt);
+  border-color: var(--c-border);
+  box-shadow: none;
+}
+.lang-flag-btn--active {
+  border-color: var(--c-accent);
+  background: var(--c-accent-lt);
+}
+.btn-signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  padding: 8px 16px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-pill);
+  color: var(--c-ink-2);
+  font-size: var(--t-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 150ms,
+    color 150ms,
+    background 150ms;
+}
+.btn-signout:hover {
+  border-color: var(--c-danger, #ef4444);
+  color: var(--c-danger, #ef4444);
+  background: color-mix(in srgb, var(--c-danger, #ef4444) 6%, transparent);
+  box-shadow: none;
+}

@@ -30,6 +30,40 @@
     </div>
   </div>
 
+  <!-- ── PT mode: student picker ──────────────────────────── -->
+  @if (ptMode() && isTeacher()) {
+    <div class="pt-student-bar">
+      <span class="pt-student-label">{{ i18n.t('avaliacao.meusAlunos') }}</span>
+      @if (studentsLoading()) {
+        <span class="spinner spinner--sm" aria-hidden="true"></span>
+      } @else {
+        <div class="pt-student-chips">
+          <button
+            type="button"
+            class="pt-student-chip"
+            [class.pt-student-chip--active]="selectedStudentId() === null"
+            (click)="selectStudent(null)"
+          >
+            {{ i18n.t('avaliacao.todos') }}
+          </button>
+          @for (s of students(); track s.userId) {
+            <button
+              type="button"
+              class="pt-student-chip"
+              [class.pt-student-chip--active]="selectedStudentId() === s.userId"
+              (click)="selectStudent(s.userId)"
+            >
+              {{ s.name || s.email || s.userId }}
+            </button>
+          }
+          @if (students().length === 0) {
+            <span class="pt-no-students">{{ i18n.t('avaliacao.semAlunos') }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+
   @if (loading()) {
     <div class="state-row">
       <span class="spinner" aria-hidden="true"></span>
@@ -77,54 +111,75 @@
       @for (f of fichas(); track f._id) {
         <article class="ficha-card" [class.ficha-card--expanded]="expandedId() === f._id">
           <!-- Header -->
-          <button
-            type="button"
-            class="ficha-header"
-            (click)="toggle(f._id!)"
-            [attr.aria-expanded]="expandedId() === f._id"
-          >
-            <div class="ficha-meta">
-              <div class="ficha-title-row">
-                <span class="ficha-objective">{{ f.objetivo }}</span>
-                @if (isSharedView(f)) {
-                  <span class="ficha-shared-badge">{{ i18n.t('avaliacao.sharedByStudent') }}</span>
+          <div class="ficha-card-top">
+            <button
+              type="button"
+              class="ficha-header"
+              (click)="toggle(f._id!)"
+              [attr.aria-expanded]="expandedId() === f._id"
+            >
+              <div class="ficha-meta">
+                <div class="ficha-title-row">
+                  <span class="ficha-objective">{{ f.objetivo || '—' }}</span>
+                  @if (isSharedView(f)) {
+                    <span class="ficha-shared-badge">{{
+                      i18n.t('avaliacao.sharedByStudent')
+                    }}</span>
+                  }
+                </div>
+                @if (latestEntry(f); as latest) {
+                  <span class="ficha-latest">
+                    {{ latest.data | date: 'dd MMM yyyy' }}
+                    @if (latest.peso) {
+                      · {{ latest.peso }} kg
+                    }
+                    @if (latest.percentualMassaGorda) {
+                      · {{ latest.percentualMassaGorda }}% BF
+                    }
+                  </span>
+                } @else {
+                  <span class="ficha-latest">{{ i18n.t('avaliacao.noEntries') }}</span>
                 }
               </div>
-              @if (latestEntry(f); as latest) {
-                <span class="ficha-latest">
-                  {{ latest.data | date: 'dd MMM yyyy' }}
-                  @if (latest.peso) {
-                    · {{ latest.peso }} kg
-                  }
-                  @if (latest.percentualMassaGorda) {
-                    · {{ latest.percentualMassaGorda }}% BF
-                  }
-                </span>
-              } @else {
-                <span class="ficha-latest">{{ i18n.t('avaliacao.noEntries') }}</span>
-              }
-            </div>
-            <svg
-              class="expand-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </button>
+              <svg
+                class="expand-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            @if (!isSharedView(f)) {
+              <button
+                type="button"
+                class="btn-card-edit"
+                [title]="i18n.t('avaliacao.editar')"
+                (click)="startEditFicha(f)"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+            }
+          </div>
 
           <!-- Body -->
           @if (expandedId() === f._id) {
             <div class="ficha-body">
-              @if (f.outrosObjetivos) {
-                <p class="ficha-outros">{{ f.outrosObjetivos }}</p>
-              }
-
               @if (f.avaliacoes.length > 0) {
                 <div class="entries-scroll">
                   <table class="entries-table">
@@ -219,26 +274,6 @@
                   </div>
                 </div>
               }
-
-              <div class="card-actions">
-                @if (!isSharedView(f)) {
-                  <button type="button" class="btn-edit" (click)="startEditFicha(f)">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                    {{ i18n.t('avaliacao.editar') }}
-                  </button>
-                }
-              </div>
 
               @if (addingEntryFor() === f._id) {
                 <form class="entry-form" (ngSubmit)="saveEntry(f._id!)">
@@ -448,40 +483,41 @@
       @if (ptMode() && !editingFicha()) {
         <div class="form-group">
           <label class="form-label" for="studentId">{{ i18n.t('avaliacao.studentId') }}</label>
-          <input
-            id="studentId"
-            type="text"
-            [(ngModel)]="fichaForm.studentId"
-            name="studentId"
-            [placeholder]="i18n.t('avaliacao.studentIdPlaceholder')"
-          />
+          @if (selectedStudentId()) {
+            <div class="selected-student-pill">
+              {{ studentName(selectedStudentId()) }}
+            </div>
+          } @else {
+            <input
+              id="studentId"
+              type="text"
+              [(ngModel)]="fichaForm.studentId"
+              name="studentId"
+              [placeholder]="i18n.t('avaliacao.studentIdPlaceholder')"
+            />
+          }
         </div>
       }
       <div class="form-group">
-        <span class="form-label">{{ i18n.t('avaliacao.criar.objetivo') }}</span>
-        <div class="objetivo-options">
+        <label class="form-label" for="objetivo">{{ i18n.t('avaliacao.criar.objetivo') }}</label>
+        <div class="objetivo-chips">
           @for (obj of objetivos; track obj) {
             <button
               type="button"
-              class="objetivo-btn"
-              [class.objetivo-btn--active]="fichaForm.objetivo === obj"
-              (click)="fichaForm.objetivo = obj"
+              class="objetivo-chip"
+              [class.objetivo-chip--active]="fichaForm.objetivo === obj"
+              (click)="fichaForm.objetivo = fichaForm.objetivo === obj ? '' : obj"
             >
               {{ obj }}
             </button>
           }
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="outrosObjetivos">{{
-          i18n.t('avaliacao.criar.outros')
-        }}</label>
         <input
-          id="outrosObjetivos"
+          id="objetivo"
           type="text"
-          [(ngModel)]="fichaForm.outrosObjetivos"
-          name="outrosObjetivos"
-          [placeholder]="i18n.t('avaliacao.criar.outrosPlaceholder')"
+          [(ngModel)]="fichaForm.objetivo"
+          name="objetivo"
+          [placeholder]="i18n.t('avaliacao.criar.objetivoPlaceholder')"
         />
       </div>
       <div class="sheet-actions">

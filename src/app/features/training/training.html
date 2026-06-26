@@ -7,14 +7,16 @@
       }
     </h2>
     <div class="header-actions">
-      <button
-        type="button"
-        class="btn-pt-toggle"
-        [class.btn-pt-toggle--active]="ptMode()"
-        (click)="togglePtMode()"
-      >
-        {{ ptMode() ? i18n.t('treino.modoPt.desativar') : i18n.t('treino.modoPt.ativar') }}
-      </button>
+      @if (isTeacher()) {
+        <button
+          type="button"
+          class="btn-pt-toggle"
+          [class.btn-pt-toggle--active]="ptMode()"
+          (click)="togglePtMode()"
+        >
+          {{ ptMode() ? i18n.t('treino.modoPt.desativar') : i18n.t('treino.modoPt.ativar') }}
+        </button>
+      }
       <button type="button" class="btn-new" (click)="startCreate()">
         <svg
           viewBox="0 0 24 24"
@@ -146,14 +148,13 @@
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
-              <button
-                type="button"
-                class="btn-card-toggle"
-                [class.btn-card-toggle--active]="p.ativo"
-                (click)="toggleActive(p)"
+              <label
+                class="card-toggle"
+                [title]="p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar')"
               >
-                {{ p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar') }}
-              </button>
+                <input type="checkbox" [checked]="p.ativo" (change)="toggleActive(p)" />
+                <span class="card-toggle-track"></span>
+              </label>
             </div>
           </div>
 

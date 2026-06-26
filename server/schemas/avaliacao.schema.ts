@@ -6,16 +6,7 @@ import { z } from 'zod';
 
 export const CreateAvaliacaoSchema = z.object({
   studentId: z.string().min(1),
-  objetivo: z
-    .enum([
-      'Hipertrofia',
-      'Perda Massa Gorda',
-      'Reabilitação / Corretivo',
-      'Performance',
-      'Saúde e Bem-Estar',
-    ])
-    .optional(),
-  outrosObjetivos: z.string().optional(),
+  objetivo: z.string().optional(),
   metas: z
     .object({
       pesoMin: z.number().positive().optional(),

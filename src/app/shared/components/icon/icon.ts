@@ -14,9 +14,12 @@ export type IconName =
   | 'arrow-right'
   | 'chart'
   | 'close'
+  | 'dumbbell'
   | 'edit'
+  | 'home'
   | 'logout'
   | 'mic'
+  | 'person'
   | 'plus'
   | 'trash';
 

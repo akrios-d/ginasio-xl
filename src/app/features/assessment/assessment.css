@@ -101,12 +101,46 @@
   border-color: var(--c-accent);
 }
 
+/* ── Card top row (header + edit icon) ─────────── */
+.ficha-card-top {
+  display: flex;
+  align-items: stretch;
+}
+
+.btn-card-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--c-border);
+  color: var(--c-ink-3);
+  cursor: pointer;
+  transition:
+    color 120ms,
+    background 120ms;
+  min-height: unset;
+  padding: 0;
+}
+.btn-card-edit svg {
+  width: 15px;
+  height: 15px;
+}
+.btn-card-edit:hover {
+  color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
+  box-shadow: none;
+}
+
 .ficha-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 16px;
   background: transparent;
   border: none;
@@ -468,10 +502,6 @@
   width: 12px;
   height: 12px;
 }
-tr:hover .btn-entry-edit,
-.entry-row--editing .btn-entry-edit {
-  opacity: 1;
-}
 .btn-entry-edit:hover {
   color: var(--c-accent);
   background: color-mix(in srgb, var(--c-accent) 10%, transparent);
@@ -651,42 +681,37 @@ tr:hover .btn-entry-edit,
   flex: 1;
 }
 
-/* ── Objetivo options ────────────────────────────── */
-.objetivo-options {
+/* ── Objetivo chips ──────────────────────────────── */
+.objetivo-chips {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
+  margin-bottom: 8px;
 }
-
-.objetivo-btn {
-  text-align: left;
-  padding: 10px 14px;
+.objetivo-chip {
+  padding: 4px 12px;
   background: var(--c-surface-alt);
   border: 1.5px solid var(--c-border);
-  border-radius: var(--r-md);
-  font-size: var(--t-secondary);
-  color: var(--c-ink);
+  border-radius: var(--r-pill);
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: var(--c-ink-2);
   cursor: pointer;
   min-height: unset;
   transition:
     border-color 120ms,
-    background 120ms;
+    background 120ms,
+    color 120ms;
 }
-.objetivo-btn:hover {
+.objetivo-chip:hover {
   border-color: var(--c-accent);
   box-shadow: none;
 }
-.objetivo-btn--active {
+.objetivo-chip--active {
   border-color: var(--c-accent);
   background: var(--c-accent-lt);
   color: var(--c-accent);
   font-weight: 600;
-}
-.ficha-outros {
-  margin: 12px 0 0;
-  font-size: var(--t-secondary);
-  color: var(--c-ink-2);
-  font-style: italic;
 }
 
 .btn-add-entry {
@@ -706,42 +731,77 @@ tr:hover .btn-entry-edit,
   box-shadow: none;
 }
 
-/* ── Card actions ──────────────────────────────── */
-.card-actions {
+/* ── PT mode: student picker ─────────────────────── */
+.pt-student-bar {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--c-border);
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--c-surface-alt);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  margin-bottom: 20px;
 }
 
-.btn-edit {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  min-height: unset;
+.pt-student-label {
   font-size: var(--t-meta);
   font-weight: 600;
-  background: transparent;
-  border: 1.5px solid var(--c-border);
-  border-radius: var(--r-sm);
   color: var(--c-ink-2);
-  cursor: pointer;
-  transition:
-    color 120ms,
-    border-color 120ms,
-    background 120ms;
-}
-.btn-edit svg {
-  width: 13px;
-  height: 13px;
   flex-shrink: 0;
 }
-.btn-edit:hover {
-  color: var(--c-accent);
+
+.pt-student-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pt-student-chip {
+  padding: 4px 12px;
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-pill);
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: var(--c-ink-2);
+  cursor: pointer;
+  min-height: unset;
+  transition:
+    border-color 120ms,
+    background 120ms,
+    color 120ms;
+}
+.pt-student-chip:hover {
   border-color: var(--c-accent);
-  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
   box-shadow: none;
+}
+.pt-student-chip--active {
+  border-color: var(--c-accent);
+  background: var(--c-accent-lt);
+  color: var(--c-accent);
+  font-weight: 600;
+}
+
+.pt-no-students {
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  font-style: italic;
+}
+
+.spinner--sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+
+.selected-student-pill {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--c-accent-lt);
+  border: 1.5px solid var(--c-accent);
+  border-radius: var(--r-pill);
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  color: var(--c-accent);
 }

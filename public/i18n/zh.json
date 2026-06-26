@@ -125,6 +125,7 @@
   "avaliacao.editar.titulo": "编辑评估表",
   "avaliacao.criar.titulo": "新评估表",
   "avaliacao.criar.objetivo": "目标",
+  "avaliacao.criar.objetivoPlaceholder": "例如：增肌、减脂…",
   "avaliacao.criar.outros": "其他目标",
   "avaliacao.criar.outrosPlaceholder": "例如：降低胆固醇…",
   "avaliacao.criar.cancel": "取消",
@@ -165,5 +166,8 @@
   "avaliacao.studentId": "学员 ID",
   "avaliacao.studentIdPlaceholder": "学员 ID（由学员在个人资料中分享）",
   "avaliacao.shareWithTeachers": "与教练分享",
-  "avaliacao.sharedByStudent": "学员已分享"
+  "avaliacao.sharedByStudent": "学员已分享",
+  "avaliacao.meusAlunos": "我的学生",
+  "avaliacao.semAlunos": "暂无关联学生",
+  "avaliacao.todos": "全部"
 }

@@ -4,15 +4,14 @@ import { z } from 'zod';
 // Objetivos possíveis (checkboxes do cartão)
 // ---------------------------------------------------------------------------
 
-export const ObjetivoTreinoSchema = z.enum([
+// Predefined options shown as chips in the UI (free text also allowed)
+export const OBJETIVO_OPTIONS = [
   'Hipertrofia',
   'Perda Massa Gorda',
   'Reabilitação / Corretivo',
   'Performance',
   'Saúde e Bem-Estar',
-]);
-
-export type ObjetivoTreino = z.infer<typeof ObjetivoTreinoSchema>;
+] as const;
 
 // ---------------------------------------------------------------------------
 // Entrada de avaliação (uma linha da tabela)
@@ -67,8 +66,7 @@ export const FichaAvaliacaoSchema = z.object({
   studentId: z.string(), // userId of the student
   createdById: z.string(), // userId of creator — student or teacher
   sharedWithTeacherIds: z.array(z.string()).optional(), // teacher userIds who can see this
-  objetivo: ObjetivoTreinoSchema.optional(),
-  outrosObjetivos: z.string().optional(),
+  objetivo: z.string().optional(),
   metas: MetasAvaliacaoSchema.optional(),
   avaliacoes: z.array(EntradaAvaliacaoSchema).default([]),
   createdAt: z.coerce.date().optional(),

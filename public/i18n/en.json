@@ -154,6 +154,7 @@
   "avaliacao.editar.titulo": "Edit assessment sheet",
   "avaliacao.criar.titulo": "New assessment sheet",
   "avaliacao.criar.objetivo": "Goal",
+  "avaliacao.criar.objetivoPlaceholder": "e.g. Hypertrophy, Weight loss…",
   "avaliacao.criar.outros": "Other goals",
   "avaliacao.criar.outrosPlaceholder": "e.g. Reduce cholesterol…",
   "avaliacao.criar.cancel": "Cancel",
@@ -165,5 +166,8 @@
   "perfil.professoresAtuais": "Associated trainers",
   "perfil.associar": "Associate",
   "perfil.associate": "Associate",
-  "perfil.desassociar": "Remove"
+  "perfil.desassociar": "Remove",
+  "avaliacao.meusAlunos": "My students",
+  "avaliacao.semAlunos": "No associated students",
+  "avaliacao.todos": "All"
 }

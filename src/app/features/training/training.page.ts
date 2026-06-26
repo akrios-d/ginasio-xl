@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
+import { PerfilService } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
 import type { ProgramaTreino } from '../../core/models';
 
@@ -60,6 +61,7 @@ function emptyGrupo(index: number): GrupoForm {
 export class TrainingPage {
   protected readonly i18n = inject(I18nService);
   private readonly svc = inject(ProgramaTreinoService);
+  private readonly perfilSvc = inject(PerfilService);
   private readonly auth = inject(AuthService);
 
   private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
@@ -72,6 +74,7 @@ export class TrainingPage {
   protected readonly editing = signal<ProgramaTreino | null>(null);
   protected readonly saving = signal(false);
   protected readonly activeTab = signal<ActiveTab>(0);
+  protected readonly isTeacher = signal(false);
   protected readonly ptMode = signal<boolean>(
     localStorage.getItem(TrainingPage.PT_MODE_KEY) === 'true',
   );
@@ -79,6 +82,18 @@ export class TrainingPage {
   protected form: PlanForm = this.emptyForm();
 
   constructor() {
+    this.perfilSvc.get().subscribe({
+      next: (p) => {
+        const hasTeacherRole = (p.roles ?? []).includes('teacher');
+        this.isTeacher.set(hasTeacherRole);
+        // clear ptMode if user no longer has teacher role
+        if (!hasTeacherRole && this.ptMode()) {
+          this.ptMode.set(false);
+          localStorage.removeItem(TrainingPage.PT_MODE_KEY);
+        }
+      },
+      error: () => undefined,
+    });
     this.loadPrograms();
   }
 

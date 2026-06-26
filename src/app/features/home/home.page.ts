@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -7,6 +7,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { CheckinService } from '../../core/services/checkin.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { Icon, type IconName } from '../../shared/components/icon/icon';
 import type { Checkin } from '../../core/models/checkin.model';
 import type { ProgramaTreino } from '../../core/models';
 
@@ -27,7 +28,7 @@ interface CheckinForm {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, ConfirmDialog],
+  imports: [RouterLink, FormsModule, DatePipe, ConfirmDialog, Icon],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -36,17 +37,7 @@ export class HomePage {
   protected readonly i18n = inject(I18nService);
   private readonly checkinSvc = inject(CheckinService);
   private readonly treinoSvc = inject(ProgramaTreinoService);
-  private readonly elRef = inject(ElementRef);
-
-  // ── Greeting ──────────────────────────────────────────────────────────────
-  protected readonly greeting = computed(() => {
-    const firstName = this.auth.user()?.name?.split(' ')[0];
-    return firstName
-      ? this.i18n.t('home.greetingName').replace('{name}', firstName)
-      : this.i18n.t('home.greeting');
-  });
-
-  protected readonly sections = [
+  protected readonly sections: Array<{ key: string; route: string; icon: IconName }> = [
     { key: 'treino', route: '/training', icon: 'dumbbell' },
     { key: 'avaliacao', route: '/assessment', icon: 'chart' },
     { key: 'perfil', route: '/profile', icon: 'person' },
@@ -67,6 +58,7 @@ export class HomePage {
   protected readonly savingCheckin = signal(false);
   protected readonly pendingDeleteId = signal<string | null>(null);
   protected form: CheckinForm = this.emptyForm();
+  protected readonly selectedProgramId = signal('');
 
   // ── Calendar computed ─────────────────────────────────────────────────────
   protected readonly monthLabel = computed(() => {
@@ -113,7 +105,7 @@ export class HomePage {
   });
 
   protected readonly selectedProgramGroups = computed<string[]>(() => {
-    const pid = this.form.programaTreinoId;
+    const pid = this.selectedProgramId();
     const prog = this.programs().find((p) => p._id === pid);
     return prog?.fasePrincipal.grupos.map((g) => g.letra) ?? [];
   });
@@ -170,11 +162,11 @@ export class HomePage {
       this.addingCheckin.set(false);
     } else {
       this.selectedDate.set(day.date);
-      this.addingCheckin.set(false);
-      setTimeout(() => {
-        const panel = this.elRef.nativeElement.querySelector('.day-panel') as HTMLElement | null;
-        panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 30);
+      this.form = this.emptyForm();
+      const defaultPid = this.programs()[0]?._id ?? '';
+      this.form.programaTreinoId = defaultPid;
+      this.selectedProgramId.set(defaultPid);
+      this.addingCheckin.set(true);
     }
   }
 
