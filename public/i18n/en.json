@@ -184,5 +184,7 @@
   "profile.cancelBtn": "Cancel",
   "profile.manageStudents": "Manage students",
   "profile.meusTrainadores": "My trainers",
-  "treino.alunoNaoEncontrado": "Student not found"
+  "treino.alunoNaoEncontrado": "Student not found",
+  "profile.removeTrainador": "Remove",
+  "profile.confirmRemoveTrainador": "Remove this trainer?"
 }

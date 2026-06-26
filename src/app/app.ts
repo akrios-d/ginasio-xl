@@ -7,10 +7,11 @@ import { AuthService } from './core/auth/auth.service';
 import { PerfilService } from './core/services/perfil.service';
 import { Toast } from './shared/components/toast/toast';
 import { Icon } from './shared/components/icon/icon';
+import { LoadingBar } from './shared/components/loading-bar/loading-bar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, Icon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, Icon, LoadingBar],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -20,7 +21,6 @@ export class App {
   private readonly perfilSvc = inject(PerfilService);
 
   constructor() {
-    // Trigger profile auto-creation as soon as the user is authenticated
     effect(() => {
       if (this.auth.isAuthenticated()) {
         this.perfilSvc.get().subscribe({ error: () => undefined });
@@ -31,15 +31,15 @@ export class App {
   protected readonly isLoginPage = toSignal(
     inject(Router).events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map((e) => e.urlAfterRedirects.startsWith('/login')),
+      map((e) => e.url === '/login'),
     ),
     { initialValue: false },
   );
 
   protected readonly greeting = computed(() => {
-    const firstName = this.auth.user()?.name?.split(' ')[0];
-    return firstName
-      ? this.i18n.t('home.greetingName').replace('{name}', firstName)
-      : this.i18n.t('home.greeting');
+    const hour = new Date().getHours();
+    if (hour < 12) return this.i18n.t('app.goodMorning');
+    if (hour < 18) return this.i18n.t('app.goodAfternoon');
+    return this.i18n.t('app.goodEvening');
   });
 }

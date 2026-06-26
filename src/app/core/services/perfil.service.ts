@@ -67,4 +67,12 @@ export class PerfilService {
       { withCredentials: true },
     );
   }
+
+  /** Student removes one of their teachers */
+  removeTeacher(teacherUserId: string): Observable<{ unlinked: boolean }> {
+    return this.http.delete<{ unlinked: boolean }>(
+      `${this.baseMulti}?teacherUserId=${encodeURIComponent(teacherUserId)}`,
+      { withCredentials: true },
+    );
+  }
 }

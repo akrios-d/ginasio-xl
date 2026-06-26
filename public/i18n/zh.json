@@ -184,5 +184,7 @@
   "profile.cancelBtn": "取消",
   "profile.manageStudents": "管理学生",
   "profile.meusTrainadores": "我的教练",
-  "treino.alunoNaoEncontrado": "未找到学生"
+  "treino.alunoNaoEncontrado": "未找到学生",
+  "profile.removeTrainador": "移除",
+  "profile.confirmRemoveTrainador": "移除此教练？"
 }

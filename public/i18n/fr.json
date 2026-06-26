@@ -184,5 +184,7 @@
   "profile.cancelBtn": "Annuler",
   "profile.manageStudents": "Gérer les élèves",
   "profile.meusTrainadores": "Mes entraîneurs",
-  "treino.alunoNaoEncontrado": "Élève introuvable"
+  "treino.alunoNaoEncontrado": "Élève introuvable",
+  "profile.removeTrainador": "Retirer",
+  "profile.confirmRemoveTrainador": "Retirer ce coach ?"
 }

@@ -1,0 +1,31 @@
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: 3px;
+  pointer-events: none;
+}
+
+.loading-bar__track {
+  height: 100%;
+  background: var(--c-accent);
+  animation: loading-bar-slide 1.2s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+@keyframes loading-bar-slide {
+  0% {
+    transform: scaleX(0);
+    margin-left: 0%;
+  }
+  50% {
+    transform: scaleX(0.6);
+    margin-left: 20%;
+  }
+  100% {
+    transform: scaleX(0);
+    margin-left: 100%;
+  }
+}

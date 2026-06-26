@@ -126,20 +126,32 @@ export default async function handler(req: any, res: any): Promise<void> {
       return;
     }
 
-    // ── DELETE — teacher unlinks a student ────────────────────────────────────
+    // ── DELETE — teacher unlinks a student OR student removes a teacher ─────
     if (req.method === 'DELETE') {
       const studentUserId = (req.query as any).studentUserId as string | undefined;
-      if (!studentUserId) {
-        res.status(400).json({ error: 'studentUserId required' });
+      const teacherUserId = (req.query as any).teacherUserId as string | undefined;
+
+      if (studentUserId) {
+        // Teacher removing a student from their list
+        await col.updateOne(
+          { userId: studentUserId },
+          { $pull: { teacherIds: userId } as any, $set: { updatedAt: new Date() } },
+        );
+        res.status(200).json({ unlinked: true });
         return;
       }
 
-      await col.updateOne(
-        { userId: studentUserId },
-        { $pull: { teacherIds: userId } as any, $set: { updatedAt: new Date() } },
-      );
+      if (teacherUserId) {
+        // Student removing a teacher from their own teacherIds
+        await col.updateOne(
+          { userId },
+          { $pull: { teacherIds: teacherUserId } as any, $set: { updatedAt: new Date() } },
+        );
+        res.status(200).json({ unlinked: true });
+        return;
+      }
 
-      res.status(200).json({ unlinked: true });
+      res.status(400).json({ error: 'studentUserId or teacherUserId required' });
       return;
     }
 

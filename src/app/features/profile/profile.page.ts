@@ -36,6 +36,10 @@ export class ProfilePage {
 
   // Student: my teachers
   protected myTeachers = signal<TeacherInfo[]>([]);
+  protected confirmTeacher = signal<TeacherInfo | null>(null);
+  protected removingTeacherId = signal<string | null>(null);
+
+  // Teacher: students sheet
   protected students = signal<StudentInfo[]>([]);
   protected studentsSheetOpen = signal(false);
   protected studentIdInput = signal('');
@@ -51,7 +55,6 @@ export class ProfilePage {
         this.isTeacher.set(isT);
         this.loading.set(false);
         if (isT) this.loadStudents();
-        // Always load teachers (user may also be a student)
         this.loadMyTeachers();
       },
       error: () => this.loading.set(false),
@@ -72,10 +75,10 @@ export class ProfilePage {
     });
   }
 
+  // ── Name edit ────────────────────────────────────────────
   protected startEditName(): void {
     this.nameEditing.set(true);
   }
-
   protected cancelEditName(): void {
     this.nameEditing.set(false);
   }
@@ -93,6 +96,29 @@ export class ProfilePage {
     });
   }
 
+  // ── Remove teacher (student action) ─────────────────────
+  protected askRemoveTeacher(t: TeacherInfo): void {
+    this.confirmTeacher.set(t);
+  }
+  protected cancelRemoveTeacher(): void {
+    this.confirmTeacher.set(null);
+  }
+
+  protected doRemoveTeacher(): void {
+    const t = this.confirmTeacher();
+    if (!t || this.removingTeacherId()) return;
+    this.confirmTeacher.set(null);
+    this.removingTeacherId.set(t.userId);
+    this.perfilSvc.removeTeacher(t.userId).subscribe({
+      next: () => {
+        this.myTeachers.update((list) => list.filter((x) => x.userId !== t.userId));
+        this.removingTeacherId.set(null);
+      },
+      error: () => this.removingTeacherId.set(null),
+    });
+  }
+
+  // ── Students sheet ───────────────────────────────────────
   protected openStudentsSheet(): void {
     this.studentsSheetOpen.set(true);
   }
@@ -108,7 +134,6 @@ export class ProfilePage {
     if (!id || this.linkSaving()) return;
     this.linkError.set('');
     this.linkSaving.set(true);
-
     this.perfilSvc.linkStudent(id).subscribe({
       next: (res) => {
         this.students.update((list) => {
@@ -144,6 +169,7 @@ export class ProfilePage {
     });
   }
 
+  // ── Misc ─────────────────────────────────────────────────
   protected copyId(): void {
     const id = this.auth.userId();
     if (!id) return;

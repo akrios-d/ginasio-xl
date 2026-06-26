@@ -71,6 +71,14 @@
                       <span class="prof-email">{{ t.email }}</span>
                     }
                   </div>
+                  <button
+                    type="button"
+                    class="btn-assoc btn-assoc--remove"
+                    [disabled]="removingTeacherId() === t.userId"
+                    (click)="askRemoveTeacher(t)"
+                  >
+                    {{ i18n.t('profile.removeTrainador') }}
+                  </button>
                 </li>
               }
             </ul>
@@ -87,7 +95,7 @@
           <div class="user-id-row">
             <code class="user-id-value">{{ auth.userId() }}</code>
             <button type="button" class="btn-copy" (click)="copyId()">
-              {{ idCopied() ? '✓' : i18n.t('profile.copy') }}
+              {{ idCopied() ? '\u2713' : i18n.t('profile.copy') }}
             </button>
           </div>
         </div>
@@ -186,5 +194,30 @@
     } @else {
       <p class="text-muted">{{ i18n.t('profile.semAlunos') }}</p>
     }
+  </div>
+}
+
+<!-- ── Confirm remove teacher dialog ─────────────── -->
+@if (confirmTeacher(); as ct) {
+  <div
+    class="sheet-backdrop"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="i18n.t('profile.cancelBtn')"
+    (click)="cancelRemoveTeacher()"
+    (keyup.enter)="cancelRemoveTeacher()"
+    (keyup.escape)="cancelRemoveTeacher()"
+  ></div>
+  <div class="confirm-dialog" role="alertdialog" aria-modal="true">
+    <p class="confirm-msg">{{ i18n.t('profile.confirmRemoveTrainador') }}</p>
+    <strong class="confirm-name">{{ ct.name || ct.email || ct.userId }}</strong>
+    <div class="confirm-actions">
+      <button type="button" class="btn-cancel" (click)="cancelRemoveTeacher()">
+        {{ i18n.t('profile.cancelBtn') }}
+      </button>
+      <button type="button" class="btn-assoc btn-assoc--remove" (click)="doRemoveTeacher()">
+        {{ i18n.t('profile.removeTrainador') }}
+      </button>
+    </div>
   </div>
 }
