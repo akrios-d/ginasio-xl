@@ -24,7 +24,11 @@ export default async function handler(req: any, res: any): Promise<void> {
     const _id = toObjectId(id);
 
     if (req.method === 'GET') {
-      const doc = await col.findOne({ _id });
+      // Accessible to: student owner, teacher in sharedWithTeacherIds, or creator
+      const doc = await col.findOne({
+        _id,
+        $or: [{ studentId: userId }, { createdById: userId }, { sharedWithTeacherIds: userId }],
+      });
       if (!doc) {
         res.status(404).json({ error: 'Not found' });
         return;
@@ -35,7 +39,11 @@ export default async function handler(req: any, res: any): Promise<void> {
 
     if (req.method === 'PUT') {
       const body = UpdateAvaliacaoSchema.parse(req.body);
-      const result = await col.updateOne({ _id }, { $set: { ...body, updatedAt: new Date() } });
+      // Only student owner or creator can update
+      const result = await col.updateOne(
+        { _id, $or: [{ studentId: userId }, { createdById: userId }] },
+        { $set: { ...body, updatedAt: new Date() } },
+      );
       if (result.matchedCount === 0) {
         res.status(404).json({ error: 'Not found' });
         return;
@@ -45,7 +53,11 @@ export default async function handler(req: any, res: any): Promise<void> {
     }
 
     if (req.method === 'DELETE') {
-      const result = await col.deleteOne({ _id });
+      // Only student owner or creator can delete
+      const result = await col.deleteOne({
+        _id,
+        $or: [{ studentId: userId }, { createdById: userId }],
+      });
       if (result.deletedCount === 0) {
         res.status(404).json({ error: 'Not found' });
         return;

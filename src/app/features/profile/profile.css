@@ -79,7 +79,27 @@
   }
 }
 
-/* ── Professor association ──────────────────────── */
+/* ── Teacher profile section ────────────────────── */
+.teacher-profile-section {
+  margin-top: 28px;
+  max-width: 480px;
+}
+
+.section-title {
+  margin: 0 0 16px;
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* ── Teacher association ─────────────────────────── */
+/* (formerly: Professor association) */
 .prof-section {
   margin-top: 28px;
   max-width: 480px;
@@ -92,7 +112,7 @@
 }
 .prof-current {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   margin-bottom: 12px;
   padding: 8px 12px;
@@ -104,6 +124,12 @@
   font-size: var(--t-meta);
   font-weight: 600;
   color: var(--c-ink-2);
+  white-space: nowrap;
+}
+.prof-current-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 .prof-current-name {
   font-size: var(--t-meta);
@@ -149,6 +175,14 @@
 .prof-email {
   font-size: var(--t-meta);
   color: var(--c-ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prof-specialty {
+  font-size: var(--t-meta);
+  color: var(--c-accent);
+  font-style: italic;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

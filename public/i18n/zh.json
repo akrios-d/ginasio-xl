@@ -130,9 +130,10 @@
   "avaliacao.criar.save": "创建",
   "avaliacao.editar.save": "保存更改",
   "perfil.associarProf": "关联教练",
-  "perfil.professores": "可选教练",
   "perfil.semProfessores": "未找到教练。",
   "perfil.professorAtual": "当前教练",
+  "perfil.professoresAtuais": "已关联教练",
   "perfil.associar": "关联",
+  "perfil.associate": "关联",
   "perfil.desassociar": "移除"
 }

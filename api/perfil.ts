@@ -61,8 +61,8 @@ export default async function handler(req: any, res: any): Promise<void> {
           $set: { ...body, updatedAt: now },
           $setOnInsert: {
             userId,
-            role: 'aluno',
-            nome: authUser.name ?? authUser.email ?? userId,
+            roles: ['student'],
+            name: authUser.name ?? authUser.email ?? userId,
             email: authUser.email ?? '',
             createdAt: now,
           },

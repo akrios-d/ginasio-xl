@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -36,6 +36,7 @@ export class HomePage {
   protected readonly i18n = inject(I18nService);
   private readonly checkinSvc = inject(CheckinService);
   private readonly treinoSvc = inject(ProgramaTreinoService);
+  private readonly elRef = inject(ElementRef);
 
   // ── Greeting ──────────────────────────────────────────────────────────────
   protected readonly greeting = computed(() => {
@@ -170,6 +171,10 @@ export class HomePage {
     } else {
       this.selectedDate.set(day.date);
       this.addingCheckin.set(false);
+      setTimeout(() => {
+        const panel = this.elRef.nativeElement.querySelector('.day-panel') as HTMLElement | null;
+        panel?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 30);
     }
   }
 

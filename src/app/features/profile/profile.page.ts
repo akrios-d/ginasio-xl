@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../core/i18n/i18n.service';
-import { PerfilService, type ProfessorInfo } from '../../core/services/perfil.service';
+import { PerfilService, type TeacherInfo } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
+import type { Role, TeacherProfile } from '../../core/models';
 
 @Component({
   selector: 'app-profile',
@@ -16,66 +17,94 @@ export class ProfilePage {
   private readonly perfilSvc = inject(PerfilService);
   protected readonly auth = inject(AuthService);
 
-  private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
-
-  protected numeroAluno = signal('');
   protected loading = signal(true);
-  protected saving = signal(false);
-  protected saved = signal(false);
-  protected ptMode = signal<boolean>(localStorage.getItem(ProfilePage.PT_MODE_KEY) === 'true');
   protected idCopied = signal(false);
 
-  protected professors = signal<ProfessorInfo[]>([]);
-  protected professorId = signal('');
-  protected loadingProfs = signal(false);
+  // Roles
+  protected roles = signal<Role[]>(['student']);
+  protected isTeacher = computed(() => this.roles().includes('teacher'));
+  protected teacherSaving = signal(false);
+
+  // Teacher profile fields
+  protected teacherProfile = signal<TeacherProfile>({});
+  protected teacherProfileSaving = signal(false);
+  protected teacherProfileSaved = signal(false);
+
+  // Teacher association (student side)
+  protected teachers = signal<TeacherInfo[]>([]);
+  protected teacherIds = signal<string[]>([]);
+  protected loadingTeachers = signal(false);
   protected assocSaving = signal(false);
 
   constructor() {
     this.perfilSvc.get().subscribe({
       next: (p) => {
-        this.numeroAluno.set(p.numeroAluno ?? '');
-        this.professorId.set(p.professorId ?? '');
+        this.roles.set(p.roles ?? ['student']);
+        this.teacherIds.set(p.teacherIds ?? []);
+        this.teacherProfile.set(p.teacherProfile ?? {});
         this.loading.set(false);
-        if (!this.ptMode()) {
-          this.loadProfessors();
-        }
+        this.loadTeachers();
       },
       error: () => this.loading.set(false),
     });
   }
 
-  private loadProfessors(): void {
-    this.loadingProfs.set(true);
-    this.perfilSvc.listProfessores().subscribe({
+  private loadTeachers(): void {
+    this.loadingTeachers.set(true);
+    this.perfilSvc.listTeachers().subscribe({
       next: (list) => {
-        this.professors.set(list);
-        this.loadingProfs.set(false);
+        this.teachers.set(list);
+        this.loadingTeachers.set(false);
       },
-      error: () => this.loadingProfs.set(false),
+      error: () => this.loadingTeachers.set(false),
     });
   }
 
-  protected togglePtMode(): void {
-    const next = !this.ptMode();
-    this.ptMode.set(next);
-    localStorage.setItem(ProfilePage.PT_MODE_KEY, String(next));
-    this.perfilSvc.save({ isProfessor: next }).subscribe({
-      next: () => undefined,
-      error: () => undefined,
-    });
-    if (!next) {
-      this.loadProfessors();
-    }
-  }
-
-  protected associate(prof: ProfessorInfo): void {
-    if (this.assocSaving()) return;
-    const isSame = this.professorId() === prof.userId;
-    const next = isSame ? '' : prof.userId;
-    this.assocSaving.set(true);
-    this.perfilSvc.save({ professorId: next || undefined }).subscribe({
+  protected toggleTeacherMode(): void {
+    if (this.teacherSaving()) return;
+    const current = this.roles();
+    const next: Role[] = this.isTeacher()
+      ? current.filter((r) => r !== 'teacher')
+      : [...current, 'teacher'];
+    this.teacherSaving.set(true);
+    this.perfilSvc.save({ roles: next }).subscribe({
       next: () => {
-        this.professorId.set(next);
+        this.roles.set(next);
+        this.teacherSaving.set(false);
+        if (next.includes('teacher')) this.loadTeachers();
+      },
+      error: () => this.teacherSaving.set(false),
+    });
+  }
+
+  protected saveTeacherProfile(): void {
+    if (this.teacherProfileSaving()) return;
+    this.teacherProfileSaving.set(true);
+    this.perfilSvc.save({ teacherProfile: this.teacherProfile() }).subscribe({
+      next: () => {
+        this.teacherProfileSaving.set(false);
+        this.teacherProfileSaved.set(true);
+        setTimeout(() => this.teacherProfileSaved.set(false), 2500);
+      },
+      error: () => this.teacherProfileSaving.set(false),
+    });
+  }
+
+  protected updateTeacherField(field: keyof TeacherProfile, value: string): void {
+    this.teacherProfile.set({ ...this.teacherProfile(), [field]: value });
+  }
+
+  protected associate(teacher: TeacherInfo): void {
+    if (this.assocSaving()) return;
+    const current = this.teacherIds();
+    const isSelected = current.includes(teacher.userId);
+    const next = isSelected
+      ? current.filter((id) => id !== teacher.userId)
+      : [...current, teacher.userId];
+    this.assocSaving.set(true);
+    this.perfilSvc.save({ teacherIds: next }).subscribe({
+      next: () => {
+        this.teacherIds.set(next);
         this.assocSaving.set(false);
       },
       error: () => this.assocSaving.set(false),

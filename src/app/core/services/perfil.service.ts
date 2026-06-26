@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import type { Perfil } from '../models';
+import type { Perfil, TeacherProfile } from '../models';
 
-export interface ProfessorInfo {
+export interface TeacherInfo {
   _id: string;
   userId: string;
-  nome: string;
+  name: string;
   email: string;
+  teacherProfile?: TeacherProfile;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,13 +23,13 @@ export class PerfilService {
   }
 
   save(
-    payload: Partial<Pick<Perfil, 'numeroAluno' | 'isProfessor' | 'professorId'>>,
+    payload: Partial<Pick<Perfil, 'studentNumber' | 'roles' | 'teacherIds' | 'teacherProfile'>>,
   ): Observable<{ saved: boolean }> {
     return this.http.put<{ saved: boolean }>(this.base, payload, { withCredentials: true });
   }
 
-  listProfessores(): Observable<ProfessorInfo[]> {
-    return this.http.get<ProfessorInfo[]>(`${this.baseMulti}?isProfessor=true`, {
+  listTeachers(): Observable<TeacherInfo[]> {
+    return this.http.get<TeacherInfo[]>(`${this.baseMulti}?role=teacher`, {
       withCredentials: true,
     });
   }

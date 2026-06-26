@@ -130,9 +130,10 @@
   "avaliacao.criar.save": "Criar ficha",
   "avaliacao.editar.save": "Guardar alterações",
   "perfil.associarProf": "Associar professor",
-  "perfil.professores": "Professores disponíveis",
   "perfil.semProfessores": "Nenhum professor encontrado.",
   "perfil.professorAtual": "Professor associado",
+  "perfil.professoresAtuais": "Professores associados",
   "perfil.associar": "Associar",
+  "perfil.associate": "Associar",
   "perfil.desassociar": "Remover"
 }

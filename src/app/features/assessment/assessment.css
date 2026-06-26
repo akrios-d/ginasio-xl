@@ -333,6 +333,113 @@
 }
 
 /* ── New button ──────────────────────────────────── */
+/* ── Header actions ──────────────────────────────── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-pt-mode {
+  padding: 6px 12px;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-sm);
+  font-size: var(--t-meta);
+  font-weight: 700;
+  color: var(--c-ink-3);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition:
+    background 120ms,
+    border-color 120ms,
+    color 120ms;
+}
+.btn-pt-mode--active {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+.btn-pt-mode:hover:not(.btn-pt-mode--active) {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  box-shadow: none;
+}
+
+/* ── Shared-by-student badge ─────────────────────── */
+.ficha-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ficha-shared-badge {
+  font-size: var(--t-meta);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent);
+}
+
+/* ── Share with teachers ─────────────────────────── */
+.share-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-border);
+}
+.share-label {
+  margin: 0 0 8px;
+  font-size: var(--t-meta);
+  font-weight: 600;
+  color: var(--c-ink-2);
+}
+.share-teachers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.share-teacher-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  min-height: unset;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: var(--c-ink-2);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    color 120ms,
+    background 120ms;
+}
+.share-teacher-btn--on {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 8%, transparent);
+}
+.share-teacher-btn:hover:not(:disabled) {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  box-shadow: none;
+}
+.share-teacher-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-border);
+  flex-shrink: 0;
+  transition: background 120ms;
+}
+.share-teacher-btn--on .share-teacher-dot {
+  background: var(--c-accent);
+}
+
 .btn-new {
   display: inline-flex;
   align-items: center;

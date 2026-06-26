@@ -5,7 +5,7 @@ import { z } from 'zod';
 // ---------------------------------------------------------------------------
 
 export const CreateAvaliacaoSchema = z.object({
-  alunoId: z.string().min(1),
+  studentId: z.string().min(1),
   objetivo: z
     .enum([
       'Hipertrofia',
@@ -59,9 +59,13 @@ export const CreateAvaliacaoSchema = z.object({
 // ---------------------------------------------------------------------------
 
 export const UpdateAvaliacaoSchema = CreateAvaliacaoSchema.omit({
-  alunoId: true,
+  studentId: true,
   avaliacoes: true,
-}).partial();
+})
+  .extend({
+    sharedWithTeacherIds: z.array(z.string()).optional(),
+  })
+  .partial();
 
 // ---------------------------------------------------------------------------
 // POST /api/avaliacao/[id]/entrada  — adicionar uma nova medição

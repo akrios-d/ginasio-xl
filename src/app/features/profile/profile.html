@@ -1,90 +1,140 @@
 <section class="container page">
   <div class="page-header">
-    <h2 class="page-title">{{ i18n.t('perfil.title') }}</h2>
+    <h2 class="page-title">{{ i18n.t('profile.title') }}</h2>
   </div>
 
   @if (loading()) {
-    <p class="text-muted">{{ i18n.t('perfil.loading') }}</p>
+    <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
   } @else {
-    <!-- ── Associar Professor (só para alunos) ── -->
-    @if (!ptMode()) {
-      <div class="prof-section">
-        <h3 class="prof-section-title">{{ i18n.t('perfil.associarProf') }}</h3>
-
-        @if (professorId()) {
-          <div class="prof-current">
-            <span class="prof-current-label">{{ i18n.t('perfil.professorAtual') }}:</span>
-            @for (p of professors(); track p.userId) {
-              @if (p.userId === professorId()) {
-                <span class="prof-current-name">{{ p.nome || p.email }}</span>
-              }
-            }
-          </div>
-        }
-
-        @if (loadingProfs()) {
-          <p class="text-muted">{{ i18n.t('common.loading') }}</p>
-        } @else if (professors().length === 0) {
-          <p class="text-muted">{{ i18n.t('perfil.semProfessores') }}</p>
-        } @else {
-          <ul class="prof-list">
-            @for (p of professors(); track p.userId) {
-              <li class="prof-item" [class.prof-item--selected]="professorId() === p.userId">
-                <div class="prof-info">
-                  <span class="prof-name">{{ p.nome || p.email }}</span>
-                  @if (p.nome && p.email) {
-                    <span class="prof-email">{{ p.email }}</span>
-                  }
-                </div>
-                <button
-                  type="button"
-                  class="btn-assoc"
-                  [class.btn-assoc--remove]="professorId() === p.userId"
-                  [disabled]="assocSaving()"
-                  (click)="associate(p)"
-                >
-                  {{
-                    professorId() === p.userId
-                      ? i18n.t('perfil.desassociar')
-                      : i18n.t('perfil.associate')
-                  }}
-                </button>
-              </li>
-            }
-          </ul>
-        }
-      </div>
-    }
-
-    <!-- ── Modo Personal Trainer ── -->
+    <!-- ── Teacher Mode toggle ── -->
     <div class="pt-section">
       <div class="pt-section-header">
         <div>
-          <p class="pt-section-title">{{ i18n.t('perfil.ptMode') }}</p>
-          <p class="pt-section-desc">{{ i18n.t('perfil.ptModeDesc') }}</p>
+          <p class="pt-section-title">{{ i18n.t('profile.teacherMode') }}</p>
+          <p class="pt-section-desc">{{ i18n.t('profile.teacherModeDesc') }}</p>
         </div>
         <button
           type="button"
           class="pt-mode-toggle"
-          [class.pt-mode-toggle--on]="ptMode()"
-          (click)="togglePtMode()"
+          [class.pt-mode-toggle--on]="isTeacher()"
+          [disabled]="teacherSaving()"
+          (click)="toggleTeacherMode()"
         >
           <span class="pt-mode-knob"></span>
         </button>
       </div>
       <p class="pt-mode-status">
-        {{ ptMode() ? i18n.t('perfil.ptModeOn') : i18n.t('perfil.ptModeOff') }}
+        {{ isTeacher() ? i18n.t('profile.teacherModeOn') : i18n.t('profile.teacherModeOff') }}
       </p>
     </div>
 
-    <!-- ── O meu ID ── -->
+    <!-- ── Teacher profile fields (only when teacher role is active) ── -->
+    @if (isTeacher()) {
+      <div class="teacher-profile-section">
+        <h3 class="section-title">{{ i18n.t('profile.teacherProfile') }}</h3>
+
+        <div class="perfil-form">
+          <div class="form-group">
+            <label class="form-label" for="specialty">{{ i18n.t('profile.specialty') }}</label>
+            <input
+              id="specialty"
+              class="form-input"
+              type="text"
+              [placeholder]="i18n.t('profile.specialtyPlaceholder')"
+              [value]="teacherProfile().specialty ?? ''"
+              (input)="updateTeacherField('specialty', $any($event.target).value)"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bio">{{ i18n.t('profile.bio') }}</label>
+            <textarea
+              id="bio"
+              class="form-input form-textarea"
+              [placeholder]="i18n.t('profile.bioPlaceholder')"
+              [value]="teacherProfile().bio ?? ''"
+              (input)="updateTeacherField('bio', $any($event.target).value)"
+            ></textarea>
+          </div>
+
+          <div class="form-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="teacherProfileSaving()"
+              (click)="saveTeacherProfile()"
+            >
+              {{ teacherProfileSaving() ? i18n.t('common.saving') : i18n.t('profile.save') }}
+            </button>
+            @if (teacherProfileSaved()) {
+              <span class="save-confirm">{{ i18n.t('profile.saved') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ── Associate Teacher(s) (student side) ── -->
+    <div class="prof-section">
+      <h3 class="prof-section-title">{{ i18n.t('profile.associateTeacher') }}</h3>
+
+      @if (teacherIds().length > 0) {
+        <div class="prof-current">
+          <span class="prof-current-label">{{ i18n.t('profile.currentTeachers') }}:</span>
+          <div class="prof-current-names">
+            @for (t of teachers(); track t.userId) {
+              @if (teacherIds().includes(t.userId)) {
+                <span class="prof-current-name">{{ t.name || t.email }}</span>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      @if (loadingTeachers()) {
+        <p class="text-muted">{{ i18n.t('common.loading') }}</p>
+      } @else if (teachers().length === 0) {
+        <p class="text-muted">{{ i18n.t('profile.noTeachers') }}</p>
+      } @else {
+        <ul class="prof-list">
+          @for (t of teachers(); track t.userId) {
+            <li class="prof-item" [class.prof-item--selected]="teacherIds().includes(t.userId)">
+              <div class="prof-info">
+                <span class="prof-name">{{ t.name || t.email }}</span>
+                @if (t.name && t.email) {
+                  <span class="prof-email">{{ t.email }}</span>
+                }
+                @if (t.teacherProfile?.specialty) {
+                  <span class="prof-specialty">{{ t.teacherProfile!.specialty }}</span>
+                }
+              </div>
+              <button
+                type="button"
+                class="btn-assoc"
+                [class.btn-assoc--remove]="teacherIds().includes(t.userId)"
+                [disabled]="assocSaving()"
+                (click)="associate(t)"
+              >
+                {{
+                  teacherIds().includes(t.userId)
+                    ? i18n.t('profile.remove')
+                    : i18n.t('profile.associate')
+                }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- ── My ID ── -->
     <div class="user-id-section">
-      <p class="user-id-label">{{ i18n.t('perfil.meuId') }}</p>
-      <p class="user-id-desc">{{ i18n.t('perfil.meuIdDesc') }}</p>
+      <p class="user-id-label">{{ i18n.t('profile.myId') }}</p>
+      <p class="user-id-desc">{{ i18n.t('profile.myIdDesc') }}</p>
       <div class="user-id-row">
         <code class="user-id-value">{{ auth.userId() }}</code>
         <button type="button" class="btn-copy" (click)="copyId()">
-          {{ idCopied() ? '✓' : i18n.t('perfil.copiar') }}
+          {{ idCopied() ? '✓' : i18n.t('profile.copy') }}
         </button>
       </div>
     </div>

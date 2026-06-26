@@ -20,8 +20,12 @@ export default async function handler(req: any, res: any): Promise<void> {
   try {
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
-      const alunoId = (req.query as any).alunoId ?? userId;
-      const docs = await col.find({ alunoId }).sort({ createdAt: -1 }).toArray();
+      // Return own assessments + assessments shared with this user as a teacher
+      const studentId = (req.query as any).studentId as string | undefined;
+      const query = studentId
+        ? { studentId } // teacher viewing a specific student (teacher mode)
+        : { $or: [{ studentId: userId }, { sharedWithTeacherIds: userId }] };
+      const docs = await col.find(query).sort({ createdAt: -1 }).toArray();
       res.status(200).json(docs.map(mapDocumentId));
       return;
     }
@@ -33,7 +37,7 @@ export default async function handler(req: any, res: any): Promise<void> {
       const now = new Date();
       const result = await col.insertOne({
         ...body,
-        criadoPorId: userId,
+        createdById: userId,
         createdAt: now,
         updatedAt: now,
       });

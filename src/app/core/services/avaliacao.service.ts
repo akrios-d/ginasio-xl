@@ -9,8 +9,8 @@ export class AvaliacaoService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/api/avaliacao`;
 
-  list(alunoId?: string): Observable<FichaAvaliacao[]> {
-    const params: Record<string, string> | undefined = alunoId ? { alunoId } : undefined;
+  list(studentId?: string): Observable<FichaAvaliacao[]> {
+    const params: Record<string, string> | undefined = studentId ? { studentId } : undefined;
     return this.http.get<FichaAvaliacao[]>(this.base, { params, withCredentials: true });
   }
 
@@ -19,22 +19,31 @@ export class AvaliacaoService {
   }
 
   create(
-    payload: Omit<FichaAvaliacao, '_id' | 'criadoPorId' | 'createdAt' | 'updatedAt'>,
+    payload: Omit<FichaAvaliacao, '_id' | 'createdById' | 'createdAt' | 'updatedAt'>,
   ): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(this.base, payload, { withCredentials: true });
   }
 
-  update(id: string, payload: Partial<FichaAvaliacao>): Observable<{ updated: boolean }> {
+  update(
+    id: string,
+    payload: Partial<
+      Pick<FichaAvaliacao, 'objetivo' | 'outrosObjetivos' | 'metas' | 'sharedWithTeacherIds'>
+    >,
+  ): Observable<{ updated: boolean }> {
     return this.http.put<{ updated: boolean }>(`${this.base}/${id}`, payload, {
       withCredentials: true,
     });
+  }
+
+  /** Update just the sharedWithTeacherIds for an assessment */
+  share(id: string, teacherIds: string[]): Observable<{ updated: boolean }> {
+    return this.update(id, { sharedWithTeacherIds: teacherIds });
   }
 
   delete(id: string): Observable<{ deleted: boolean }> {
     return this.http.delete<{ deleted: boolean }>(`${this.base}/${id}`, { withCredentials: true });
   }
 
-  /** Adiciona uma nova medição a uma ficha existente */
   addEntrada(fichaId: string, entrada: EntradaAvaliacao): Observable<{ added: boolean }> {
     return this.http.post<{ added: boolean }>(`${this.base}/${fichaId}/entrada`, entrada, {
       withCredentials: true,

@@ -1,21 +1,33 @@
 <section class="container page">
   <div class="page-header">
     <h2 class="page-title">{{ i18n.t('nav.avaliacao') }}</h2>
-    <button type="button" class="btn-new" (click)="startCreateFicha()">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      {{ i18n.t('avaliacao.nova') }}
-    </button>
+    <div class="header-actions">
+      @if (isTeacher()) {
+        <button
+          type="button"
+          class="btn-pt-mode"
+          [class.btn-pt-mode--active]="ptMode()"
+          (click)="togglePtMode()"
+        >
+          PT
+        </button>
+      }
+      <button type="button" class="btn-new" (click)="startCreateFicha()">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        {{ i18n.t('avaliacao.nova') }}
+      </button>
+    </div>
   </div>
 
   @if (loading()) {
@@ -72,7 +84,12 @@
             [attr.aria-expanded]="expandedId() === f._id"
           >
             <div class="ficha-meta">
-              <span class="ficha-objective">{{ f.objetivo }}</span>
+              <div class="ficha-title-row">
+                <span class="ficha-objective">{{ f.objetivo }}</span>
+                @if (isSharedView(f)) {
+                  <span class="ficha-shared-badge">{{ i18n.t('avaliacao.sharedByStudent') }}</span>
+                }
+              </div>
               @if (latestEntry(f); as latest) {
                 <span class="ficha-latest">
                   {{ latest.data | date: 'dd MMM yyyy' }}
@@ -80,7 +97,7 @@
                     · {{ latest.peso }} kg
                   }
                   @if (latest.percentualMassaGorda) {
-                    · {{ latest.percentualMassaGorda }}% MG
+                    · {{ latest.percentualMassaGorda }}% BF
                   }
                 </span>
               } @else {
@@ -153,22 +170,45 @@
                 <p class="save-confirm">✓ {{ i18n.t('avaliacao.saved') }}</p>
               }
 
+              <!-- ── Share with teachers (only for own assessments) ── -->
+              @if (!isSharedView(f) && myTeachers().length > 0) {
+                <div class="share-section">
+                  <p class="share-label">{{ i18n.t('avaliacao.shareWithTeachers') }}</p>
+                  <div class="share-teachers">
+                    @for (t of myTeachers(); track t.userId) {
+                      <button
+                        type="button"
+                        class="share-teacher-btn"
+                        [class.share-teacher-btn--on]="isSharedWith(f, t.userId)"
+                        [disabled]="sharingSaving() === f._id"
+                        (click)="toggleShare(f, t)"
+                      >
+                        <span class="share-teacher-dot"></span>
+                        {{ t.name || t.email }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
               <div class="card-actions">
-                <button type="button" class="btn-edit" (click)="startEditFicha(f)">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                  {{ i18n.t('avaliacao.editar') }}
-                </button>
+                @if (!isSharedView(f)) {
+                  <button type="button" class="btn-edit" (click)="startEditFicha(f)">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    {{ i18n.t('avaliacao.editar') }}
+                  </button>
+                }
               </div>
 
               @if (addingEntryFor() === f._id) {
@@ -362,6 +402,19 @@
       </button>
     </div>
     <div class="sheet-body">
+      <!-- Student ID field in PT mode (only when creating, not editing) -->
+      @if (ptMode() && !editingFicha()) {
+        <div class="form-group">
+          <label class="form-label" for="studentId">{{ i18n.t('avaliacao.studentId') }}</label>
+          <input
+            id="studentId"
+            type="text"
+            [(ngModel)]="fichaForm.studentId"
+            name="studentId"
+            [placeholder]="i18n.t('avaliacao.studentIdPlaceholder')"
+          />
+        </div>
+      }
       <div class="form-group">
         <span class="form-label">{{ i18n.t('avaliacao.criar.objetivo') }}</span>
         <div class="objetivo-options">

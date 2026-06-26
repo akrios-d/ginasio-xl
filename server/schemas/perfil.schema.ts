@@ -1,7 +1,16 @@
 import { z } from 'zod';
 
+const RoleSchema = z.enum(['student', 'teacher', 'admin']);
+
+const TeacherProfileSchema = z.object({
+  specialty: z.string().optional(),
+  bio: z.string().optional(),
+  certifications: z.array(z.string()).optional(),
+});
+
 export const UpsertPerfilSchema = z.object({
-  numeroAluno: z.string().optional(),
-  isProfessor: z.boolean().optional(),
-  professorId: z.string().optional(),
+  studentNumber: z.string().optional(),
+  roles: z.array(RoleSchema).optional(),
+  teacherIds: z.array(z.string()).optional(),
+  teacherProfile: TeacherProfileSchema.optional(),
 });

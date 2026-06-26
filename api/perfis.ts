@@ -1,5 +1,5 @@
 /**
- * GET /api/perfis?isProfessor=true — lista perfis de professors/PTs
+ * GET /api/perfis?role=teacher — list teacher profiles
  */
 import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
@@ -20,8 +20,8 @@ export default async function handler(req: any, res: any): Promise<void> {
   try {
     const col = await getCollection('perfis');
     const docs = await col
-      .find({ isProfessor: true })
-      .project({ userId: 1, nome: 1, email: 1 })
+      .find({ roles: 'teacher' })
+      .project({ userId: 1, name: 1, email: 1 })
       .toArray();
 
     res.status(200).json(docs.map(mapDocumentId));
