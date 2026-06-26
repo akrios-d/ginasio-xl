@@ -118,13 +118,11 @@ export default async function handler(req: any, res: any): Promise<void> {
         }
       }
 
-      res
-        .status(200)
-        .json({
-          linked: true,
-          name: displayName ?? student.email ?? studentUserId,
-          email: student.email,
-        });
+      res.status(200).json({
+        linked: true,
+        name: displayName ?? student.email ?? studentUserId,
+        email: student.email,
+      });
       return;
     }
 
@@ -138,7 +136,7 @@ export default async function handler(req: any, res: any): Promise<void> {
 
       await col.updateOne(
         { userId: studentUserId },
-        { $pull: { teacherIds: userId }, $set: { updatedAt: new Date() } },
+        { $pull: { teacherIds: userId } as any, $set: { updatedAt: new Date() } },
       );
 
       res.status(200).json({ unlinked: true });

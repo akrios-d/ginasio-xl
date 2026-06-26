@@ -6,6 +6,16 @@
         <span class="brand-greeting">{{ greeting() }}</span>
       }
     </div>
+    @if (auth.isAuthenticated()) {
+      <button
+        type="button"
+        class="btn-header-signout"
+        (click)="auth.logout()"
+        [attr.aria-label]="i18n.t('app.signOut')"
+      >
+        <app-icon name="logout" [size]="18" />
+      </button>
+    }
   </header>
 
   @if (auth.isAuthenticated()) {

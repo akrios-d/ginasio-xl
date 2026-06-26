@@ -114,10 +114,6 @@
               }
             </div>
           </div>
-          <button type="button" class="btn-signout" (click)="auth.logout()">
-            <app-icon name="logout" [size]="16" />
-            {{ i18n.t('app.signOut') }}
-          </button>
         </div>
       </div>
     </div>
@@ -126,7 +122,15 @@
 
 <!-- ── Students bottom sheet ─────────────────────── -->
 @if (studentsSheetOpen()) {
-  <div class="sheet-backdrop" (click)="closeStudentsSheet()"></div>
+  <div
+    class="sheet-backdrop"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="i18n.t('profile.cancelBtn')"
+    (click)="closeStudentsSheet()"
+    (keyup.enter)="closeStudentsSheet()"
+    (keyup.escape)="closeStudentsSheet()"
+  ></div>
   <div class="students-sheet">
     <div class="sheet-header">
       <span class="sheet-title">{{ i18n.t('profile.meusAlunos') }}</span>

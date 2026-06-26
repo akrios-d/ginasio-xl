@@ -34,18 +34,18 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('renders the app title', async () => {
+  it('renders the app shell header', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Ginásio XL');
+    expect(compiled.querySelector('.app-shell')).toBeTruthy();
   });
 
-  it('renders the language trigger', async () => {
+  it('renders the brand logo', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     await fixture.whenStable();
-    expect((fixture.nativeElement as HTMLElement).querySelector('.lang-trigger')).toBeTruthy();
+    expect((fixture.nativeElement as HTMLElement).querySelector('.brand-logo')).toBeTruthy();
   });
 });

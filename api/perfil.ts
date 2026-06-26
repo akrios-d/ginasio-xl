@@ -54,7 +54,7 @@ export default async function handler(req: any, res: any): Promise<void> {
         });
         doc = await col.findOne({ userId });
       }
-      res.status(200).json(mapDocumentId(doc));
+      res.status(200).json(mapDocumentId(doc!));
       return;
     }
 
