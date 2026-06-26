@@ -189,5 +189,6 @@
   "profile.meusTrainadores": "My trainers",
   "treino.alunoNaoEncontrado": "Student not found",
   "profile.removeTrainador": "Remove",
-  "profile.confirmRemoveTrainador": "Remove this trainer?"
+  "profile.confirmRemoveTrainador": "Remove this trainer?",
+  "avaliacao.mine": "Mine"
 }

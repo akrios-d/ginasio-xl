@@ -134,6 +134,10 @@ export class AssessmentPage {
     });
   }
 
+  protected onStudentSelectChange(value: string): void {
+    this.selectStudent(value || null);
+  }
+
   protected selectStudent(id: string | null): void {
     this.selectedStudentId.set(id);
     this.expandedId.set(null);

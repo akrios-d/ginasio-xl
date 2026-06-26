@@ -432,6 +432,12 @@
   color: var(--c-accent);
 }
 
+.ficha-student-name {
+  font-size: var(--t-meta);
+  color: var(--c-ink-2);
+  font-weight: 500;
+}
+
 /* ── Share with teachers ─────────────────────────── */
 .share-section {
   margin-top: 16px;
@@ -769,8 +775,7 @@
 .pt-student-bar {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   padding: 10px 14px;
   background: var(--c-surface-alt);
   border: 1px solid var(--c-border);
@@ -785,44 +790,22 @@
   flex-shrink: 0;
 }
 
-.pt-student-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.pt-student-chip {
-  padding: 4px 12px;
+.pt-student-select {
+  flex: 1;
+  max-width: 280px;
+  padding: 6px 10px;
   background: var(--c-surface);
   border: 1.5px solid var(--c-border);
-  border-radius: var(--r-pill);
-  font-size: var(--t-meta);
-  font-weight: 500;
-  color: var(--c-ink-2);
+  border-radius: var(--r-sm);
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
   cursor: pointer;
-  min-height: unset;
-  transition:
-    border-color 120ms,
-    background 120ms,
-    color 120ms;
+  appearance: auto;
+  transition: border-color 120ms;
 }
-@media (hover: hover) {
-  .pt-student-chip:hover {
-    border-color: var(--c-accent);
-    box-shadow: none;
-  }
-}
-.pt-student-chip--active {
+.pt-student-select:focus {
+  outline: none;
   border-color: var(--c-accent);
-  background: var(--c-accent-lt);
-  color: var(--c-accent);
-  font-weight: 600;
-}
-
-.pt-no-students {
-  font-size: var(--t-meta);
-  color: var(--c-ink-3);
-  font-style: italic;
 }
 
 .spinner--sm {

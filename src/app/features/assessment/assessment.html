@@ -33,33 +33,24 @@
   <!-- ── PT mode: student picker ──────────────────────────── -->
   @if (ptMode() && isTeacher()) {
     <div class="pt-student-bar">
-      <span class="pt-student-label">{{ i18n.t('avaliacao.meusAlunos') }}</span>
+      <label class="pt-student-label" for="ptStudentSelect">{{
+        i18n.t('avaliacao.meusAlunos')
+      }}</label>
       @if (studentsLoading()) {
         <span class="spinner spinner--sm" aria-hidden="true"></span>
       } @else {
-        <div class="pt-student-chips">
-          <button
-            type="button"
-            class="pt-student-chip"
-            [class.pt-student-chip--active]="selectedStudentId() === null"
-            (click)="selectStudent(null)"
-          >
-            {{ i18n.t('avaliacao.todos') }}
-          </button>
+        <select
+          id="ptStudentSelect"
+          class="pt-student-select"
+          (change)="onStudentSelectChange($any($event.target).value)"
+        >
+          <option value="">{{ i18n.t('avaliacao.mine') }}</option>
           @for (s of students(); track s.userId) {
-            <button
-              type="button"
-              class="pt-student-chip"
-              [class.pt-student-chip--active]="selectedStudentId() === s.userId"
-              (click)="selectStudent(s.userId)"
-            >
+            <option [value]="s.userId" [selected]="selectedStudentId() === s.userId">
               {{ s.name || s.email || s.userId }}
-            </button>
+            </option>
           }
-          @if (students().length === 0) {
-            <span class="pt-no-students">{{ i18n.t('avaliacao.semAlunos') }}</span>
-          }
-        </div>
+        </select>
       }
     </div>
   }
@@ -127,6 +118,9 @@
                     }}</span>
                   }
                 </div>
+                @if (isSharedView(f)) {
+                  <span class="ficha-student-name">{{ studentName(f.studentId) }}</span>
+                }
                 @if (latestEntry(f); as latest) {
                   <span class="ficha-latest">
                     {{ latest.data | date: 'dd MMM yyyy' }}

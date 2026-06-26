@@ -189,5 +189,6 @@
   "profile.meusTrainadores": "Mes coachs",
   "treino.alunoNaoEncontrado": "Élève introuvable",
   "profile.removeTrainador": "Retirer",
-  "profile.confirmRemoveTrainador": "Retirer ce coach ?"
+  "profile.confirmRemoveTrainador": "Retirer ce coach ?",
+  "avaliacao.mine": "Les miennes"
 }
