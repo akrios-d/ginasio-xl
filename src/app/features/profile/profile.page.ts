@@ -1,14 +1,12 @@
-import { Component, inject, signal, computed } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { PerfilService, type TeacherInfo } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
-import type { Role, TeacherProfile } from '../../core/models';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule],
+  imports: [],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -20,20 +18,6 @@ export class ProfilePage {
   protected loading = signal(true);
   protected idCopied = signal(false);
 
-  // Roles
-  protected roles = signal<Role[]>(['student']);
-  protected isTrainer = computed(() => this.roles().includes('teacher'));
-
-  // Trainer profile modal
-  protected trainerModalOpen = signal(false);
-  /** draft while modal is open — discarded on cancel */
-  protected trainerDraft = signal<TeacherProfile>({});
-  protected trainerSaving = signal(false);
-  protected trainerSaved = signal(false);
-
-  // Saved trainer profile (shown in the card)
-  protected trainerProfile = signal<TeacherProfile>({});
-
   // Teacher association (student side)
   protected teachers = signal<TeacherInfo[]>([]);
   protected teacherIds = signal<string[]>([]);
@@ -43,9 +27,7 @@ export class ProfilePage {
   constructor() {
     this.perfilSvc.get().subscribe({
       next: (p) => {
-        this.roles.set(p.roles ?? ['student']);
         this.teacherIds.set(p.teacherIds ?? []);
-        this.trainerProfile.set(p.teacherProfile ?? {});
         this.loading.set(false);
         this.loadTeachers();
       },
@@ -61,65 +43,6 @@ export class ProfilePage {
         this.loadingTeachers.set(false);
       },
       error: () => this.loadingTeachers.set(false),
-    });
-  }
-
-  // ── Trainer mode toggle / modal ───────────────────
-
-  protected clickTrainerToggle(): void {
-    if (this.isTrainer()) {
-      // Already active → turn off immediately (no modal needed)
-      this.setTrainerRole(false);
-    } else {
-      // Not active → open modal to fill profile before activating
-      this.openTrainerModal();
-    }
-  }
-
-  protected openTrainerModal(): void {
-    // Seed draft with current saved profile
-    this.trainerDraft.set({ ...this.trainerProfile() });
-    this.trainerSaved.set(false);
-    this.trainerModalOpen.set(true);
-  }
-
-  protected closeTrainerModal(): void {
-    this.trainerModalOpen.set(false);
-  }
-
-  protected saveTrainerModal(): void {
-    if (this.trainerSaving()) return;
-    this.trainerSaving.set(true);
-
-    const draft = this.trainerDraft();
-    const wasTrainer = this.isTrainer();
-    const newRoles: Role[] = wasTrainer ? this.roles() : [...this.roles(), 'teacher'];
-
-    this.perfilSvc.save({ roles: newRoles, teacherProfile: draft }).subscribe({
-      next: () => {
-        this.roles.set(newRoles);
-        this.trainerProfile.set(draft);
-        this.trainerSaving.set(false);
-        this.trainerSaved.set(true);
-        setTimeout(() => {
-          this.trainerSaved.set(false);
-          this.trainerModalOpen.set(false);
-          if (!wasTrainer) this.loadTeachers();
-        }, 1000);
-      },
-      error: () => this.trainerSaving.set(false),
-    });
-  }
-
-  protected updateDraftField(field: keyof TeacherProfile, value: string): void {
-    this.trainerDraft.set({ ...this.trainerDraft(), [field]: value });
-  }
-
-  private setTrainerRole(active: boolean): void {
-    const current = this.roles();
-    const next: Role[] = active ? [...current, 'teacher'] : current.filter((r) => r !== 'teacher');
-    this.perfilSvc.save({ roles: next }).subscribe({
-      next: () => this.roles.set(next),
     });
   }
 

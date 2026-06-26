@@ -6,38 +6,6 @@
   @if (loading()) {
     <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
   } @else {
-    <!-- ── Trainer Mode card ── -->
-    <div class="pt-section">
-      <div class="pt-section-header">
-        <div>
-          <p class="pt-section-title">{{ i18n.t('profile.trainerMode') }}</p>
-          <p class="pt-section-desc">{{ i18n.t('profile.trainerModeDesc') }}</p>
-        </div>
-        <button
-          type="button"
-          class="pt-mode-toggle"
-          [class.pt-mode-toggle--on]="isTrainer()"
-          (click)="clickTrainerToggle()"
-        >
-          <span class="pt-mode-knob"></span>
-        </button>
-      </div>
-
-      @if (isTrainer()) {
-        <div class="trainer-status-row">
-          <span class="trainer-status-on">{{ i18n.t('profile.trainerModeOn') }}</span>
-          @if (trainerProfile().specialty) {
-            <span class="trainer-specialty">· {{ trainerProfile().specialty }}</span>
-          }
-          <button type="button" class="btn-edit-profile" (click)="openTrainerModal()">
-            {{ i18n.t('profile.editTrainerProfile') }}
-          </button>
-        </div>
-      } @else {
-        <p class="pt-mode-status">{{ i18n.t('profile.trainerModeOff') }}</p>
-      }
-    </div>
-
     <!-- ── Associate Trainer(s) (student side) ── -->
     <div class="prof-section">
       <h3 class="prof-section-title">{{ i18n.t('profile.associateTeacher') }}</h3>
@@ -104,65 +72,3 @@
     </div>
   }
 </section>
-
-<!-- ── Trainer Profile modal ── -->
-@if (trainerModalOpen()) {
-  <div class="sheet-backdrop" (click)="closeTrainerModal()" aria-hidden="true"></div>
-  <div class="trainer-sheet" role="dialog" aria-modal="true">
-    <div class="sheet-handle" aria-hidden="true"></div>
-    <div class="sheet-header">
-      <h3 class="sheet-title">{{ i18n.t('profile.trainerProfile') }}</h3>
-      <button type="button" class="sheet-close" (click)="closeTrainerModal()">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    </div>
-    <div class="sheet-body">
-      <div class="form-group">
-        <label class="form-label" for="specialty">{{ i18n.t('profile.specialty') }}</label>
-        <input
-          id="specialty"
-          class="form-input"
-          type="text"
-          [placeholder]="i18n.t('profile.specialtyPlaceholder')"
-          [value]="trainerDraft().specialty ?? ''"
-          (input)="updateDraftField('specialty', $any($event.target).value)"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="bio">{{ i18n.t('profile.bio') }}</label>
-        <textarea
-          id="bio"
-          class="form-input form-textarea"
-          [placeholder]="i18n.t('profile.bioPlaceholder')"
-          [value]="trainerDraft().bio ?? ''"
-          (input)="updateDraftField('bio', $any($event.target).value)"
-        ></textarea>
-      </div>
-
-      <div class="sheet-actions">
-        <button type="button" class="btn-ghost" (click)="closeTrainerModal()">
-          {{ i18n.t('common.cancel') }}
-        </button>
-        <button type="button" [disabled]="trainerSaving()" (click)="saveTrainerModal()">
-          @if (trainerSaved()) {
-            ✓ {{ i18n.t('profile.saved') }}
-          } @else {
-            {{ trainerSaving() ? i18n.t('common.saving') : i18n.t('profile.save') }}
-          }
-        </button>
-      </div>
-    </div>
-  </div>
-}
