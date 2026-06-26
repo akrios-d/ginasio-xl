@@ -118,6 +118,7 @@
   "treino.criar.equipamentoPlaceholder": "Appareil (ex : Elliptique, Tapis…)",
   "treino.criar.nivelPlaceholder": "Niveau (ex : 3-4)",
   "treino.criar.velocidadePlaceholder": "Vitesse (ex : 90-120)",
+  "treino.criar.youtubeUrlPlaceholder": "URL YouTube (optionnel)",
   "treino.criar.cancel": "Annuler",
   "treino.criar.save": "Enregistrer",
   "avaliacao.editar": "Modifier",

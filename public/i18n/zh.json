@@ -118,6 +118,7 @@
   "treino.criar.equipamentoPlaceholder": "器械（如：椭圆机、跑步机…）",
   "treino.criar.nivelPlaceholder": "级别（如：3-4）",
   "treino.criar.velocidadePlaceholder": "速度（如：90-120）",
+  "treino.criar.youtubeUrlPlaceholder": "YouTube 链接（可选）",
   "treino.criar.cancel": "取消",
   "treino.criar.save": "保存",
   "avaliacao.editar": "编辑",

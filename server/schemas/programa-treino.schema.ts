@@ -16,6 +16,7 @@ const ExercicioResistenciaSchema = z.object({
   series: z.number().int().positive(),
   repeticoes: z.number().int().positive(),
   progressao: z.array(ProgressaoSchema).default([]),
+  youtubeUrl: z.string().url().optional(),
 });
 
 const GrupoTreinoSchema = z.object({

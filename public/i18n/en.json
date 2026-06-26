@@ -141,6 +141,7 @@
   "treino.criar.equipamentoPlaceholder": "Equipment (e.g. Elliptical, Treadmill…)",
   "treino.criar.nivelPlaceholder": "Level (e.g. 3-4)",
   "treino.criar.velocidadePlaceholder": "Speed (e.g. 90-120)",
+  "treino.criar.youtubeUrlPlaceholder": "YouTube URL (optional)",
   "treino.criar.cancel": "Cancel",
   "treino.criar.save": "Save",
   "avaliacao.editEntry": "Edit measurement",

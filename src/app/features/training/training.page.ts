@@ -18,6 +18,7 @@ interface ExercicioForm {
   numeroMaquina: number | null;
   series: number;
   repeticoes: number;
+  youtubeUrl: string;
 }
 
 interface GrupoForm {
@@ -42,7 +43,7 @@ function emptyCardio(): CardioForm {
 }
 
 function emptyExercicio(): ExercicioForm {
-  return { nome: '', numeroMaquina: null, series: 3, repeticoes: 10 };
+  return { nome: '', numeroMaquina: null, series: 3, repeticoes: 10, youtubeUrl: '' };
 }
 
 function emptyGrupo(index: number): GrupoForm {
@@ -150,6 +151,7 @@ export class TrainingPage {
           numeroMaquina: e.numeroMaquina ?? null,
           series: e.series,
           repeticoes: e.repeticoes,
+          youtubeUrl: e.youtubeUrl ?? '',
         })),
       })),
     };
@@ -242,6 +244,7 @@ export class TrainingPage {
                 series: e.series,
                 repeticoes: e.repeticoes,
                 progressao: [],
+                youtubeUrl: e.youtubeUrl.trim() || undefined,
               })),
           })),
         descansoEntreSeriesSegundos: existing?.fasePrincipal.descansoEntreSeriesSegundos ?? 60,

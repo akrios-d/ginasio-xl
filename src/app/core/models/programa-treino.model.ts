@@ -63,6 +63,7 @@ export const ExercicioResistenciaSchema = z.object({
   series: z.number().int().positive(), // ex: 3
   repeticoes: z.number().int().positive(), // ex: 10
   progressao: z.array(ProgressaoSchema).default([]),
+  youtubeUrl: z.string().url().optional(),
 });
 
 export type ExercicioResistencia = z.infer<typeof ExercicioResistenciaSchema>;
