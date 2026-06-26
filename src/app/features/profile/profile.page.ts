@@ -22,13 +22,17 @@ export class ProfilePage {
 
   // Roles
   protected roles = signal<Role[]>(['student']);
-  protected isTeacher = computed(() => this.roles().includes('teacher'));
-  protected teacherSaving = signal(false);
+  protected isTrainer = computed(() => this.roles().includes('teacher'));
 
-  // Teacher profile fields
-  protected teacherProfile = signal<TeacherProfile>({});
-  protected teacherProfileSaving = signal(false);
-  protected teacherProfileSaved = signal(false);
+  // Trainer profile modal
+  protected trainerModalOpen = signal(false);
+  /** draft while modal is open — discarded on cancel */
+  protected trainerDraft = signal<TeacherProfile>({});
+  protected trainerSaving = signal(false);
+  protected trainerSaved = signal(false);
+
+  // Saved trainer profile (shown in the card)
+  protected trainerProfile = signal<TeacherProfile>({});
 
   // Teacher association (student side)
   protected teachers = signal<TeacherInfo[]>([]);
@@ -41,7 +45,7 @@ export class ProfilePage {
       next: (p) => {
         this.roles.set(p.roles ?? ['student']);
         this.teacherIds.set(p.teacherIds ?? []);
-        this.teacherProfile.set(p.teacherProfile ?? {});
+        this.trainerProfile.set(p.teacherProfile ?? {});
         this.loading.set(false);
         this.loadTeachers();
       },
@@ -60,39 +64,66 @@ export class ProfilePage {
     });
   }
 
-  protected toggleTeacherMode(): void {
-    if (this.teacherSaving()) return;
+  // ── Trainer mode toggle / modal ───────────────────
+
+  protected clickTrainerToggle(): void {
+    if (this.isTrainer()) {
+      // Already active → turn off immediately (no modal needed)
+      this.setTrainerRole(false);
+    } else {
+      // Not active → open modal to fill profile before activating
+      this.openTrainerModal();
+    }
+  }
+
+  protected openTrainerModal(): void {
+    // Seed draft with current saved profile
+    this.trainerDraft.set({ ...this.trainerProfile() });
+    this.trainerSaved.set(false);
+    this.trainerModalOpen.set(true);
+  }
+
+  protected closeTrainerModal(): void {
+    this.trainerModalOpen.set(false);
+  }
+
+  protected saveTrainerModal(): void {
+    if (this.trainerSaving()) return;
+    this.trainerSaving.set(true);
+
+    const draft = this.trainerDraft();
+    const wasTrainer = this.isTrainer();
+    const newRoles: Role[] = wasTrainer ? this.roles() : [...this.roles(), 'teacher'];
+
+    this.perfilSvc.save({ roles: newRoles, teacherProfile: draft }).subscribe({
+      next: () => {
+        this.roles.set(newRoles);
+        this.trainerProfile.set(draft);
+        this.trainerSaving.set(false);
+        this.trainerSaved.set(true);
+        setTimeout(() => {
+          this.trainerSaved.set(false);
+          this.trainerModalOpen.set(false);
+          if (!wasTrainer) this.loadTeachers();
+        }, 1000);
+      },
+      error: () => this.trainerSaving.set(false),
+    });
+  }
+
+  protected updateDraftField(field: keyof TeacherProfile, value: string): void {
+    this.trainerDraft.set({ ...this.trainerDraft(), [field]: value });
+  }
+
+  private setTrainerRole(active: boolean): void {
     const current = this.roles();
-    const next: Role[] = this.isTeacher()
-      ? current.filter((r) => r !== 'teacher')
-      : [...current, 'teacher'];
-    this.teacherSaving.set(true);
+    const next: Role[] = active ? [...current, 'teacher'] : current.filter((r) => r !== 'teacher');
     this.perfilSvc.save({ roles: next }).subscribe({
-      next: () => {
-        this.roles.set(next);
-        this.teacherSaving.set(false);
-        if (next.includes('teacher')) this.loadTeachers();
-      },
-      error: () => this.teacherSaving.set(false),
+      next: () => this.roles.set(next),
     });
   }
 
-  protected saveTeacherProfile(): void {
-    if (this.teacherProfileSaving()) return;
-    this.teacherProfileSaving.set(true);
-    this.perfilSvc.save({ teacherProfile: this.teacherProfile() }).subscribe({
-      next: () => {
-        this.teacherProfileSaving.set(false);
-        this.teacherProfileSaved.set(true);
-        setTimeout(() => this.teacherProfileSaved.set(false), 2500);
-      },
-      error: () => this.teacherProfileSaving.set(false),
-    });
-  }
-
-  protected updateTeacherField(field: keyof TeacherProfile, value: string): void {
-    this.teacherProfile.set({ ...this.teacherProfile(), [field]: value });
-  }
+  // ── Teacher association (student side) ───────────
 
   protected associate(teacher: TeacherInfo): void {
     if (this.assocSaving()) return;

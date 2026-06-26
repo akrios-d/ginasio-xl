@@ -130,6 +130,7 @@
                   <table class="entries-table">
                     <thead>
                       <tr>
+                        <th></th>
                         <th>{{ i18n.t('avaliacao.date') }}</th>
                         <th>{{ i18n.t('avaliacao.peso') }}</th>
                         <th>{{ i18n.t('avaliacao.imc') }}</th>
@@ -145,8 +146,36 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @for (e of f.avaliacoes.slice().reverse(); track e.data) {
-                        <tr>
+                      @for (e of f.avaliacoes.slice().reverse(); track e.data; let ri = $index) {
+                        <tr
+                          [class.entry-row--editing]="
+                            addingEntryFor() === f._id &&
+                            editingEntryIndex() === f.avaliacoes.length - 1 - ri
+                          "
+                        >
+                          <td class="entry-edit-cell">
+                            <button
+                              type="button"
+                              class="btn-entry-edit"
+                              title="Edit"
+                              (click)="startEditEntry(f._id!, ri, e, f.avaliacoes.length)"
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            </button>
+                          </td>
                           <td>{{ e.data | date: 'dd/MM/yy' }}</td>
                           <td>{{ e.peso ?? '—' }}</td>
                           <td>{{ e.imc ?? '—' }}</td>
@@ -213,6 +242,13 @@
 
               @if (addingEntryFor() === f._id) {
                 <form class="entry-form" (ngSubmit)="saveEntry(f._id!)">
+                  <p class="entry-form-title">
+                    {{
+                      editingEntryIndex() !== null
+                        ? i18n.t('avaliacao.editEntry')
+                        : i18n.t('avaliacao.addEntry')
+                    }}
+                  </p>
                   <div class="entry-form-grid">
                     <div class="form-group">
                       <label class="form-label" for="data">{{ i18n.t('avaliacao.date') }}</label>
@@ -360,7 +396,13 @@
                       {{ i18n.t('avaliacao.cancel') }}
                     </button>
                     <button type="submit" [disabled]="saving()">
-                      {{ saving() ? i18n.t('common.saving') : i18n.t('avaliacao.save') }}
+                      {{
+                        saving()
+                          ? i18n.t('common.saving')
+                          : editingEntryIndex() !== null
+                            ? i18n.t('avaliacao.saveEntry')
+                            : i18n.t('avaliacao.save')
+                      }}
                     </button>
                   </div>
                 </form>

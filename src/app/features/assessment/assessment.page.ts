@@ -220,20 +220,82 @@ export class AssessmentPage {
     });
   }
 
-  // ── Add entry ─────────────────────────────────────────────────────────────
+  // ── Add / Edit entry ──────────────────────────────────────────────────────
+
+  /** Index (in the original, non-reversed array) of the entry being edited. null = add mode */
+  protected editingEntryIndex = signal<number | null>(null);
 
   protected startAddEntry(fichaId: string): void {
     this.entryForm = this.emptyEntryForm();
+    this.editingEntryIndex.set(null);
+    this.addingEntryFor.set(fichaId);
+  }
+
+  /**
+   * @param fichaId  the assessment id
+   * @param reversedIndex  the row index as displayed (table is reversed)
+   * @param entry  the entry to pre-populate
+   * @param totalEntries  total number of entries, needed to convert reversed→original index
+   */
+  protected startEditEntry(
+    fichaId: string,
+    reversedIndex: number,
+    entry: EntradaAvaliacao,
+    totalEntries: number,
+  ): void {
+    const originalIndex = totalEntries - 1 - reversedIndex;
+    this.editingEntryIndex.set(originalIndex);
+    this.entryForm = this.entryToForm(entry);
     this.addingEntryFor.set(fichaId);
   }
 
   protected cancelAddEntry(): void {
     this.addingEntryFor.set(null);
+    this.editingEntryIndex.set(null);
   }
 
   protected saveEntry(fichaId: string): void {
     if (this.saving()) return;
     this.saving.set(true);
+
+    const entry = this.buildEntryFromForm();
+    const editIndex = this.editingEntryIndex();
+
+    if (editIndex !== null) {
+      // Edit existing entry: replace it in the array and PUT the whole array
+      const ficha = this.fichas().find((f) => f._id === fichaId);
+      if (!ficha) {
+        this.saving.set(false);
+        return;
+      }
+      const updated = ficha.avaliacoes.map((e, i) => (i === editIndex ? entry : e));
+      this.svc.update(fichaId, { avaliacoes: updated }).subscribe({
+        next: () => {
+          this.addingEntryFor.set(null);
+          this.editingEntryIndex.set(null);
+          this.saving.set(false);
+          this.savedId.set(fichaId);
+          setTimeout(() => this.savedId.set(null), 2500);
+          this.loadFichas();
+        },
+        error: () => this.saving.set(false),
+      });
+    } else {
+      // Add new entry
+      this.svc.addEntrada(fichaId, entry).subscribe({
+        next: () => {
+          this.addingEntryFor.set(null);
+          this.saving.set(false);
+          this.savedId.set(fichaId);
+          setTimeout(() => this.savedId.set(null), 2500);
+          this.loadFichas();
+        },
+        error: () => this.saving.set(false),
+      });
+    }
+  }
+
+  private buildEntryFromForm(): EntradaAvaliacao {
     const f = this.entryForm;
     const pa =
       n(f.paSistolica) !== undefined && n(f.paDiastolica) !== undefined
@@ -243,7 +305,7 @@ export class AssessmentPage {
       n(f.perimetroAbdominal) !== undefined || n(f.perimetroCintura) !== undefined
         ? { abdominal: n(f.perimetroAbdominal), cintura: n(f.perimetroCintura) }
         : undefined;
-    const entry: EntradaAvaliacao = {
+    return {
       data: new Date(f.data),
       peso: n(f.peso),
       imc: n(f.imc),
@@ -255,16 +317,24 @@ export class AssessmentPage {
       fcRepouso: n(f.fcRepouso) !== undefined ? Math.round(n(f.fcRepouso)!) : undefined,
       perimetros: per,
     };
-    this.svc.addEntrada(fichaId, entry).subscribe({
-      next: () => {
-        this.addingEntryFor.set(null);
-        this.saving.set(false);
-        this.savedId.set(fichaId);
-        setTimeout(() => this.savedId.set(null), 2500);
-        this.loadFichas();
-      },
-      error: () => this.saving.set(false),
-    });
+  }
+
+  private entryToForm(e: EntradaAvaliacao): EntryForm {
+    const d = e.data instanceof Date ? e.data : new Date(e.data);
+    return {
+      data: d.toISOString().slice(0, 10),
+      peso: e.peso?.toString() ?? '',
+      imc: e.imc?.toString() ?? '',
+      percentualMassaGorda: e.percentualMassaGorda?.toString() ?? '',
+      percentualMassaMagra: e.percentualMassaMagra?.toString() ?? '',
+      kcal: e.kcal?.toString() ?? '',
+      glicemiaVejuno: e.glicemiaVejuno?.toString() ?? '',
+      paSistolica: e.pressaoArterial?.sistolica?.toString() ?? '',
+      paDiastolica: e.pressaoArterial?.diastolica?.toString() ?? '',
+      fcRepouso: e.fcRepouso?.toString() ?? '',
+      perimetroAbdominal: e.perimetros?.abdominal?.toString() ?? '',
+      perimetroCintura: e.perimetros?.cintura?.toString() ?? '',
+    };
   }
 
   private emptyEntryForm(): EntryForm {

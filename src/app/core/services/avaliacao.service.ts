@@ -27,7 +27,10 @@ export class AvaliacaoService {
   update(
     id: string,
     payload: Partial<
-      Pick<FichaAvaliacao, 'objetivo' | 'outrosObjetivos' | 'metas' | 'sharedWithTeacherIds'>
+      Pick<
+        FichaAvaliacao,
+        'objetivo' | 'outrosObjetivos' | 'metas' | 'sharedWithTeacherIds' | 'avaliacoes'
+      >
     >,
   ): Observable<{ updated: boolean }> {
     return this.http.put<{ updated: boolean }>(`${this.base}/${id}`, payload, {

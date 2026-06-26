@@ -60,7 +60,6 @@ export const CreateAvaliacaoSchema = z.object({
 
 export const UpdateAvaliacaoSchema = CreateAvaliacaoSchema.omit({
   studentId: true,
-  avaliacoes: true,
 })
   .extend({
     sharedWithTeacherIds: z.array(z.string()).optional(),

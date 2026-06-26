@@ -440,6 +440,55 @@
   background: var(--c-accent);
 }
 
+/* ── Entry row edit button ───────────────────────── */
+.entry-edit-cell {
+  padding: 0 4px !important;
+  width: 28px;
+}
+.btn-entry-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  min-height: unset;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--c-ink-3);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 120ms,
+    color 120ms,
+    background 120ms;
+}
+.btn-entry-edit svg {
+  width: 12px;
+  height: 12px;
+}
+tr:hover .btn-entry-edit,
+.entry-row--editing .btn-entry-edit {
+  opacity: 1;
+}
+.btn-entry-edit:hover {
+  color: var(--c-accent);
+  background: color-mix(in srgb, var(--c-accent) 10%, transparent);
+  box-shadow: none;
+}
+.entry-row--editing {
+  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
+}
+
+/* ── Entry form title ────────────────────────────── */
+.entry-form-title {
+  margin: 0 0 12px;
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
 .btn-new {
   display: inline-flex;
   align-items: center;
