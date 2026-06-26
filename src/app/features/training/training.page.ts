@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
 import { PerfilService } from '../../core/services/perfil.service';
+import type { StudentInfo } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
 import type { ProgramaTreino } from '../../core/models';
 
@@ -29,7 +30,7 @@ interface GrupoForm {
 
 interface PlanForm {
   objetivos: string;
-  alunoId: string; // só usado em modo PT
+  alunoId: string;
   cardio: CardioForm[];
   grupos: GrupoForm[];
   observacoes: string;
@@ -79,6 +80,24 @@ export class TrainingPage {
     localStorage.getItem(TrainingPage.PT_MODE_KEY) === 'true',
   );
 
+  // ── Student combobox ──────────────────────────────────────
+  protected readonly students = signal<StudentInfo[]>([]);
+  protected readonly studentQuery = signal('');
+  protected readonly studentDropdownOpen = signal(false);
+  protected readonly selectedStudent = signal<StudentInfo | null>(null);
+
+  protected readonly filteredStudents = computed(() => {
+    const q = this.studentQuery().toLowerCase().trim();
+    const all = this.students();
+    if (!q) return all;
+    return all.filter(
+      (s) =>
+        (s.name ?? '').toLowerCase().includes(q) ||
+        (s.email ?? '').toLowerCase().includes(q) ||
+        s.userId.toLowerCase().includes(q),
+    );
+  });
+
   protected form: PlanForm = this.emptyForm();
 
   constructor() {
@@ -86,15 +105,24 @@ export class TrainingPage {
       next: (p) => {
         const hasTeacherRole = (p.roles ?? []).includes('teacher');
         this.isTeacher.set(hasTeacherRole);
-        // clear ptMode if user no longer has teacher role
         if (!hasTeacherRole && this.ptMode()) {
           this.ptMode.set(false);
           localStorage.removeItem(TrainingPage.PT_MODE_KEY);
+        }
+        if (hasTeacherRole) {
+          this.loadStudents();
         }
       },
       error: () => undefined,
     });
     this.loadPrograms();
+  }
+
+  private loadStudents(): void {
+    this.perfilSvc.listStudents().subscribe({
+      next: (list) => this.students.set(list),
+      error: () => undefined,
+    });
   }
 
   protected togglePtMode(): void {
@@ -118,6 +146,39 @@ export class TrainingPage {
     });
   }
 
+  // ── Combobox methods ─────────────────────────────────────
+  protected onStudentInput(value: string): void {
+    this.studentQuery.set(value);
+    this.form.alunoId = value;
+    this.selectedStudent.set(null);
+    this.studentDropdownOpen.set(true);
+  }
+
+  protected selectStudent(s: StudentInfo): void {
+    this.selectedStudent.set(s);
+    this.form.alunoId = s.userId;
+    this.studentQuery.set(s.name ?? s.email ?? s.userId);
+    this.studentDropdownOpen.set(false);
+  }
+
+  protected clearStudent(): void {
+    this.selectedStudent.set(null);
+    this.form.alunoId = '';
+    this.studentQuery.set('');
+    this.studentDropdownOpen.set(false);
+  }
+
+  protected openStudentDropdown(): void {
+    this.studentDropdownOpen.set(true);
+  }
+
+  /** Delay to let click on option register before blur fires */
+  protected blurStudentInput(): void {
+    setTimeout(() => this.studentDropdownOpen.set(false), 160);
+  }
+
+  // ─────────────────────────────────────────────────────────
+
   protected toggleActive(p: ProgramaTreino): void {
     if (!p._id) return;
     const next = !p.ativo;
@@ -139,6 +200,7 @@ export class TrainingPage {
 
   protected startCreate(): void {
     this.form = this.emptyForm();
+    this.clearStudent();
     this.activeTab.set(0);
     this.creating.set(true);
   }
@@ -170,6 +232,16 @@ export class TrainingPage {
         })),
       })),
     };
+    // Pre-select student if alunoId matches a known student
+    const known = this.students().find((s) => s.userId === p.alunoId);
+    if (known) {
+      this.selectedStudent.set(known);
+      this.studentQuery.set(known.name ?? known.email ?? known.userId);
+    } else {
+      this.selectedStudent.set(null);
+      this.studentQuery.set(p.alunoId ?? '');
+    }
+    this.studentDropdownOpen.set(false);
     this.activeTab.set(0);
     this.editing.set(p);
   }

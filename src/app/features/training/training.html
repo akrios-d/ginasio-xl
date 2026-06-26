@@ -300,15 +300,65 @@
     <div class="sheet-top">
       @if (ptMode()) {
         <div class="form-group">
-          <label class="form-label" for="alunoId">{{ i18n.t('treino.alunoId') }}</label>
-          <input
-            id="alunoId"
-            type="text"
-            [(ngModel)]="form.alunoId"
-            name="alunoId"
-            [placeholder]="i18n.t('treino.alunoIdPlaceholder')"
-            class="aluno-id-input"
-          />
+          <label class="form-label" for="studentCombo">{{ i18n.t('treino.alunoId') }}</label>
+          <div class="student-combo">
+            <div class="student-combo-input-row">
+              <input
+                id="studentCombo"
+                type="text"
+                class="student-search-input"
+                [value]="studentQuery()"
+                (input)="onStudentInput($any($event.target).value)"
+                (focus)="openStudentDropdown()"
+                (blur)="blurStudentInput()"
+                [placeholder]="i18n.t('treino.alunoIdPlaceholder')"
+                autocomplete="off"
+              />
+              @if (studentQuery()) {
+                <button
+                  type="button"
+                  class="student-clear-btn"
+                  (click)="clearStudent()"
+                  tabindex="-1"
+                  aria-label="Limpar"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              }
+            </div>
+            @if (studentDropdownOpen() && filteredStudents().length > 0) {
+              <ul class="student-dropdown" role="listbox">
+                @for (s of filteredStudents(); track s.userId) {
+                  <li class="student-option" role="option" (mousedown)="selectStudent(s)">
+                    <span class="student-option-name">{{ s.name || s.email || s.userId }}</span>
+                    @if (s.name && s.email) {
+                      <span class="student-option-email">{{ s.email }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            @if (studentDropdownOpen() && studentQuery() && filteredStudents().length === 0) {
+              <div class="student-dropdown student-dropdown--empty">
+                <span>{{ i18n.t('treino.alunoNaoEncontrado') }}</span>
+              </div>
+            }
+            @if (selectedStudent()) {
+              <p class="student-selected-hint">
+                ID: <code>{{ form.alunoId }}</code>
+              </p>
+            }
+          </div>
         </div>
       }
       <div class="form-group">

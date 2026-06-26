@@ -183,5 +183,6 @@
   "profile.saveNameBtn": "Guardar",
   "profile.cancelBtn": "Cancelar",
   "profile.manageStudents": "Gerir alunos",
-  "profile.meusTrainadores": "Os meus treinadores"
+  "profile.meusTrainadores": "Os meus treinadores",
+  "treino.alunoNaoEncontrado": "Aluno não encontrado"
 }

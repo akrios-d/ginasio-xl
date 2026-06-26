@@ -183,5 +183,6 @@
   "profile.saveNameBtn": "Enregistrer",
   "profile.cancelBtn": "Annuler",
   "profile.manageStudents": "Gérer les élèves",
-  "profile.meusTrainadores": "Mes entraîneurs"
+  "profile.meusTrainadores": "Mes entraîneurs",
+  "treino.alunoNaoEncontrado": "Élève introuvable"
 }
