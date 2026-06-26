@@ -84,8 +84,10 @@
   line-height: 1;
 }
 
-.nav-link:hover {
-  color: var(--c-ink-2);
+@media (hover: hover) {
+  .nav-link:hover {
+    color: var(--c-ink-2);
+  }
 }
 
 .nav-link--active {

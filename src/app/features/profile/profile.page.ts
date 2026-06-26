@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { I18nService, type AppLanguage } from '../../core/i18n/i18n.service';
-import { PerfilService, type TeacherInfo } from '../../core/services/perfil.service';
+import { PerfilService, type StudentInfo } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Flag } from '../../shared/components/flag/flag';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
@@ -9,7 +10,7 @@ import { Icon } from '../../shared/components/icon/icon';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [Flag, ThemeToggle, Icon],
+  imports: [FormsModule, Flag, ThemeToggle, Icon],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -21,50 +22,71 @@ export class ProfilePage {
   protected loading = signal(true);
   protected idCopied = signal(false);
 
-  // Teacher association (student side)
-  protected teachers = signal<TeacherInfo[]>([]);
-  protected teacherIds = signal<string[]>([]);
-  protected loadingTeachers = signal(false);
-  protected assocSaving = signal(false);
+  // Teacher state
+  protected isTeacher = signal(false);
+  protected students = signal<StudentInfo[]>([]);
+  protected studentIdInput = signal('');
+  protected linkSaving = signal(false);
+  protected linkError = signal('');
+  protected unlinkingId = signal<string | null>(null);
 
   constructor() {
     this.perfilSvc.get().subscribe({
       next: (p) => {
-        this.teacherIds.set(p.teacherIds ?? []);
+        const isT = (p.roles ?? []).includes('teacher');
+        this.isTeacher.set(isT);
         this.loading.set(false);
-        this.loadTeachers();
+        if (isT) this.loadStudents();
       },
       error: () => this.loading.set(false),
     });
   }
 
-  private loadTeachers(): void {
-    this.loadingTeachers.set(true);
-    this.perfilSvc.listTeachers().subscribe({
-      next: (list) => {
-        this.teachers.set(list);
-        this.loadingTeachers.set(false);
-      },
-      error: () => this.loadingTeachers.set(false),
+  private loadStudents(): void {
+    this.perfilSvc.listStudents().subscribe({
+      next: (list) => this.students.set(list),
+      error: () => undefined,
     });
   }
 
-  // ── Teacher association (student side) ───────────
+  protected linkStudent(): void {
+    const id = this.studentIdInput().trim();
+    if (!id || this.linkSaving()) return;
+    this.linkError.set('');
+    this.linkSaving.set(true);
 
-  protected associate(teacher: TeacherInfo): void {
-    if (this.assocSaving()) return;
-    const current = this.teacherIds();
-    const isSelected = current.includes(teacher.userId);
-    const next = isSelected
-      ? current.filter((id) => id !== teacher.userId)
-      : [...current, teacher.userId];
-    this.assocSaving.set(true);
-    this.perfilSvc.save({ teacherIds: next }).subscribe({
-      next: () => {
-        this.teacherIds.set(next);
-        this.assocSaving.set(false);
+    this.perfilSvc.linkStudent(id).subscribe({
+      next: (res) => {
+        this.students.update((list) => {
+          if (list.some((s) => s.userId === id)) return list;
+          return [...list, { _id: '', userId: id, name: res.name, email: res.email }];
+        });
+        this.studentIdInput.set('');
+        this.linkSaving.set(false);
       },
-      error: () => this.assocSaving.set(false),
+      error: (err) => {
+        const status = err?.status;
+        this.linkError.set(
+          status === 404
+            ? this.i18n.t('profile.alunoNotFound')
+            : status === 403
+              ? this.i18n.t('profile.forbidden')
+              : this.i18n.t('common.error'),
+        );
+        this.linkSaving.set(false);
+      },
+    });
+  }
+
+  protected unlinkStudent(s: StudentInfo): void {
+    if (this.unlinkingId()) return;
+    this.unlinkingId.set(s.userId);
+    this.perfilSvc.unlinkStudent(s.userId).subscribe({
+      next: () => {
+        this.students.update((list) => list.filter((x) => x.userId !== s.userId));
+        this.unlinkingId.set(null);
+      },
+      error: () => this.unlinkingId.set(null),
     });
   }
 

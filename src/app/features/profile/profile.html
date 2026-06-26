@@ -6,60 +6,63 @@
   @if (loading()) {
     <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
   } @else {
-    <!-- ── Associate Trainer(s) (student side) ── -->
-    <div class="prof-section">
-      <h3 class="prof-section-title">{{ i18n.t('profile.associateTeacher') }}</h3>
+    <!-- ── Teacher: manage students ──────────────────── -->
+    @if (isTeacher()) {
+      <div class="prof-section">
+        <h3 class="prof-section-title">{{ i18n.t('profile.meusAlunos') }}</h3>
 
-      @if (teacherIds().length > 0) {
-        <div class="prof-current">
-          <span class="prof-current-label">{{ i18n.t('profile.currentTeachers') }}:</span>
-          <div class="prof-current-names">
-            @for (t of teachers(); track t.userId) {
-              @if (teacherIds().includes(t.userId)) {
-                <span class="prof-current-name">{{ t.name || t.email }}</span>
-              }
-            }
-          </div>
+        <!-- Link input -->
+        <div class="link-row">
+          <input
+            class="link-input"
+            type="text"
+            [ngModel]="studentIdInput()"
+            (ngModelChange)="studentIdInput.set($event); linkError.set('')"
+            name="studentId"
+            [placeholder]="i18n.t('profile.alunoIdPlaceholder')"
+          />
+          <button
+            type="button"
+            class="btn-assoc"
+            [disabled]="!studentIdInput().trim() || linkSaving()"
+            (click)="linkStudent()"
+          >
+            {{ linkSaving() ? i18n.t('common.saving') : i18n.t('profile.addAluno') }}
+          </button>
         </div>
-      }
+        @if (linkError()) {
+          <p class="link-error">{{ linkError() }}</p>
+        }
 
-      @if (loadingTeachers()) {
-        <p class="text-muted">{{ i18n.t('common.loading') }}</p>
-      } @else if (teachers().length === 0) {
-        <p class="text-muted">{{ i18n.t('profile.noTeachers') }}</p>
-      } @else {
-        <ul class="prof-list">
-          @for (t of teachers(); track t.userId) {
-            <li class="prof-item" [class.prof-item--selected]="teacherIds().includes(t.userId)">
-              <div class="prof-info">
-                <span class="prof-name">{{ t.name || t.email }}</span>
-                @if (t.name && t.email) {
-                  <span class="prof-email">{{ t.email }}</span>
-                }
-                @if (t.teacherProfile?.specialty) {
-                  <span class="prof-specialty">{{ t.teacherProfile!.specialty }}</span>
-                }
-              </div>
-              <button
-                type="button"
-                class="btn-assoc"
-                [class.btn-assoc--remove]="teacherIds().includes(t.userId)"
-                [disabled]="assocSaving()"
-                (click)="associate(t)"
-              >
-                {{
-                  teacherIds().includes(t.userId)
-                    ? i18n.t('profile.remove')
-                    : i18n.t('profile.associate')
-                }}
-              </button>
-            </li>
-          }
-        </ul>
-      }
-    </div>
+        <!-- Students list -->
+        @if (students().length > 0) {
+          <ul class="prof-list">
+            @for (s of students(); track s.userId) {
+              <li class="prof-item">
+                <div class="prof-info">
+                  <span class="prof-name">{{ s.name || s.email || s.userId }}</span>
+                  @if (s.name && s.email) {
+                    <span class="prof-email">{{ s.email }}</span>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="btn-assoc btn-assoc--remove"
+                  [disabled]="unlinkingId() === s.userId"
+                  (click)="unlinkStudent(s)"
+                >
+                  {{ i18n.t('profile.removeAluno') }}
+                </button>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="text-muted">{{ i18n.t('profile.semAlunos') }}</p>
+        }
+      </div>
+    }
 
-    <!-- ── My ID ── -->
+    <!-- ── My ID ─────────────────────────────────────── -->
     <div class="user-id-section">
       <p class="user-id-label">{{ i18n.t('profile.myId') }}</p>
       <p class="user-id-desc">{{ i18n.t('profile.myIdDesc') }}</p>
@@ -71,7 +74,7 @@
       </div>
     </div>
 
-    <!-- ── Settings ── -->
+    <!-- ── Settings ──────────────────────────────────── -->
     <div class="settings-section">
       <div class="settings-row">
         <span class="settings-label">{{ i18n.t('app.themeLabel') }}</span>

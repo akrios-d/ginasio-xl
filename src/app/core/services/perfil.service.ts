@@ -44,4 +44,21 @@ export class PerfilService {
       withCredentials: true,
     });
   }
+
+  linkStudent(
+    studentUserId: string,
+  ): Observable<{ linked: boolean; name?: string; email?: string }> {
+    return this.http.post<{ linked: boolean; name?: string; email?: string }>(
+      this.baseMulti,
+      { studentUserId },
+      { withCredentials: true },
+    );
+  }
+
+  unlinkStudent(studentUserId: string): Observable<{ unlinked: boolean }> {
+    return this.http.delete<{ unlinked: boolean }>(
+      `${this.baseMulti}?studentUserId=${encodeURIComponent(studentUserId)}`,
+      { withCredentials: true },
+    );
+  }
 }

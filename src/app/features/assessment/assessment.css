@@ -128,10 +128,12 @@
   width: 15px;
   height: 15px;
 }
-.btn-card-edit:hover {
-  color: var(--c-accent);
-  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-card-edit:hover {
+    color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 6%, transparent);
+    box-shadow: none;
+  }
 }
 
 .ficha-header {
@@ -152,9 +154,11 @@
   transition: background 120ms;
 }
 
-.ficha-header:hover {
-  background: var(--c-surface-alt);
-  box-shadow: none;
+@media (hover: hover) {
+  .ficha-header:hover {
+    background: var(--c-surface-alt);
+    box-shadow: none;
+  }
 }
 
 .ficha-header:focus-visible {
@@ -243,8 +247,10 @@
   border-bottom: none;
 }
 
-.entries-table tbody tr:hover td {
-  background: var(--c-surface-alt);
+@media (hover: hover) {
+  .entries-table tbody tr:hover td {
+    background: var(--c-surface-alt);
+  }
 }
 
 /* ── Save confirm ──────────────────────────────── */
@@ -283,11 +289,13 @@
   height: 16px;
 }
 
-.add-entry-btn:hover {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  background: var(--c-accent-lt);
-  box-shadow: none;
+@media (hover: hover) {
+  .add-entry-btn:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    background: var(--c-accent-lt);
+    box-shadow: none;
+  }
 }
 
 .add-entry-btn:focus-visible {
@@ -342,11 +350,13 @@
   border: 1.5px solid var(--c-border);
 }
 
-.btn-ghost:hover {
-  background: var(--c-surface);
-  border-color: var(--c-border-strong);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--c-surface);
+    border-color: var(--c-border-strong);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 /* ── Desktop tweaks ────────────────────────────── */
@@ -374,31 +384,36 @@
   gap: 8px;
 }
 
-.btn-pt-mode {
-  padding: 6px 12px;
+/* btn-pt-toggle mirrors training/training.css — keep in sync */
+.btn-pt-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 13px;
   min-height: unset;
   background: transparent;
   border: 1.5px solid var(--c-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
+  color: var(--c-ink-2);
   font-size: var(--t-meta);
-  font-weight: 700;
-  color: var(--c-ink-3);
+  font-weight: 600;
   cursor: pointer;
-  letter-spacing: 0.04em;
+  white-space: nowrap;
   transition:
-    background 120ms,
     border-color 120ms,
-    color 120ms;
+    color 120ms,
+    background 120ms;
 }
-.btn-pt-mode--active {
-  background: var(--c-accent);
-  border-color: var(--c-accent);
-  color: #fff;
-}
-.btn-pt-mode:hover:not(.btn-pt-mode--active) {
+.btn-pt-toggle--active {
   border-color: var(--c-accent);
   color: var(--c-accent);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--c-accent) 8%, transparent);
+}
+@media (hover: hover) {
+  .btn-pt-toggle:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 
 /* ── Shared-by-student badge ─────────────────────── */
@@ -457,10 +472,12 @@
   color: var(--c-accent);
   background: color-mix(in srgb, var(--c-accent) 8%, transparent);
 }
-.share-teacher-btn:hover:not(:disabled) {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  box-shadow: none;
+@media (hover: hover) {
+  .share-teacher-btn:hover:not(:disabled) {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 .share-teacher-dot {
   width: 7px;
@@ -502,10 +519,12 @@
   width: 12px;
   height: 12px;
 }
-.btn-entry-edit:hover {
-  color: var(--c-accent);
-  background: color-mix(in srgb, var(--c-accent) 10%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-entry-edit:hover {
+    color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 10%, transparent);
+    box-shadow: none;
+  }
 }
 .entry-row--editing {
   background: color-mix(in srgb, var(--c-accent) 6%, transparent);
@@ -539,9 +558,11 @@
   width: 14px;
   height: 14px;
 }
-.btn-new:hover {
-  background: var(--c-accent-dk);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-new:hover {
+    background: var(--c-accent-dk);
+    box-shadow: none;
+  }
 }
 .btn-new--empty {
   margin-top: 16px;
@@ -660,10 +681,12 @@
   width: 16px;
   height: 16px;
 }
-.sheet-close:hover {
-  background: var(--c-border);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .sheet-close:hover {
+    background: var(--c-border);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 .sheet-body {
@@ -703,9 +726,11 @@
     background 120ms,
     color 120ms;
 }
-.objetivo-chip:hover {
-  border-color: var(--c-accent);
-  box-shadow: none;
+@media (hover: hover) {
+  .objetivo-chip:hover {
+    border-color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 .objetivo-chip--active {
   border-color: var(--c-accent);
@@ -726,9 +751,11 @@
   cursor: pointer;
   min-height: unset;
 }
-.btn-add-entry:hover {
-  text-decoration: underline;
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-add-entry:hover {
+    text-decoration: underline;
+    box-shadow: none;
+  }
 }
 
 /* ── PT mode: student picker ─────────────────────── */
@@ -772,9 +799,11 @@
     background 120ms,
     color 120ms;
 }
-.pt-student-chip:hover {
-  border-color: var(--c-accent);
-  box-shadow: none;
+@media (hover: hover) {
+  .pt-student-chip:hover {
+    border-color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 .pt-student-chip--active {
   border-color: var(--c-accent);

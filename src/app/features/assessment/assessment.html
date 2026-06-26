@@ -5,11 +5,11 @@
       @if (isTeacher()) {
         <button
           type="button"
-          class="btn-pt-mode"
-          [class.btn-pt-mode--active]="ptMode()"
+          class="btn-pt-toggle"
+          [class.btn-pt-toggle--active]="ptMode()"
           (click)="togglePtMode()"
         >
-          PT
+          {{ ptMode() ? i18n.t('treino.modoPt.desativar') : i18n.t('treino.modoPt.ativar') }}
         </button>
       }
       <button type="button" class="btn-new" (click)="startCreateFicha()">

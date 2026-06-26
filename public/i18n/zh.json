@@ -169,5 +169,12 @@
   "avaliacao.sharedByStudent": "学员已分享",
   "avaliacao.meusAlunos": "我的学生",
   "avaliacao.semAlunos": "暂无关联学生",
-  "avaliacao.todos": "全部"
+  "avaliacao.todos": "全部",
+  "profile.meusAlunos": "我的学生",
+  "profile.addAluno": "关联",
+  "profile.alunoIdPlaceholder": "粘贴学生ID",
+  "profile.semAlunos": "暂无关联学生",
+  "profile.removeAluno": "移除",
+  "profile.alunoNotFound": "未找到学生",
+  "profile.forbidden": "权限不足"
 }

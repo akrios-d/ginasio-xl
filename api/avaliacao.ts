@@ -20,11 +20,25 @@ export default async function handler(req: any, res: any): Promise<void> {
   try {
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
-      // Return own assessments + assessments shared with this user as a teacher
       const studentId = (req.query as any).studentId as string | undefined;
+
+      if (studentId) {
+        // Teacher viewing a specific student — verify the student is actually associated
+        const perfisCol = await getCollection('perfis');
+        const studentPerfil = await perfisCol.findOne({ userId: studentId });
+        const isAssociated =
+          Array.isArray(studentPerfil?.teacherIds) && studentPerfil.teacherIds.includes(userId);
+
+        if (!isAssociated) {
+          res.status(403).json({ error: 'Forbidden: student not associated with this teacher' });
+          return;
+        }
+      }
+
       const query = studentId
-        ? { studentId } // teacher viewing a specific student (teacher mode)
+        ? { studentId }
         : { $or: [{ studentId: userId }, { sharedWithTeacherIds: userId }] };
+
       const docs = await col.find(query).sort({ createdAt: -1 }).toArray();
       res.status(200).json(docs.map(mapDocumentId));
       return;

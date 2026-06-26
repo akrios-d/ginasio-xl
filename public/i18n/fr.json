@@ -169,5 +169,12 @@
   "avaliacao.sharedByStudent": "Partagé par l'élève",
   "avaliacao.meusAlunos": "Mes élèves",
   "avaliacao.semAlunos": "Aucun élève associé",
-  "avaliacao.todos": "Tous"
+  "avaliacao.todos": "Tous",
+  "profile.meusAlunos": "Mes élèves",
+  "profile.addAluno": "Associer",
+  "profile.alunoIdPlaceholder": "Collez l'ID de l'élève ici",
+  "profile.semAlunos": "Aucun élève associé",
+  "profile.removeAluno": "Supprimer",
+  "profile.alunoNotFound": "Élève introuvable",
+  "profile.forbidden": "Permission refusée"
 }

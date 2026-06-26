@@ -169,5 +169,12 @@
   "avaliacao.sharedByStudent": "Partilhado pelo aluno",
   "avaliacao.meusAlunos": "Os meus alunos",
   "avaliacao.semAlunos": "Sem alunos associados",
-  "avaliacao.todos": "Todos"
+  "avaliacao.todos": "Todos",
+  "profile.meusAlunos": "Os meus alunos",
+  "profile.addAluno": "Associar",
+  "profile.alunoIdPlaceholder": "Cola o ID do aluno aqui",
+  "profile.semAlunos": "Sem alunos associados",
+  "profile.removeAluno": "Remover",
+  "profile.alunoNotFound": "Aluno não encontrado",
+  "profile.forbidden": "Sem permissão"
 }

@@ -57,10 +57,12 @@
     transform 100ms;
 }
 
-.section-card:hover {
-  border-color: var(--c-border-strong);
-  box-shadow: var(--sh-sm);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .section-card:hover {
+    border-color: var(--c-border-strong);
+    box-shadow: var(--sh-sm);
+    transform: translateY(-1px);
+  }
 }
 
 .section-card:active {
@@ -124,9 +126,11 @@
     color 150ms;
 }
 
-.section-card:hover .section-card-arrow {
-  color: var(--c-accent);
-  transform: translateX(3px);
+@media (hover: hover) {
+  .section-card:hover .section-card-arrow {
+    color: var(--c-accent);
+    transform: translateX(3px);
+  }
 }
 
 @media (min-width: 600px) {
@@ -202,11 +206,13 @@
   height: 16px;
 }
 
-.cal-nav-btn:hover {
-  background: var(--c-surface-alt);
-  border-color: var(--c-border);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .cal-nav-btn:hover {
+    background: var(--c-surface-alt);
+    border-color: var(--c-border);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 .cal-today-btn {
@@ -223,10 +229,12 @@
     background 120ms,
     color 120ms;
 }
-.cal-today-btn:hover {
-  background: var(--c-accent);
-  color: var(--btn-primary-text, #fff);
-  box-shadow: none;
+@media (hover: hover) {
+  .cal-today-btn:hover {
+    background: var(--c-accent);
+    color: var(--btn-primary-text, #fff);
+    box-shadow: none;
+  }
 }
 
 /* ── Calendar grid ─────────────────────────────── */
@@ -272,9 +280,11 @@
   cursor: default;
 }
 
-.cal-cell:not(.cal-cell--pad):hover {
-  background: var(--c-surface-alt);
-  box-shadow: none;
+@media (hover: hover) {
+  .cal-cell:not(.cal-cell--pad):hover {
+    background: var(--c-surface-alt);
+    box-shadow: none;
+  }
 }
 
 .cal-cell:focus-visible {
@@ -373,9 +383,11 @@
   height: 14px;
 }
 
-.add-checkin-btn:hover {
-  background: var(--c-accent-dk);
-  box-shadow: none;
+@media (hover: hover) {
+  .add-checkin-btn:hover {
+    background: var(--c-accent-dk);
+    box-shadow: none;
+  }
 }
 
 .day-empty {
@@ -474,10 +486,12 @@
   height: 14px;
 }
 
-.checkin-delete:hover {
-  color: var(--c-danger);
-  background: color-mix(in srgb, var(--c-danger) 10%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .checkin-delete:hover {
+    color: var(--c-danger);
+    background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+    box-shadow: none;
+  }
 }
 
 /* ── Bottom sheet / modal ──────────────────────── */
@@ -601,10 +615,12 @@
   height: 16px;
 }
 
-.sheet-close:hover {
-  background: var(--c-border);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .sheet-close:hover {
+    background: var(--c-border);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 .sheet-body {
@@ -646,14 +662,16 @@
   border: 1.5px solid var(--c-border);
 }
 
-.btn-ghost:hover {
-  background: var(--c-surface-alt);
-  border-color: var(--c-border-strong);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--c-surface-alt);
+    border-color: var(--c-border-strong);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
-/* ── Group chip buttons ────────────────────────── */
+/* ── Group chip buttons ────────────�/* ── Group chip buttons ──────────────────────────── */
 .group-chips {
   display: flex;
   flex-wrap: wrap;
@@ -680,11 +698,13 @@
     color 120ms;
 }
 
-.group-chip-btn:hover {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  background: var(--c-accent-lt);
-  box-shadow: none;
+@media (hover: hover) {
+  .group-chip-btn:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    background: var(--c-accent-lt);
+    box-shadow: none;
+  }
 }
 
 .group-chip-btn--active {
@@ -693,10 +713,12 @@
   color: #fff;
 }
 
-.group-chip-btn--active:hover {
-  background: var(--c-accent-dk);
-  border-color: var(--c-accent-dk);
-  color: #fff;
+@media (hover: hover) {
+  .group-chip-btn--active:hover {
+    background: var(--c-accent-dk);
+    border-color: var(--c-accent-dk);
+    color: #fff;
+  }
 }
 
 @media (max-width: 400px) {

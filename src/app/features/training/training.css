@@ -121,9 +121,11 @@
   transition: background 120ms;
 }
 
-.program-header:hover {
-  background: var(--c-surface-alt);
-  box-shadow: none;
+@media (hover: hover) {
+  .program-header:hover {
+    background: var(--c-surface-alt);
+    box-shadow: none;
+  }
 }
 
 .program-header:focus-visible {
@@ -346,9 +348,11 @@
   width: 20px;
   height: 20px;
 }
-.btn-yt-play:hover {
-  opacity: 1;
-  transform: scale(1.1);
+@media (hover: hover) {
+  .btn-yt-play:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .rest-info {
@@ -427,11 +431,13 @@
   width: 14px;
   height: 14px;
 }
-.btn-card-edit:hover {
-  color: var(--c-accent);
-  border-color: var(--c-accent);
-  background: color-mix(in srgb, var(--c-accent) 6%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-card-edit:hover {
+    color: var(--c-accent);
+    border-color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 6%, transparent);
+    box-shadow: none;
+  }
 }
 
 /* ── Active / inactive toggle switch ──────────────── */
@@ -507,18 +513,22 @@
     background 120ms,
     color 120ms;
 }
-.btn-toggle-active:hover {
-  background: var(--c-success, #22c55e);
-  color: #fff;
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-toggle-active:hover {
+    background: var(--c-success, #22c55e);
+    color: #fff;
+    box-shadow: none;
+  }
 }
 .btn-toggle-active--off {
   border-color: var(--c-ink-3, #94a3b8);
   color: var(--c-ink-3, #94a3b8);
 }
-.btn-toggle-active--off:hover {
-  background: var(--c-ink-3, #94a3b8);
-  color: #fff;
+@media (hover: hover) {
+  .btn-toggle-active--off:hover {
+    background: var(--c-ink-3, #94a3b8);
+    color: #fff;
+  }
 }
 
 /* ── PT mode badge & toggle ────────────────────── */
@@ -562,10 +572,12 @@
   color: var(--c-accent);
   background: color-mix(in srgb, var(--c-accent) 8%, transparent);
 }
-.btn-pt-toggle:hover {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-pt-toggle:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 .aluno-id-input {
   font-family: var(--font-mono, monospace);
@@ -594,9 +606,11 @@
   width: 14px;
   height: 14px;
 }
-.btn-new:hover {
-  background: var(--c-accent-dk);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-new:hover {
+    background: var(--c-accent-dk);
+    box-shadow: none;
+  }
 }
 .btn-new--empty {
   margin-top: 16px;
@@ -714,10 +728,12 @@
   width: 16px;
   height: 16px;
 }
-.sheet-close:hover {
-  background: var(--c-border);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .sheet-close:hover {
+    background: var(--c-border);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 /* ── Sheet sections ────────────────────────────── */
@@ -784,9 +800,11 @@
     color 120ms,
     border-color 120ms;
 }
-.tab-btn:hover {
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .tab-btn:hover {
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 .tab-btn--active {
   color: var(--c-accent);
@@ -949,10 +967,12 @@
   width: 14px;
   height: 14px;
 }
-.btn-remove-ex:hover {
-  color: var(--c-danger);
-  background: color-mix(in srgb, var(--c-danger) 10%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-remove-ex:hover {
+    color: var(--c-danger);
+    background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+    box-shadow: none;
+  }
 }
 
 .btn-remove-group {
@@ -976,10 +996,12 @@
   width: 14px;
   height: 14px;
 }
-.btn-remove-group:hover {
-  color: var(--c-danger);
-  background: color-mix(in srgb, var(--c-danger) 10%, transparent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-remove-group:hover {
+    color: var(--c-danger);
+    background: color-mix(in srgb, var(--c-danger) 10%, transparent);
+    box-shadow: none;
+  }
 }
 
 .btn-add-ex {
@@ -993,9 +1015,11 @@
   text-align: left;
   min-height: unset;
 }
-.btn-add-ex:hover {
-  text-decoration: underline;
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-add-ex:hover {
+    text-decoration: underline;
+    box-shadow: none;
+  }
 }
 
 /* ── Sheet actions ─────────────────────────────── */
@@ -1012,11 +1036,13 @@
   color: var(--c-ink-2);
   border: 1.5px solid var(--c-border);
 }
-.btn-ghost:hover {
-  background: var(--c-surface-alt);
-  border-color: var(--c-border-strong);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--c-surface-alt);
+    border-color: var(--c-border-strong);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }
 
 .btn-add-ex {
@@ -1031,9 +1057,11 @@
   min-height: unset;
 }
 
-.btn-add-ex:hover {
-  text-decoration: underline;
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-add-ex:hover {
+    text-decoration: underline;
+    box-shadow: none;
+  }
 }
 
 .btn-add-group {
@@ -1054,10 +1082,12 @@
   min-height: unset;
 }
 
-.btn-add-group:hover {
-  border-color: var(--c-accent);
-  color: var(--c-accent);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-add-group:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    box-shadow: none;
+  }
 }
 
 /* ── Sheet actions ─────────────────────────────── */
@@ -1076,9 +1106,11 @@
   border: 1.5px solid var(--c-border);
 }
 
-.btn-ghost:hover {
-  background: var(--c-surface-alt);
-  border-color: var(--c-border-strong);
-  color: var(--c-ink);
-  box-shadow: none;
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--c-surface-alt);
+    border-color: var(--c-border-strong);
+    color: var(--c-ink);
+    box-shadow: none;
+  }
 }

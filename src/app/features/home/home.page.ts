@@ -37,7 +37,7 @@ export class HomePage {
   protected readonly i18n = inject(I18nService);
   private readonly checkinSvc = inject(CheckinService);
   private readonly treinoSvc = inject(ProgramaTreinoService);
-  protected readonly sections: Array<{ key: string; route: string; icon: IconName }> = [
+  protected readonly sections: { key: string; route: string; icon: IconName }[] = [
     { key: 'treino', route: '/training', icon: 'dumbbell' },
     { key: 'avaliacao', route: '/assessment', icon: 'chart' },
     { key: 'perfil', route: '/profile', icon: 'person' },
