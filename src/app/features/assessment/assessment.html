@@ -39,18 +39,56 @@
       @if (studentsLoading()) {
         <span class="spinner spinner--sm" aria-hidden="true"></span>
       } @else {
-        <select
-          id="ptStudentSelect"
-          class="pt-student-select"
-          (change)="onStudentSelectChange($any($event.target).value)"
+        <div
+          class="pt-student-combo"
+          role="combobox"
+          aria-haspopup="listbox"
+          [attr.aria-expanded]="studentComboOpen()"
+          aria-controls="ptStudentListbox"
         >
-          <option value="">{{ i18n.t('avaliacao.mine') }}</option>
-          @for (s of students(); track s.userId) {
-            <option [value]="s.userId" [selected]="selectedStudentId() === s.userId">
-              {{ s.name || s.email || s.userId }}
-            </option>
+          <input
+            type="text"
+            class="pt-student-search"
+            [value]="studentComboOpen() ? studentComboQuery() : studentComboDisplay()"
+            (input)="onStudentComboInput($any($event.target).value)"
+            (focus)="openStudentCombo()"
+            (blur)="blurStudentCombo()"
+            autocomplete="off"
+            [placeholder]="studentComboDisplay()"
+          />
+          @if (studentComboOpen()) {
+            <ul class="pt-student-dropdown" role="listbox" id="ptStudentListbox">
+              <li
+                class="pt-student-option"
+                [class.pt-student-option--active]="selectedStudentId() === null"
+                role="option"
+                [attr.aria-selected]="selectedStudentId() === null"
+                (mousedown)="selectStudentFromCombo(null)"
+              >
+                {{ i18n.t('avaliacao.mine') }}
+              </li>
+              @for (s of filteredStudentsForCombo(); track s.userId) {
+                <li
+                  class="pt-student-option"
+                  [class.pt-student-option--active]="selectedStudentId() === s.userId"
+                  role="option"
+                  [attr.aria-selected]="selectedStudentId() === s.userId"
+                  (mousedown)="selectStudentFromCombo(s.userId)"
+                >
+                  <span class="pt-option-main">{{ s.alias || s.name || s.email || s.userId }}</span>
+                  @if (s.alias && (s.name || s.email)) {
+                    <span class="pt-option-sub">{{ s.name || s.email }}</span>
+                  }
+                </li>
+              }
+              @if (filteredStudentsForCombo().length === 0) {
+                <li class="pt-student-empty" role="option" aria-selected="false">
+                  {{ i18n.t('avaliacao.semAlunos') }}
+                </li>
+              }
+            </ul>
           }
-        </select>
+        </div>
       }
     </div>
   }

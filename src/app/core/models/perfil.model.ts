@@ -33,6 +33,7 @@ export const PerfilSchema = z.object({
   studentNumber: z.string().optional(), // assigned by the gym
   teacherIds: z.array(z.string()).optional(), // userIds of associated teachers/PTs
   teacherProfile: TeacherProfileSchema.optional(), // only relevant when roles includes 'teacher'
+  studentAliases: z.record(z.string(), z.string()).optional(), // teacher's custom names for students
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

@@ -75,6 +75,28 @@ export class AssessmentPage {
   protected readonly selectedStudentId = signal<string | null>(null);
   protected readonly studentsLoading = signal(false);
 
+  // Combobox for student filter
+  protected readonly studentComboQuery = signal('');
+  protected readonly studentComboOpen = signal(false);
+  protected readonly studentComboDisplay = computed(() => {
+    const id = this.selectedStudentId();
+    if (id === null) return this.i18n.t('avaliacao.mine');
+    const s = this.students().find((st) => st.userId === id);
+    if (!s) return id;
+    return s.alias || s.name || s.email || id;
+  });
+  protected readonly filteredStudentsForCombo = computed(() => {
+    const q = this.studentComboQuery().toLowerCase().trim();
+    if (!q) return this.students();
+    return this.students().filter(
+      (s) =>
+        (s.alias || '').toLowerCase().includes(q) ||
+        (s.name || '').toLowerCase().includes(q) ||
+        (s.email || '').toLowerCase().includes(q) ||
+        s.userId.toLowerCase().includes(q),
+    );
+  });
+
   // Teachers available for sharing (the student's associated teachers)
   protected readonly myTeacherIds = signal<string[]>([]);
   protected readonly teachers = signal<TeacherInfo[]>([]);
@@ -134,8 +156,26 @@ export class AssessmentPage {
     });
   }
 
-  protected onStudentSelectChange(value: string): void {
-    this.selectStudent(value || null);
+  protected onStudentComboInput(value: string): void {
+    this.studentComboQuery.set(value);
+    this.studentComboOpen.set(true);
+  }
+
+  protected selectStudentFromCombo(id: string | null): void {
+    this.selectStudent(id);
+    this.studentComboQuery.set('');
+    this.studentComboOpen.set(false);
+  }
+
+  protected openStudentCombo(): void {
+    this.studentComboOpen.set(true);
+  }
+
+  protected blurStudentCombo(): void {
+    setTimeout(() => {
+      this.studentComboQuery.set('');
+      this.studentComboOpen.set(false);
+    }, 160);
   }
 
   protected selectStudent(id: string | null): void {
@@ -151,7 +191,7 @@ export class AssessmentPage {
   protected studentName(id: string | null): string {
     if (!id) return '';
     const s = this.students().find((st) => st.userId === id);
-    return s?.name || s?.email || id;
+    return s?.alias || s?.name || s?.email || id;
   }
 
   protected togglePtMode(): void {

@@ -190,5 +190,7 @@
   "treino.alunoNaoEncontrado": "Élève introuvable",
   "profile.removeTrainador": "Retirer",
   "profile.confirmRemoveTrainador": "Retirer ce coach ?",
-  "avaliacao.mine": "Les miennes"
+  "avaliacao.mine": "Les miennes",
+  "profile.addAlias": "Alias",
+  "profile.aliasPlaceholder": "Nom personnalisé…"
 }

@@ -17,6 +17,7 @@ export interface StudentInfo {
   userId: string;
   name?: string;
   email?: string;
+  alias?: string; // teacher's custom name for this student
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +30,11 @@ export class PerfilService {
     return this.http.get<Perfil>(this.base, { withCredentials: true });
   }
 
-  save(payload: { name?: string; teacherIds?: string[] }): Observable<{ saved: boolean }> {
+  save(payload: {
+    name?: string;
+    teacherIds?: string[];
+    studentAliases?: Record<string, string>;
+  }): Observable<{ saved: boolean }> {
     return this.http.put<{ saved: boolean }>(this.base, payload, { withCredentials: true });
   }
 

@@ -190,5 +190,7 @@
   "treino.alunoNaoEncontrado": "Student not found",
   "profile.removeTrainador": "Remove",
   "profile.confirmRemoveTrainador": "Remove this trainer?",
-  "avaliacao.mine": "Mine"
+  "avaliacao.mine": "Mine",
+  "profile.addAlias": "Alias",
+  "profile.aliasPlaceholder": "Custom name…"
 }

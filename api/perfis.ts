@@ -71,6 +71,11 @@ export default async function handler(req: any, res: any): Promise<void> {
             return d;
           }),
         );
+
+        // Attach teacher's custom alias for each student
+        const myPerfil = await col.findOne({ userId });
+        const aliases: Record<string, string> = myPerfil?.studentAliases ?? {};
+        docs = docs.map((d) => (aliases[d.userId] ? { ...d, alias: aliases[d.userId] } : d));
       } else {
         docs = await col
           .find({ roles: 'teacher' })

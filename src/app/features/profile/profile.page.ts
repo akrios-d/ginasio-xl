@@ -41,7 +41,11 @@ export class ProfilePage {
 
   // Teacher: students sheet
   protected students = signal<StudentInfo[]>([]);
+  protected studentAliases = signal<Record<string, string>>({});
   protected studentsSheetOpen = signal(false);
+  protected editingAliasId = signal<string | null>(null);
+  protected aliasInput = signal('');
+  protected aliasSaving = signal(false);
   protected studentIdInput = signal('');
   protected linkSaving = signal(false);
   protected linkError = signal('');
@@ -63,7 +67,14 @@ export class ProfilePage {
 
   private loadStudents(): void {
     this.perfilSvc.listStudents().subscribe({
-      next: (list) => this.students.set(list),
+      next: (list) => {
+        this.students.set(list);
+        const map: Record<string, string> = {};
+        for (const s of list) {
+          if (s.alias) map[s.userId] = s.alias;
+        }
+        this.studentAliases.set(map);
+      },
       error: () => undefined,
     });
   }
@@ -176,6 +187,37 @@ export class ProfilePage {
     navigator.clipboard.writeText(id).then(() => {
       this.idCopied.set(true);
       setTimeout(() => this.idCopied.set(false), 2000);
+    });
+  }
+
+  // ── Alias editing (teacher's custom name for a student) ─────────────────
+  protected startEditAlias(studentUserId: string, current: string): void {
+    this.editingAliasId.set(studentUserId);
+    this.aliasInput.set(current);
+  }
+
+  protected cancelAlias(): void {
+    this.editingAliasId.set(null);
+    this.aliasInput.set('');
+  }
+
+  protected saveAlias(studentUserId: string): void {
+    if (this.aliasSaving()) return;
+    const alias = this.aliasInput().trim();
+    this.aliasSaving.set(true);
+    const updated = { ...this.studentAliases(), [studentUserId]: alias };
+    if (!alias) delete updated[studentUserId];
+    this.perfilSvc.save({ studentAliases: updated }).subscribe({
+      next: () => {
+        this.studentAliases.set(updated);
+        this.students.update((list) =>
+          list.map((s) => (s.userId === studentUserId ? { ...s, alias: alias || undefined } : s)),
+        );
+        this.aliasSaving.set(false);
+        this.editingAliasId.set(null);
+        this.aliasInput.set('');
+      },
+      error: () => this.aliasSaving.set(false),
     });
   }
 

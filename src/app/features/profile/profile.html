@@ -175,9 +175,45 @@
         @for (s of students(); track s.userId) {
           <li class="prof-item">
             <div class="prof-info">
-              <span class="prof-name">{{ s.name || s.email || s.userId }}</span>
-              @if (s.name && s.email) {
-                <span class="prof-email">{{ s.email }}</span>
+              @if (editingAliasId() === s.userId) {
+                <div class="alias-edit-row">
+                  <input
+                    class="alias-input"
+                    type="text"
+                    [ngModel]="aliasInput()"
+                    (ngModelChange)="aliasInput.set($event)"
+                    [placeholder]="i18n.t('profile.aliasPlaceholder')"
+                    name="alias"
+                  />
+                  <button
+                    type="button"
+                    class="btn-assoc btn-sm"
+                    [disabled]="aliasSaving()"
+                    (click)="saveAlias(s.userId)"
+                  >
+                    ✓
+                  </button>
+                  <button type="button" class="btn-cancel btn-sm" (click)="cancelAlias()">✕</button>
+                </div>
+              } @else {
+                <div class="prof-name-row">
+                  <span class="prof-name">{{ s.name || s.email || s.userId }}</span>
+                  <button
+                    type="button"
+                    class="btn-alias"
+                    [title]="i18n.t('profile.addAlias')"
+                    (click)="startEditAlias(s.userId, s.alias || '')"
+                  >
+                    @if (s.alias) {
+                      <span class="alias-tag">{{ s.alias }}</span>
+                    } @else {
+                      <app-icon name="edit" [size]="12" />
+                    }
+                  </button>
+                </div>
+                @if (s.email && s.name) {
+                  <span class="prof-email">{{ s.email }}</span>
+                }
               }
             </div>
             <button
