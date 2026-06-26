@@ -22,9 +22,7 @@ export class PerfilService {
     return this.http.get<Perfil>(this.base, { withCredentials: true });
   }
 
-  save(
-    payload: Partial<Pick<Perfil, 'studentNumber' | 'roles' | 'teacherIds' | 'teacherProfile'>>,
-  ): Observable<{ saved: boolean }> {
+  save(payload: { teacherIds: string[] }): Observable<{ saved: boolean }> {
     return this.http.put<{ saved: boolean }>(this.base, payload, { withCredentials: true });
   }
 
