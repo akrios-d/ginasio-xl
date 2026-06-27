@@ -203,5 +203,6 @@
   "profile.aliasPlaceholder": "Custom name…",
   "treino.criar.carga": "Load (kg)",
   "treino.criar.aulasRecomendadas": "Recommended activities",
-  "treino.criar.aulasPlaceholder": "E.g. Yoga, Pilates…"
+  "treino.criar.aulasPlaceholder": "E.g. Yoga, Pilates…",
+  "avaliacao.metas.titulo": "Set targets (optional)"
 }

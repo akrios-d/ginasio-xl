@@ -33,11 +33,17 @@ export const CreateAvaliacaoSchema = z.object({
   objetivo: z.string().optional(),
   metas: z
     .object({
-      pesoMin: z.number().positive().optional(),
-      pesoMax: z.number().positive().optional(),
-      percentualMassaGordaMin: z.number().min(0).max(100).optional(),
-      percentualMassaGordaMax: z.number().min(0).max(100).optional(),
-      glicemiaVejunoMax: z.number().positive().optional(),
+      peso: z.number().positive().optional(),
+      imc: z.number().positive().optional(),
+      percentualMassaGorda: z.number().min(0).max(100).optional(),
+      percentualMassaMagra: z.number().min(0).max(100).optional(),
+      kcal: z.number().positive().optional(),
+      glicemiaVejuno: z.number().positive().optional(),
+      paSistolica: z.number().int().positive().optional(),
+      paDiastolica: z.number().int().positive().optional(),
+      fcRepouso: z.number().int().positive().optional(),
+      perimetroAbdominal: z.number().positive().optional(),
+      perimetroCintura: z.number().positive().optional(),
     })
     .optional(),
   // avaliacoes can be seeded on create, but NEVER updated via PUT

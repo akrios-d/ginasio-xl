@@ -44,15 +44,21 @@ export const EntradaAvaliacaoSchema = z.object({
 export type EntradaAvaliacao = z.infer<typeof EntradaAvaliacaoSchema>;
 
 // ---------------------------------------------------------------------------
-// Metas do aluno (linha amarela)
+// Metas do aluno (objetivo por métrica)
 // ---------------------------------------------------------------------------
 
 export const MetasAvaliacaoSchema = z.object({
-  pesoMin: z.number().positive().optional(), // ex: 77
-  pesoMax: z.number().positive().optional(), // ex: 82
-  percentualMassaGordaMin: z.number().min(0).max(100).optional(), // ex: 18
-  percentualMassaGordaMax: z.number().min(0).max(100).optional(), // ex: 20
-  glicemiaVejunoMax: z.number().positive().optional(), // ex: 10
+  peso: z.number().positive().optional(),
+  imc: z.number().positive().optional(),
+  percentualMassaGorda: z.number().min(0).max(100).optional(),
+  percentualMassaMagra: z.number().min(0).max(100).optional(),
+  kcal: z.number().positive().optional(),
+  glicemiaVejuno: z.number().positive().optional(),
+  paSistolica: z.number().int().positive().optional(),
+  paDiastolica: z.number().int().positive().optional(),
+  fcRepouso: z.number().int().positive().optional(),
+  perimetroAbdominal: z.number().positive().optional(),
+  perimetroCintura: z.number().positive().optional(),
 });
 
 export type MetasAvaliacao = z.infer<typeof MetasAvaliacaoSchema>;

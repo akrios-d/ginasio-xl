@@ -144,7 +144,12 @@
             >
               <div class="ficha-meta">
                 <div class="ficha-title-row">
-                  <span class="ficha-objective">{{ f.objetivo || '—' }}</span>
+                  <span class="ficha-objective">
+                    <span class="ficha-objective-label"
+                      >{{ i18n.t('avaliacao.criar.objetivo') }}:</span
+                    >
+                    {{ f.objetivo || '—' }}
+                  </span>
                   @if (isSharedView(f)) {
                     <span class="ficha-shared-badge">{{
                       i18n.t('avaliacao.sharedByStudent')
@@ -159,9 +164,25 @@
                     {{ latest.data | date: 'dd MMM yyyy' }}
                     @if (latest.peso) {
                       · {{ latest.peso }} kg
+                      @if (deltaVsPrev(f, 'peso'); as d) {
+                        <span
+                          class="delta-badge"
+                          [class.delta-badge--pos]="d > 0"
+                          [class.delta-badge--neg]="d < 0"
+                          >{{ d > 0 ? '+' : '' }}{{ d }}</span
+                        >
+                      }
                     }
                     @if (latest.percentualMassaGorda) {
                       · {{ latest.percentualMassaGorda }}% BF
+                      @if (deltaVsPrev(f, 'percentualMassaGorda'); as d) {
+                        <span
+                          class="delta-badge"
+                          [class.delta-badge--pos]="d > 0"
+                          [class.delta-badge--neg]="d < 0"
+                          >{{ d > 0 ? '+' : '' }}{{ d }}%</span
+                        >
+                      }
                     }
                   </span>
                 } @else {
@@ -274,6 +295,93 @@
                       }
                     </tbody>
                   </table>
+                </div>
+              }
+
+              <!-- ── Progress rings (when metas defined) ── -->
+              @if (hasActiveMetas(f)) {
+                <div class="rings-section">
+                  @for (ring of buildRings(f); track ring.key) {
+                    <div class="ring-item">
+                      <svg viewBox="0 0 80 80" class="ring-svg" aria-hidden="true">
+                        <!-- track -->
+                        <circle cx="40" cy="40" r="30" class="ring-track" />
+                        <!-- progress arc -->
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="30"
+                          class="ring-arc"
+                          [style.stroke]="ring.color"
+                          [attr.stroke-dasharray]="188.5"
+                          [attr.stroke-dashoffset]="ring.dashOffset"
+                          transform="rotate(-90 40 40)"
+                        />
+                        <!-- % label -->
+                        <text
+                          x="40"
+                          y="36"
+                          class="ring-pct"
+                          text-anchor="middle"
+                          [style.fill]="ring.color"
+                        >
+                          {{ ring.pct }}%
+                        </text>
+                        <!-- current value -->
+                        <text x="40" y="50" class="ring-val" text-anchor="middle">
+                          {{ ring.current }}{{ ring.unit }}
+                        </text>
+                      </svg>
+                      <div class="ring-label">{{ i18n.t(ring.i18nKey) }}</div>
+                      <div class="ring-meta-val">meta: {{ ring.meta }}{{ ring.unit }}</div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- ── Line chart (when no metas, ≥2 entries) ── -->
+              @if (!hasActiveMetas(f) && f.avaliacoes.length >= 2) {
+                <div class="chart-section">
+                  <div class="chart-metric-tabs">
+                    @for (m of chartMetrics; track m.key) {
+                      @if (hasMetricData(f, m.key)) {
+                        <button
+                          type="button"
+                          class="chart-tab"
+                          [class.chart-tab--active]="chartMetric() === m.key"
+                          (click)="selectChartMetric(m.key)"
+                        >
+                          {{ i18n.t(m.i18nKey) }}
+                        </button>
+                      }
+                    }
+                  </div>
+
+                  @if (buildChart(f); as chart) {
+                    @if (chart.hasData) {
+                      <div class="chart-wrap">
+                        <svg
+                          class="chart-svg"
+                          [attr.viewBox]="'0 0 500 100'"
+                          preserveAspectRatio="none"
+                          aria-hidden="true"
+                        >
+                          @if (chart.hasCurve) {
+                            <path [attr.d]="chart.path" class="chart-line" fill="none" />
+                          }
+                          @for (dot of chart.dots; track dot.date) {
+                            <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="4" class="chart-dot">
+                              <title>{{ dot.v }} — {{ dot.date | date: 'dd/MM/yyyy' }}</title>
+                            </circle>
+                          }
+                        </svg>
+                        <div class="chart-x-labels">
+                          <span>{{ chart.firstLabel }}</span>
+                          <span>{{ chart.lastLabel }}</span>
+                        </div>
+                      </div>
+                    }
+                  }
                 </div>
               }
 
@@ -547,6 +655,137 @@
           [placeholder]="i18n.t('avaliacao.criar.objetivoPlaceholder')"
         />
       </div>
+      <!-- ── Metas (targets) ── -->
+      <div class="metas-section">
+        <button type="button" class="btn-metas-toggle" (click)="metasOpen.set(!metasOpen())">
+          <span>{{ i18n.t('avaliacao.metas.titulo') }}</span>
+          <span class="metas-chevron" [class.metas-chevron--open]="metasOpen()">▼</span>
+        </button>
+
+        @if (metasOpen()) {
+          <div class="metas-grid">
+            <div class="form-group">
+              <label class="form-label" for="metaPeso">{{ i18n.t('avaliacao.peso') }}</label>
+              <input
+                id="metaPeso"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.peso"
+                name="metaPeso"
+                placeholder="kg"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaImc">{{ i18n.t('avaliacao.imc') }}</label>
+              <input
+                id="metaImc"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.imc"
+                name="metaImc"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaMg">{{ i18n.t('avaliacao.mg') }}</label>
+              <input
+                id="metaMg"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.percentualMassaGorda"
+                name="metaMg"
+                placeholder="%"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaMm">{{ i18n.t('avaliacao.mm') }}</label>
+              <input
+                id="metaMm"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.percentualMassaMagra"
+                name="metaMm"
+                placeholder="%"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaKcal">{{ i18n.t('avaliacao.kcal') }}</label>
+              <input
+                id="metaKcal"
+                type="number"
+                step="1"
+                [(ngModel)]="fichaForm.metas.kcal"
+                name="metaKcal"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaGv">{{ i18n.t('avaliacao.gv') }}</label>
+              <input
+                id="metaGv"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.glicemiaVejuno"
+                name="metaGv"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaPas">{{ i18n.t('avaliacao.pas') }}</label>
+              <input
+                id="metaPas"
+                type="number"
+                step="1"
+                [(ngModel)]="fichaForm.metas.paSistolica"
+                name="metaPas"
+                placeholder="mmHg"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaPad">{{ i18n.t('avaliacao.pad') }}</label>
+              <input
+                id="metaPad"
+                type="number"
+                step="1"
+                [(ngModel)]="fichaForm.metas.paDiastolica"
+                name="metaPad"
+                placeholder="mmHg"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaFc">{{ i18n.t('avaliacao.fc') }}</label>
+              <input
+                id="metaFc"
+                type="number"
+                step="1"
+                [(ngModel)]="fichaForm.metas.fcRepouso"
+                name="metaFc"
+                placeholder="bpm"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaAbd">{{ i18n.t('avaliacao.abd') }}</label>
+              <input
+                id="metaAbd"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.perimetroAbdominal"
+                name="metaAbd"
+                placeholder="cm"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="metaCint">{{ i18n.t('avaliacao.cint') }}</label>
+              <input
+                id="metaCint"
+                type="number"
+                step="0.1"
+                [(ngModel)]="fichaForm.metas.perimetroCintura"
+                name="metaCint"
+                placeholder="cm"
+              />
+            </div>
+          </div>
+        }
+      </div>
+
       <div class="sheet-actions">
         <button type="button" class="btn-ghost" (click)="cancelCreateFicha()">
           {{ i18n.t('avaliacao.criar.cancel') }}

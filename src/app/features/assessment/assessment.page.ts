@@ -9,8 +9,10 @@ import {
   type StudentInfo,
 } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
-import type { FichaAvaliacao, EntradaAvaliacao } from '../../core/models';
+import type { FichaAvaliacao, EntradaAvaliacao, MetasAvaliacao } from '../../core/models';
 import { OBJETIVO_OPTIONS } from '../../core/models';
+
+// ── Form interfaces ────────────────────────────────────────────────────────
 
 interface EntryForm {
   data: string;
@@ -27,17 +29,121 @@ interface EntryForm {
   perimetroCintura: string;
 }
 
-interface FichaForm {
-  objetivo: string;
-  studentId: string; // used in PT mode to create for a specific student
+interface MetasForm {
+  peso: string;
+  imc: string;
+  percentualMassaGorda: string;
+  percentualMassaMagra: string;
+  kcal: string;
+  glicemiaVejuno: string;
+  paSistolica: string;
+  paDiastolica: string;
+  fcRepouso: string;
+  perimetroAbdominal: string;
+  perimetroCintura: string;
 }
 
+interface FichaForm {
+  objetivo: string;
+  studentId: string;
+  metas: MetasForm;
+}
+
+// ── Chart types ────────────────────────────────────────────────────────────
+
+export type ChartMetric =
+  | 'peso'
+  | 'imc'
+  | 'percentualMassaGorda'
+  | 'percentualMassaMagra'
+  | 'kcal'
+  | 'glicemiaVejuno'
+  | 'paSistolica'
+  | 'paDiastolica'
+  | 'fcRepouso'
+  | 'perimetroAbdominal'
+  | 'perimetroCintura';
+
+export interface ChartMetricDef {
+  key: ChartMetric;
+  i18nKey: string;
+  unit: string;
+}
+
+export interface ChartDot {
+  x: number;
+  y: number;
+  v: number;
+  date: Date;
+}
+
+export interface ChartResult {
+  hasData: boolean;
+  hasCurve: boolean;
+  dots: ChartDot[];
+  path: string;
+  metaPath: string | null;
+  metaY: number | null;
+  metaV: number | null;
+  yMinLabel: string;
+  yMaxLabel: string;
+  firstLabel: string;
+  lastLabel: string;
+}
+
+export interface RingResult {
+  key: ChartMetric;
+  i18nKey: string;
+  unit: string;
+  current: number;
+  meta: number;
+  pct: number; // 0–100 for display (clamped)
+  rawProgress: number; // unclamped (can be < 0 or > 1)
+  dashOffset: number;
+  color: string;
+  achieved: boolean;
+}
+
+// ── Constants ──────────────────────────────────────────────────────────────
+
 const OBJETIVOS = [...OBJETIVO_OPTIONS];
+
+const CHART_METRICS: ChartMetricDef[] = [
+  { key: 'peso', i18nKey: 'avaliacao.peso', unit: 'kg' },
+  { key: 'imc', i18nKey: 'avaliacao.imc', unit: '' },
+  { key: 'percentualMassaGorda', i18nKey: 'avaliacao.mg', unit: '%' },
+  { key: 'percentualMassaMagra', i18nKey: 'avaliacao.mm', unit: '%' },
+  { key: 'kcal', i18nKey: 'avaliacao.kcal', unit: '' },
+  { key: 'glicemiaVejuno', i18nKey: 'avaliacao.gv', unit: '' },
+  { key: 'paSistolica', i18nKey: 'avaliacao.pas', unit: '' },
+  { key: 'paDiastolica', i18nKey: 'avaliacao.pad', unit: '' },
+  { key: 'fcRepouso', i18nKey: 'avaliacao.fc', unit: 'bpm' },
+  { key: 'perimetroAbdominal', i18nKey: 'avaliacao.abd', unit: 'cm' },
+  { key: 'perimetroCintura', i18nKey: 'avaliacao.cint', unit: 'cm' },
+];
+
+// chart SVG coordinate constants
+const CW = 500;
+const CH = 100;
+const CPL = 4;
+const CPR = 4;
+const CPT = 8;
+const CPB = 4;
+
+// ring SVG constants
+const RING_R = 30;
+const RING_CIRC = 2 * Math.PI * RING_R; // ≈ 188.5
 
 function n(v: string): number | undefined {
   const x = parseFloat(v);
   return isNaN(x) ? undefined : x;
 }
+
+function fmtDate(d: Date): string {
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-assessment',
@@ -70,7 +176,7 @@ export class AssessmentPage {
   );
   protected readonly isTeacher = signal(false);
 
-  // Students (PT mode: list my students + select one to view their fichas)
+  // Students (PT mode)
   protected readonly students = signal<StudentInfo[]>([]);
   protected readonly selectedStudentId = signal<string | null>(null);
   protected readonly studentsLoading = signal(false);
@@ -97,22 +203,26 @@ export class AssessmentPage {
     );
   });
 
-  // Teachers available for sharing (the student's associated teachers)
+  // Teachers available for sharing
   protected readonly myTeacherIds = signal<string[]>([]);
   protected readonly teachers = signal<TeacherInfo[]>([]);
-  protected readonly sharingSaving = signal<string | null>(null); // fichaId being saved
-
-  // computed: only show teachers the student is actually associated with
+  protected readonly sharingSaving = signal<string | null>(null);
   protected readonly myTeachers = computed(() =>
     this.teachers().filter((t) => this.myTeacherIds().includes(t.userId)),
   );
+
+  // Chart
+  protected readonly chartMetric = signal<ChartMetric>('peso');
+  protected readonly chartMetrics = CHART_METRICS;
+
+  // Metas sheet toggle
+  protected readonly metasOpen = signal(false);
 
   protected readonly objetivos = OBJETIVOS;
   protected entryForm: EntryForm = this.emptyEntryForm();
   protected fichaForm: FichaForm = this.emptyFichaForm();
 
   constructor() {
-    // Load own profile: roles + teacherIds
     this.perfilSvc.get().subscribe({
       next: (p) => {
         const isT = p.roles?.includes('teacher') ?? false;
@@ -124,12 +234,10 @@ export class AssessmentPage {
       },
     });
 
-    // Load teachers list for share UI
     this.perfilSvc.listTeachers().subscribe({
       next: (list) => this.teachers.set(list),
     });
 
-    // In PT mode on init, don't load own fichas — wait for student selection
     if (this.ptMode()) {
       this.loading.set(false);
     } else {
@@ -189,7 +297,6 @@ export class AssessmentPage {
     this.addingEntryFor.set(null);
     this.loading.set(true);
     this.loadFichas(id ?? undefined);
-    // Pre-fill studentId in create form
     this.fichaForm.studentId = id ?? '';
   }
 
@@ -204,12 +311,10 @@ export class AssessmentPage {
     this.ptMode.set(next);
     localStorage.setItem(AssessmentPage.PT_MODE_KEY, String(next));
     if (next) {
-      // Entered PT mode: clear own fichas, require student selection
       this.fichas.set([]);
       this.selectedStudentId.set(null);
       this.loading.set(false);
     } else {
-      // Exited PT mode: load own fichas
       this.selectedStudentId.set(null);
       this.fichaForm.studentId = '';
       this.loading.set(true);
@@ -226,28 +331,44 @@ export class AssessmentPage {
     return f.avaliacoes.length > 0 ? f.avaliacoes[f.avaliacoes.length - 1] : null;
   }
 
-  /** True when this assessment belongs to another student (teacher viewing shared) */
   protected isSharedView(f: FichaAvaliacao): boolean {
     return f.studentId !== this.auth.userId();
   }
 
-  // ── Create / Edit ficha ───────────────────────────────────────────────────
+  // ── Ficha CRUD ────────────────────────────────────────────────────────────
 
   protected startCreateFicha(): void {
     this.fichaForm = this.emptyFichaForm();
+    this.metasOpen.set(false);
     this.creatingFicha.set(true);
   }
 
   protected cancelCreateFicha(): void {
     this.creatingFicha.set(false);
     this.editingFicha.set(null);
+    this.metasOpen.set(false);
   }
 
   protected startEditFicha(f: FichaAvaliacao): void {
+    const m = f.metas;
     this.fichaForm = {
       objetivo: f.objetivo ?? '',
       studentId: f.studentId,
+      metas: {
+        peso: m?.peso?.toString() ?? '',
+        imc: m?.imc?.toString() ?? '',
+        percentualMassaGorda: m?.percentualMassaGorda?.toString() ?? '',
+        percentualMassaMagra: m?.percentualMassaMagra?.toString() ?? '',
+        kcal: m?.kcal?.toString() ?? '',
+        glicemiaVejuno: m?.glicemiaVejuno?.toString() ?? '',
+        paSistolica: m?.paSistolica?.toString() ?? '',
+        paDiastolica: m?.paDiastolica?.toString() ?? '',
+        fcRepouso: m?.fcRepouso?.toString() ?? '',
+        perimetroAbdominal: m?.perimetroAbdominal?.toString() ?? '',
+        perimetroCintura: m?.perimetroCintura?.toString() ?? '',
+      },
     };
+    this.metasOpen.set(!!m && Object.values(m).some((v) => v !== undefined));
     this.editingFicha.set(f);
   }
 
@@ -258,8 +379,8 @@ export class AssessmentPage {
     this.saving.set(true);
     const existing = this.editingFicha();
     const obj = this.fichaForm.objetivo.trim() || undefined;
+    const metas = this.buildMetas();
 
-    // In PT mode a teacher can create for a different student
     const targetStudentId =
       this.ptMode() && this.fichaForm.studentId.trim()
         ? this.fichaForm.studentId.trim()
@@ -270,10 +391,12 @@ export class AssessmentPage {
     const req = existing
       ? (this.svc.update(existing._id!, {
           objetivo: obj,
+          metas,
         }) as import('rxjs').Observable<unknown>)
       : (this.svc.create({
           studentId: targetStudentId,
           objetivo: obj,
+          metas,
           avaliacoes: [],
         }) as import('rxjs').Observable<unknown>);
 
@@ -281,12 +404,30 @@ export class AssessmentPage {
       next: () => {
         this.creatingFicha.set(false);
         this.editingFicha.set(null);
+        this.metasOpen.set(false);
         this.saving.set(false);
         this.loading.set(true);
-        this.loadFichas();
+        this.loadFichas(this.selectedStudentId() ?? undefined);
       },
       error: () => this.saving.set(false),
     });
+  }
+
+  private buildMetas(): MetasAvaliacao | undefined {
+    const f = this.fichaForm.metas;
+    const m: MetasAvaliacao = {};
+    if (n(f.peso) !== undefined) m.peso = n(f.peso);
+    if (n(f.imc) !== undefined) m.imc = n(f.imc);
+    if (n(f.percentualMassaGorda) !== undefined) m.percentualMassaGorda = n(f.percentualMassaGorda);
+    if (n(f.percentualMassaMagra) !== undefined) m.percentualMassaMagra = n(f.percentualMassaMagra);
+    if (n(f.kcal) !== undefined) m.kcal = n(f.kcal);
+    if (n(f.glicemiaVejuno) !== undefined) m.glicemiaVejuno = n(f.glicemiaVejuno);
+    if (n(f.paSistolica) !== undefined) m.paSistolica = Math.round(n(f.paSistolica)!);
+    if (n(f.paDiastolica) !== undefined) m.paDiastolica = Math.round(n(f.paDiastolica)!);
+    if (n(f.fcRepouso) !== undefined) m.fcRepouso = Math.round(n(f.fcRepouso)!);
+    if (n(f.perimetroAbdominal) !== undefined) m.perimetroAbdominal = n(f.perimetroAbdominal);
+    if (n(f.perimetroCintura) !== undefined) m.perimetroCintura = n(f.perimetroCintura);
+    return Object.keys(m).length > 0 ? m : undefined;
   }
 
   // ── Share with teachers ───────────────────────────────────────────────────
@@ -305,7 +446,6 @@ export class AssessmentPage {
     this.sharingSaving.set(f._id!);
     this.svc.share(f._id!, next).subscribe({
       next: () => {
-        // Patch local state
         this.fichas.update((list) =>
           list.map((item) => (item._id === f._id ? { ...item, sharedWithTeacherIds: next } : item)),
         );
@@ -315,9 +455,8 @@ export class AssessmentPage {
     });
   }
 
-  // ── Add / Edit entry ──────────────────────────────────────────────────────
+  // ── Entry CRUD ────────────────────────────────────────────────────────────
 
-  /** Index (in the original, non-reversed array) of the entry being edited. null = add mode */
   protected editingEntryIndex = signal<number | null>(null);
 
   protected startAddEntry(fichaId: string): void {
@@ -326,12 +465,6 @@ export class AssessmentPage {
     this.addingEntryFor.set(fichaId);
   }
 
-  /**
-   * @param fichaId  the assessment id
-   * @param reversedIndex  the row index as displayed (table is reversed)
-   * @param entry  the entry to pre-populate
-   * @param totalEntries  total number of entries, needed to convert reversed→original index
-   */
   protected startEditEntry(
     fichaId: string,
     reversedIndex: number,
@@ -357,7 +490,6 @@ export class AssessmentPage {
     const editIndex = this.editingEntryIndex();
 
     if (editIndex !== null) {
-      // Edit existing entry: replace it in the array and PUT the whole array
       const ficha = this.fichas().find((f) => f._id === fichaId);
       if (!ficha) {
         this.saving.set(false);
@@ -371,24 +503,202 @@ export class AssessmentPage {
           this.saving.set(false);
           this.savedId.set(fichaId);
           setTimeout(() => this.savedId.set(null), 2500);
-          this.loadFichas();
+          this.loadFichas(this.selectedStudentId() ?? undefined);
         },
         error: () => this.saving.set(false),
       });
     } else {
-      // Add new entry
       this.svc.addEntrada(fichaId, entry).subscribe({
         next: () => {
           this.addingEntryFor.set(null);
           this.saving.set(false);
           this.savedId.set(fichaId);
           setTimeout(() => this.savedId.set(null), 2500);
-          this.loadFichas();
+          this.loadFichas(this.selectedStudentId() ?? undefined);
         },
         error: () => this.saving.set(false),
       });
     }
   }
+
+  // \u2500\u2500 Chart / metrics \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+  protected metricValue(e: EntradaAvaliacao, metric: ChartMetric): number | null {
+    switch (metric) {
+      case 'peso':
+        return e.peso ?? null;
+      case 'imc':
+        return e.imc ?? null;
+      case 'percentualMassaGorda':
+        return e.percentualMassaGorda ?? null;
+      case 'percentualMassaMagra':
+        return e.percentualMassaMagra ?? null;
+      case 'kcal':
+        return e.kcal ?? null;
+      case 'glicemiaVejuno':
+        return e.glicemiaVejuno ?? null;
+      case 'paSistolica':
+        return e.pressaoArterial?.sistolica ?? null;
+      case 'paDiastolica':
+        return e.pressaoArterial?.diastolica ?? null;
+      case 'fcRepouso':
+        return e.fcRepouso ?? null;
+      case 'perimetroAbdominal':
+        return e.perimetros?.abdominal ?? null;
+      case 'perimetroCintura':
+        return e.perimetros?.cintura ?? null;
+    }
+  }
+
+  protected metaValue(metas: MetasAvaliacao | undefined, metric: ChartMetric): number | null {
+    if (!metas) return null;
+    return (metas as Record<string, number | undefined>)[metric] ?? null;
+  }
+
+  protected deltaVsPrev(f: FichaAvaliacao, metric: ChartMetric): number | null {
+    if (f.avaliacoes.length < 2) return null;
+    const curr = this.metricValue(f.avaliacoes[f.avaliacoes.length - 1], metric);
+    const prev = this.metricValue(f.avaliacoes[f.avaliacoes.length - 2], metric);
+    if (curr === null || prev === null) return null;
+    return Math.round((curr - prev) * 10) / 10;
+  }
+
+  protected hasMetricData(f: FichaAvaliacao, metric: ChartMetric): boolean {
+    return f.avaliacoes.some((e) => this.metricValue(e, metric) !== null);
+  }
+
+  protected buildChart(f: FichaAvaliacao): ChartResult {
+    const metric = this.chartMetric();
+    const entries = f.avaliacoes
+      .map((e) => ({ date: new Date(e.data), value: this.metricValue(e, metric) }))
+      .filter((d): d is { date: Date; value: number } => d.value !== null);
+
+    if (entries.length === 0) {
+      return {
+        hasData: false,
+        hasCurve: false,
+        dots: [],
+        path: '',
+        metaPath: null,
+        metaY: null,
+        metaV: null,
+        yMinLabel: '',
+        yMaxLabel: '',
+        firstLabel: '',
+        lastLabel: '',
+      };
+    }
+
+    const metaV = this.metaValue(f.metas, metric);
+    const values = entries.map((d) => d.value);
+    const allVals = metaV !== null ? [...values, metaV] : values;
+    let lo = Math.min(...allVals);
+    let hi = Math.max(...allVals);
+    const pad = (hi - lo) * 0.12 || 2;
+    lo -= pad;
+    hi += pad;
+    const range = hi - lo;
+
+    const toX = (i: number) =>
+      CPL +
+      (entries.length > 1 ? (i / (entries.length - 1)) * (CW - CPL - CPR) : (CW - CPL - CPR) / 2);
+    const toY = (v: number) => CPT + (1 - (v - lo) / range) * (CH - CPT - CPB);
+
+    const dots: ChartDot[] = entries.map((d, i) => ({
+      x: toX(i),
+      y: toY(d.value),
+      v: d.value,
+      date: d.date,
+    }));
+
+    const hasCurve = dots.length >= 2;
+    const path = hasCurve
+      ? 'M' + dots.map((p) => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join('L')
+      : '';
+    const metaY = metaV !== null ? toY(metaV) : null;
+    const metaPath =
+      metaY !== null
+        ? 'M' + CPL + ',' + metaY.toFixed(1) + 'L' + (CW - CPR) + ',' + metaY.toFixed(1)
+        : null;
+
+    return {
+      hasData: true,
+      hasCurve,
+      dots,
+      path,
+      metaPath,
+      metaY,
+      metaV,
+      yMinLabel: Math.min(...values).toString(),
+      yMaxLabel: Math.max(...values).toString(),
+      firstLabel: fmtDate(entries[0].date),
+      lastLabel: entries.length > 1 ? fmtDate(entries[entries.length - 1].date) : '',
+    };
+  }
+
+  protected selectChartMetric(m: ChartMetric): void {
+    this.chartMetric.set(m);
+  }
+
+  protected hasActiveMetas(f: FichaAvaliacao): boolean {
+    if (!f.metas || f.avaliacoes.length === 0) return false;
+    return CHART_METRICS.some((def) => {
+      const meta = this.metaValue(f.metas, def.key);
+      const curr = this.metricValue(f.avaliacoes[f.avaliacoes.length - 1], def.key);
+      return meta !== null && curr !== null;
+    });
+  }
+
+  protected buildRings(f: FichaAvaliacao): RingResult[] {
+    if (!f.metas || f.avaliacoes.length === 0) return [];
+
+    const latest = f.avaliacoes[f.avaliacoes.length - 1];
+    const rings: RingResult[] = [];
+
+    for (const def of CHART_METRICS) {
+      const meta = this.metaValue(f.metas, def.key);
+      const curr = this.metricValue(latest, def.key);
+      if (meta === null || curr === null) continue;
+
+      // First entry with data = starting point
+      let start: number | null = null;
+      for (const e of f.avaliacoes) {
+        const v = this.metricValue(e, def.key);
+        if (v !== null) {
+          start = v;
+          break;
+        }
+      }
+      if (start === null) continue;
+
+      // progress: 0 = at start, 1 = goal reached
+      const rawProgress = start === meta ? 1 : (curr - start) / (meta - start);
+      const clamped = Math.max(0, Math.min(1, rawProgress));
+      const dashOffset = RING_CIRC * (1 - clamped);
+
+      let color: string;
+      if (rawProgress >= 1) color = 'var(--c-success)';
+      else if (rawProgress < 0) color = 'var(--c-danger)';
+      else if (rawProgress >= 0.5) color = 'var(--c-accent)';
+      else color = 'var(--c-warn)';
+
+      rings.push({
+        key: def.key,
+        i18nKey: def.i18nKey,
+        unit: def.unit,
+        current: curr,
+        meta,
+        pct: Math.round(clamped * 100),
+        rawProgress,
+        dashOffset,
+        color,
+        achieved: rawProgress >= 1,
+      });
+    }
+    return rings;
+  }
+
+  // \u2500\u2500 Helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
   private buildEntryFromForm(): EntradaAvaliacao {
     const f = this.entryForm;
@@ -417,7 +727,12 @@ export class AssessmentPage {
   private entryToForm(e: EntradaAvaliacao): EntryForm {
     const d = e.data instanceof Date ? e.data : new Date(e.data);
     return {
-      data: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+      data:
+        d.getFullYear() +
+        '-' +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(d.getDate()).padStart(2, '0'),
       peso: e.peso?.toString() ?? '',
       imc: e.imc?.toString() ?? '',
       percentualMassaGorda: e.percentualMassaGorda?.toString() ?? '',
@@ -433,11 +748,30 @@ export class AssessmentPage {
   }
 
   private emptyEntryForm(): EntryForm {
+    const nd = new Date();
     return {
-      data: (() => {
-        const n = new Date();
-        return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
-      })(),
+      data:
+        nd.getFullYear() +
+        '-' +
+        String(nd.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(nd.getDate()).padStart(2, '0'),
+      peso: '',
+      imc: '',
+      percentualMassaGorda: '',
+      percentualMassaMagra: '',
+      kcal: '',
+      glicemiaVejuno: '',
+      paSistolica: '',
+      paDiastolica: '',
+      fcRepouso: '',
+      perimetroAbdominal: '',
+      perimetroCintura: '',
+    };
+  }
+
+  private emptyMetasForm(): MetasForm {
+    return {
       peso: '',
       imc: '',
       percentualMassaGorda: '',
@@ -453,6 +787,6 @@ export class AssessmentPage {
   }
 
   private emptyFichaForm(): FichaForm {
-    return { objetivo: '', studentId: '' };
+    return { objetivo: '', studentId: '', metas: this.emptyMetasForm() };
   }
 }

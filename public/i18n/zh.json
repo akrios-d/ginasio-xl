@@ -203,5 +203,6 @@
   "profile.aliasPlaceholder": "自定义名称…",
   "treino.criar.carga": "重量 (kg)",
   "treino.criar.aulasRecomendadas": "推荐活动",
-  "treino.criar.aulasPlaceholder": "例如：瑜伽、普拉提…"
+  "treino.criar.aulasPlaceholder": "例如：瑜伽、普拉提…",
+  "avaliacao.metas.titulo": "设定目标（可选）"
 }
