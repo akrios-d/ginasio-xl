@@ -221,9 +221,16 @@ export class TrainingPage {
 
   // ── Video embed (generic) ─────────────────────────────────
   protected readonly activeVideoKey = signal<string | null>(null);
+  protected readonly openGroups = signal<string[]>([]);
 
   protected videoKey(programId: string, grupoLetra: string, exNome: string): string {
     return `${programId}|${grupoLetra}|${exNome}`;
+  }
+
+  protected toggleGroup(key: string): void {
+    this.openGroups.update((list) =>
+      list.includes(key) ? list.filter((k) => k !== key) : [...list, key],
+    );
   }
 
   protected toggleVideo(key: string): void {

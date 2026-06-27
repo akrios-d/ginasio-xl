@@ -189,4 +189,20 @@
   "profile.displayName": "Nome de exibição",
   "profile.editName": "Editar",
   "profile.saveNameBtn": "Guardar",
-  "profile.cancelBtn": "
+  "profile.cancelBtn": "Cancelar",
+  "profile.manageStudents": "Gerir alunos",
+  "app.goodMorning": "Bom dia",
+  "app.goodAfternoon": "Boa tarde",
+  "app.goodEvening": "Boa noite",
+  "profile.meusTrainadores": "Os meus treinadores",
+  "treino.alunoNaoEncontrado": "Aluno não encontrado",
+  "profile.removeTrainador": "Remover",
+  "profile.confirmRemoveTrainador": "Remover este treinador?",
+  "avaliacao.mine": "Minha",
+  "profile.addAlias": "Alcunha",
+  "profile.aliasPlaceholder": "Nome personalizado…",
+  "treino.criar.carga": "Carga (kg)",
+  "treino.criar.aulasRecomendadas": "Atividades recomendadas",
+  "treino.criar.aulasPlaceholder": "Ex: Yoga, Pilates…",
+  "avaliacao.metas.titulo": "Definir metas (opcional)"
+}

@@ -224,6 +224,33 @@
   margin-top: 20px;
 }
 
+.group-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.group-toggle-btn:hover .phase-title {
+  color: var(--c-accent);
+}
+
+.group-chevron {
+  font-size: 0.7rem;
+  color: var(--c-ink-2);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.group-chevron--open {
+  transform: rotate(180deg);
+}
+
 .phase-title {
   margin: 0 0 10px;
   font-size: var(--t-secondary);
