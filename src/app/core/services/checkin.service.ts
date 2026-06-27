@@ -17,7 +17,7 @@ export class CheckinService {
   }
 
   create(
-    payload: Pick<Checkin, 'data' | 'programaTreinoId' | 'grupoLetra' | 'notas'>,
+    payload: Pick<Checkin, 'data' | 'programaTreinoId' | 'grupoLetra' | 'notas' | 'cargas'>,
   ): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(this.base, payload, { withCredentials: true });
   }

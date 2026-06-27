@@ -5,6 +5,7 @@ export const CreateCheckinSchema = z.object({
   programaTreinoId: z.string().optional(),
   grupoLetra: z.string().optional(),
   notas: z.string().max(500).optional(),
+  cargas: z.array(z.object({ nome: z.string(), carga: z.number().positive() })).optional(),
 });
 
 export const ListCheckinSchema = z.object({

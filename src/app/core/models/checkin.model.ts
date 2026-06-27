@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+export const CheckinCargaSchema = z.object({
+  nome: z.string(),
+  carga: z.number().positive(),
+});
+
 export const CheckinSchema = z.object({
   _id: z.string().optional(),
   userId: z.string(),
@@ -7,6 +12,7 @@ export const CheckinSchema = z.object({
   programaTreinoId: z.string().optional(),
   grupoLetra: z.string().optional(), // "A", "B", "C", …
   notas: z.string().max(500).optional(),
+  cargas: z.array(CheckinCargaSchema).optional(), // actual loads done that day
   createdAt: z.coerce.date().optional(),
 });
 

@@ -65,7 +65,6 @@ export class HomePage {
   protected readonly weightDialogOpen = signal(false);
   protected readonly weightExercises = signal<WeightExercise[]>([]);
   protected readonly weightProgramId = signal('');
-  protected readonly weightSaving = signal(false);
   // Holds the check-in payload while the weight dialog is open (saved only on confirm/skip)
   private readonly pendingCheckinPayload = signal<{
     data: Date;
@@ -236,6 +235,7 @@ export class HomePage {
     programaTreinoId?: string;
     grupoLetra?: string;
     notas?: string;
+    cargas?: { nome: string; carga: number }[];
   }): void {
     this.savingCheckin.set(true);
     this.checkinSvc.create(payload).subscribe({
@@ -287,9 +287,21 @@ export class HomePage {
     const grupo = prog.fasePrincipal.grupos.find((g) => g.letra === grupoLetra);
     if (!grupo || grupo.exercicios.length === 0) return;
 
+    // Find last carga per exercise from previous check-ins
+    const pastCheckins = this.checkins().filter(
+      (c) => c.programaTreinoId === programId && c.grupoLetra === grupoLetra && c.cargas?.length,
+    );
+
     const exercises = grupo.exercicios.map((e) => {
-      const last = e.progressao.length > 0 ? e.progressao[e.progressao.length - 1] : null;
-      return { nome: e.nome, currentCarga: last?.carga ?? null, newCarga: '' };
+      let lastCarga: number | null = null;
+      for (const c of pastCheckins) {
+        const match = c.cargas?.find((x) => x.nome === e.nome);
+        if (match) {
+          lastCarga = match.carga;
+          break;
+        }
+      }
+      return { nome: e.nome, currentCarga: lastCarga, newCarga: '' };
     });
 
     this.weightProgramId.set(programId);
@@ -314,56 +326,18 @@ export class HomePage {
   }
 
   protected saveWeightUpdates(): void {
-    if (this.weightSaving()) return;
-    const pid = this.weightProgramId();
-    const prog = this.programs().find((p) => p._id === pid);
-    if (!prog) {
-      this.skipWeightUpdate();
-      return;
+    // Collect filled-in cargas
+    const cargas = this.weightExercises()
+      .map((e) => ({ nome: e.nome, carga: parseFloat(e.newCarga) }))
+      .filter((e) => !isNaN(e.carga) && e.carga > 0);
+
+    this.weightDialogOpen.set(false);
+    this.weightExercises.set([]);
+
+    const pending = this.pendingCheckinPayload();
+    if (pending) {
+      this.doSaveCheckin({ ...pending, cargas: cargas.length > 0 ? cargas : undefined });
     }
-
-    const exercises = this.weightExercises();
-    const hasChanges = exercises.some((e) => {
-      const v = parseFloat(e.newCarga);
-      return !isNaN(v) && v > 0 && v !== (e.currentCarga ?? undefined);
-    });
-    if (!hasChanges) {
-      this.skipWeightUpdate();
-      return;
-    }
-
-    this.weightSaving.set(true);
-    const now = new Date();
-    const updatedGrupos = prog.fasePrincipal.grupos.map((g) => ({
-      ...g,
-      exercicios: g.exercicios.map((ex) => {
-        const match = exercises.find((e) => e.nome === ex.nome);
-        if (!match) return ex;
-        const v = parseFloat(match.newCarga);
-        if (isNaN(v) || v <= 0 || v === (match.currentCarga ?? undefined)) return ex;
-        return { ...ex, progressao: [...ex.progressao, { data: now, carga: v }] };
-      }),
-    }));
-
-    this.treinoSvc
-      .update(pid, { fasePrincipal: { ...prog.fasePrincipal, grupos: updatedGrupos } })
-      .subscribe({
-        next: () => {
-          this.programs.update((list) =>
-            list.map((p) =>
-              p._id === pid
-                ? { ...p, fasePrincipal: { ...p.fasePrincipal, grupos: updatedGrupos } }
-                : p,
-            ),
-          );
-          this.weightSaving.set(false);
-          this.weightDialogOpen.set(false);
-          this.weightExercises.set([]);
-          const pending = this.pendingCheckinPayload();
-          if (pending) this.doSaveCheckin(pending);
-        },
-        error: () => this.weightSaving.set(false),
-      });
   }
 
   protected programName(id: string | undefined): string {

@@ -223,16 +223,11 @@
       }
     </div>
     <div class="sheet-actions">
-      <button
-        type="button"
-        class="btn-ghost"
-        (click)="skipWeightUpdate()"
-        [disabled]="weightSaving()"
-      >
+      <button type="button" class="btn-ghost" (click)="skipWeightUpdate()">
         {{ i18n.t('home.weight.skip') }}
       </button>
-      <button type="button" (click)="saveWeightUpdates()" [disabled]="weightSaving()">
-        {{ weightSaving() ? i18n.t('common.saving') : i18n.t('home.weight.save') }}
+      <button type="button" (click)="saveWeightUpdates()">
+        {{ i18n.t('home.weight.save') }}
       </button>
     </div>
   </div>
