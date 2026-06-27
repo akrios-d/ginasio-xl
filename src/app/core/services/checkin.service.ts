@@ -16,6 +16,13 @@ export class CheckinService {
     return this.http.get<Checkin[]>(this.base, { params, withCredentials: true });
   }
 
+  listForStudent(studentId: string): Observable<Checkin[]> {
+    return this.http.get<Checkin[]>(this.base, {
+      params: { studentId },
+      withCredentials: true,
+    });
+  }
+
   create(
     payload: Pick<Checkin, 'data' | 'programaTreinoId' | 'grupoLetra' | 'notas' | 'cargas'>,
   ): Observable<{ id: string }> {

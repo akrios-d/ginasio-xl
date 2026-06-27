@@ -586,6 +586,50 @@
         </article>
       }
     </div>
+
+    <!-- ── Cargas do aluno (PT mode only) ── -->
+    @if (ptMode() && isTeacher() && selectedStudentId() && cargasSummary().length > 0) {
+      <div class="cargas-section">
+        <button type="button" class="btn-metas-toggle" (click)="cargasOpen.set(!cargasOpen())">
+          <span>Cargas registadas</span>
+          <span class="metas-chevron" [class.metas-chevron--open]="cargasOpen()">▼</span>
+        </button>
+
+        @if (cargasOpen()) {
+          @for (grupo of cargasSummary(); track grupo.grupo) {
+            <div class="cargas-grupo">
+              <p class="cargas-grupo-label">Grupo {{ grupo.grupo }}</p>
+              <table class="cargas-table">
+                <thead>
+                  <tr>
+                    <th>Exercício</th>
+                    <th>Última carga</th>
+                    <th>Data</th>
+                    <th>Histórico</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ex of grupo.exercises; track ex.nome) {
+                    <tr>
+                      <td>{{ ex.nome }}</td>
+                      <td class="cargas-latest">{{ ex.latest.carga }} kg</td>
+                      <td class="cargas-date">{{ ex.latest.data | date: 'dd/MM/yy' }}</td>
+                      <td class="cargas-history">
+                        @for (e of ex.entries; track e.data; let i = $index) {
+                          @if (i < 5) {
+                            <span class="cargas-history-chip">{{ e.carga }}kg</span>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </div>
+    }
   }
 </section>
 

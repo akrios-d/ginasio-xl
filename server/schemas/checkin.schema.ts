@@ -11,4 +11,5 @@ export const CreateCheckinSchema = z.object({
 export const ListCheckinSchema = z.object({
   from: z.string().optional(), // ISO date string
   to: z.string().optional(),
+  studentId: z.string().optional(),
 });

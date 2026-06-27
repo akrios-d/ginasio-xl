@@ -9,7 +9,9 @@ import {
   type StudentInfo,
 } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { CheckinService } from '../../core/services/checkin.service';
 import type { FichaAvaliacao, EntradaAvaliacao, MetasAvaliacao } from '../../core/models';
+import type { Checkin } from '../../core/models/checkin.model';
 import { OBJETIVO_OPTIONS } from '../../core/models';
 
 // ── Form interfaces ────────────────────────────────────────────────────────
@@ -157,6 +159,7 @@ export class AssessmentPage {
   private readonly svc = inject(AvaliacaoService);
   private readonly perfilSvc = inject(PerfilService);
   private readonly auth = inject(AuthService);
+  private readonly checkinSvc = inject(CheckinService);
 
   private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
 
@@ -218,6 +221,10 @@ export class AssessmentPage {
   // Metas sheet toggle
   protected readonly metasOpen = signal(false);
 
+  // Student check-ins (PT mode — to show cargas)
+  protected readonly studentCheckins = signal<Checkin[]>([]);
+  protected readonly cargasOpen = signal(false);
+
   protected readonly objetivos = OBJETIVOS;
   protected entryForm: EntryForm = this.emptyEntryForm();
   protected fichaForm: FichaForm = this.emptyFichaForm();
@@ -242,6 +249,11 @@ export class AssessmentPage {
       this.loading.set(false);
     } else {
       this.loadFichas();
+      // Load own check-ins to show carga evolution
+      this.checkinSvc.list().subscribe({
+        next: (list) => this.studentCheckins.set(list),
+        error: () => {},
+      });
     }
   }
 
@@ -298,6 +310,14 @@ export class AssessmentPage {
     this.loading.set(true);
     this.loadFichas(id ?? undefined);
     this.fichaForm.studentId = id ?? '';
+    this.studentCheckins.set([]);
+    this.cargasOpen.set(false);
+    if (id) {
+      this.checkinSvc.listForStudent(id).subscribe({
+        next: (list) => this.studentCheckins.set(list),
+        error: () => {},
+      });
+    }
   }
 
   protected studentName(id: string | null): string {
@@ -639,6 +659,47 @@ export class AssessmentPage {
   protected selectChartMetric(m: ChartMetric): void {
     this.chartMetric.set(m);
   }
+
+  // ── Cargas (PT mode) ──────────────────────────────────────────────────────
+
+  /** Groups check-ins by programaTreinoId+grupoLetra, returns latest carga per exercise */
+  protected readonly cargasSummary = computed(() => {
+    const checkins = this.studentCheckins().filter((c) => c.cargas?.length);
+    if (!checkins.length) return [];
+
+    // Group: programaTreinoId|grupoLetra → { exercicio → [{data, carga}] }
+    const groups = new Map<
+      string,
+      { programaId: string; grupo: string; exercises: Map<string, { data: Date; carga: number }[]> }
+    >();
+
+    for (const c of checkins) {
+      if (!c.cargas?.length) continue;
+      const key = `${c.programaTreinoId ?? '?'}|${c.grupoLetra ?? '?'}`;
+      if (!groups.has(key)) {
+        groups.set(key, {
+          programaId: c.programaTreinoId ?? '?',
+          grupo: c.grupoLetra ?? '?',
+          exercises: new Map(),
+        });
+      }
+      const g = groups.get(key)!;
+      for (const carga of c.cargas) {
+        if (!g.exercises.has(carga.nome)) g.exercises.set(carga.nome, []);
+        g.exercises.get(carga.nome)!.push({ data: new Date(c.data), carga: carga.carga });
+      }
+    }
+
+    return Array.from(groups.values()).map((g) => ({
+      programaId: g.programaId,
+      grupo: g.grupo,
+      exercises: Array.from(g.exercises.entries()).map(([nome, entries]) => ({
+        nome,
+        entries: entries.sort((a, b) => b.data.getTime() - a.data.getTime()),
+        latest: entries.reduce((best, e) => (e.data > best.data ? e : best)),
+      })),
+    }));
+  });
 
   protected hasActiveMetas(f: FichaAvaliacao): boolean {
     if (!f.metas || f.avaliacoes.length === 0) return false;

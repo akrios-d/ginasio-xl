@@ -22,8 +22,22 @@ export default async function handler(req: any, res: any): Promise<void> {
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
       const { from, to } = ListCheckinSchema.parse(req.query);
+      const studentId = (req.query as any).studentId as string | undefined;
 
-      const filter: Record<string, unknown> = { userId };
+      // Teacher querying a student's check-ins — verify association
+      if (studentId) {
+        const perfisCol = await getCollection('perfis');
+        const studentPerfil = await perfisCol.findOne({ userId: studentId });
+        const isAssociated =
+          Array.isArray(studentPerfil?.teacherIds) && studentPerfil.teacherIds.includes(userId);
+        if (!isAssociated) {
+          res.status(403).json({ error: 'Forbidden: student not associated with this teacher' });
+          return;
+        }
+      }
+
+      const targetUserId = studentId ?? userId;
+      const filter: Record<string, unknown> = { userId: targetUserId };
       if (from ?? to) {
         filter['data'] = {
           ...(from ? { $gte: new Date(from) } : {}),
