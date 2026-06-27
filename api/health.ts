@@ -8,7 +8,7 @@
  *   4. return JSON, handle ZodError → 400, everything else → 500
  */
 import { setCors, handleOptions } from '../server/lib/cors.js';
-import { getCollection } from '../server/lib/mongo.js';
+import { getCollection } from '../server/lib/db.js';
 
 export default async function handler(req: any, res: any): Promise<void> {
   setCors(res, req);

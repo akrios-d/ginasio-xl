@@ -4,7 +4,7 @@
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../../../server/lib/cors.js';
-import { getCollection, toObjectId } from '../../../server/lib/mongo.js';
+import { getCollection, toId } from '../../../server/lib/db.js';
 import { requireSession } from '../../../server/lib/session.js';
 import { AddEntradaAvaliacaoSchema } from '../../../server/schemas/avaliacao.schema.js';
 import { auditLog } from '../../../server/lib/audit.js';
@@ -25,7 +25,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   const col = await getCollection('avaliacoes');
 
   try {
-    const _id = toObjectId(id);
+    const _id = toId(id);
     const entrada = AddEntradaAvaliacaoSchema.parse(req.body);
 
     // Snapshot the current avaliacoes array before pushing

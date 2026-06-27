@@ -4,7 +4,7 @@
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../server/lib/cors.js';
-import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
+import { getCollection, mapDocumentId } from '../server/lib/db.js';
 import { requireSession } from '../server/lib/session.js';
 import {
   CreateProgramaTreinoSchema,

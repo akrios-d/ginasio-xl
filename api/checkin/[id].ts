@@ -3,10 +3,9 @@
  * PATCH  /api/checkin/:id  — update cargas/notas on a check-in
  */
 import { setCors, handleOptions } from '../../server/lib/cors.js';
-import { getCollection } from '../../server/lib/mongo.js';
+import { getCollection, isValidId } from '../../server/lib/db.js';
 import { requireSession } from '../../server/lib/session.js';
 import { UpdateCheckinSchema } from '../../server/schemas/checkin.schema.js';
-import { ObjectId } from 'mongodb';
 import { ZodError } from 'zod';
 
 export default async function handler(req: any, res: any): Promise<void> {
@@ -17,7 +16,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   if (!userId) return;
 
   const { id } = req.query as { id: string };
-  if (!ObjectId.isValid(id)) {
+  if (!isValidId(id)) {
     res.status(400).json({ error: 'Invalid id' });
     return;
   }
@@ -28,7 +27,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   if (req.method === 'PATCH') {
     try {
       const body = UpdateCheckinSchema.parse(req.body);
-      const result = await col.updateOne({ _id: new ObjectId(id), userId }, { $set: body });
+      const result = await col.updateOne({ _id: id, userId }, { $set: body });
       if (result.matchedCount === 0) {
         res.status(404).json({ error: 'Not found' });
         return;
@@ -50,7 +49,7 @@ export default async function handler(req: any, res: any): Promise<void> {
     return;
   }
 
-  const result = await col.deleteOne({ _id: new ObjectId(id), userId });
+  const result = await col.deleteOne({ _id: id, userId });
 
   if (result.deletedCount === 0) {
     res.status(404).json({ error: 'Not found' });

@@ -4,8 +4,8 @@
  * Returns the authenticated user's profile, or 401 if no valid session cookie.
  * The frontend calls this once on boot to hydrate AuthService.
  */
-import { ObjectId } from 'mongodb';
 import { handleOptions, setCors } from '../server/lib/cors.js';
+// users table is always managed by Auth.js MongoDBAdapter — use mongo directly
 import { getCollection } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
 
@@ -22,7 +22,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   if (!userId) return;
 
   const users = await getCollection('users');
-  const user = await users.findOne({ _id: new ObjectId(userId) });
+  const user = await users.findOne({ _id: userId });
 
   if (!user) {
     res.status(401).json({ error: 'Unauthorized' });

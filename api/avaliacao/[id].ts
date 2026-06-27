@@ -5,7 +5,7 @@
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../../server/lib/cors.js';
-import { getCollection, toObjectId, mapDocumentId } from '../../server/lib/mongo.js';
+import { getCollection, toId, mapDocumentId } from '../../server/lib/db.js';
 import { requireSession } from '../../server/lib/session.js';
 import { UpdateAvaliacaoSchema } from '../../server/schemas/avaliacao.schema.js';
 import { auditLog } from '../../server/lib/audit.js';
@@ -21,7 +21,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   const col = await getCollection('avaliacoes');
 
   try {
-    const _id = toObjectId(id);
+    const _id = toId(id);
 
     if (req.method === 'GET') {
       const doc = await col.findOne({

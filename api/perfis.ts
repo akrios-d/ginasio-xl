@@ -4,7 +4,7 @@
  * DELETE /api/perfis?studentUserId=xxx    — teacher unlinks a student
  */
 import { setCors, handleOptions } from '../server/lib/cors.js';
-import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
+import { getCollection, mapDocumentId } from '../server/lib/db.js';
 import { requireSession } from '../server/lib/session.js';
 import { ObjectId } from 'mongodb';
 import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
@@ -13,7 +13,7 @@ import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
 async function getAuthName(userId: string): Promise<string | null> {
   try {
     const client = await clientPromise;
-    const oid = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+    const oid = userId;
     const user = await client
       .db(AUTH_DB_NAME)
       .collection('users')

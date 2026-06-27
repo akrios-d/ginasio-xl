@@ -5,7 +5,7 @@
  */
 import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../../server/lib/cors.js';
-import { getCollection, toObjectId, mapDocumentId } from '../../server/lib/mongo.js';
+import { getCollection, toId, mapDocumentId } from '../../server/lib/db.js';
 import { requireSession } from '../../server/lib/session.js';
 import { UpdateProgramaTreinoSchema } from '../../server/schemas/programa-treino.schema.js';
 
@@ -20,7 +20,7 @@ export default async function handler(req: any, res: any): Promise<void> {
   const col = await getCollection('programas-treino');
 
   try {
-    const _id = toObjectId(id);
+    const _id = toId(id);
 
     // ── GET ──────────────────────────────────────────────────────────────────
     if (req.method === 'GET') {
