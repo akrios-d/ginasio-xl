@@ -685,7 +685,16 @@ export class AssessmentPage {
 
   /** Groups check-ins by programaTreinoId+grupoLetra, returns latest carga per exercise */
   protected readonly cargasSummary = computed(() => {
-    const checkins = this.studentCheckins().filter((c) => c.cargas?.length);
+    // Only include check-ins from currently active programs
+    const activeIds = new Set(
+      this.studentPrograms()
+        .filter((p) => p.ativo)
+        .map((p) => p._id)
+        .filter(Boolean) as string[],
+    );
+    const checkins = this.studentCheckins().filter(
+      (c) => c.cargas?.length && c.programaTreinoId && activeIds.has(c.programaTreinoId),
+    );
     if (!checkins.length) return [];
 
     // Build teacher-target map: "grupoLetra|exercicioNome" → recommended carga
