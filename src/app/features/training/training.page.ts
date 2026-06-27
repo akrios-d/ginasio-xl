@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, type SafeResourceUrl } from '@angular/platform-browser';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
 import { PerfilService } from '../../core/services/perfil.service';
@@ -20,6 +21,7 @@ interface ExercicioForm {
   numeroMaquina: number | null;
   series: number;
   repeticoes: number;
+  carga: number | null; // kg
   youtubeUrl: string;
 }
 
@@ -34,6 +36,7 @@ interface PlanForm {
   cardio: CardioForm[];
   grupos: GrupoForm[];
   observacoes: string;
+  aulasRecomendadas: string[];
 }
 
 type ActiveTab = 'aquecimento' | number;
@@ -45,7 +48,7 @@ function emptyCardio(): CardioForm {
 }
 
 function emptyExercicio(): ExercicioForm {
-  return { nome: '', numeroMaquina: null, series: 3, repeticoes: 10, youtubeUrl: '' };
+  return { nome: '', numeroMaquina: null, series: 3, repeticoes: 10, carga: null, youtubeUrl: '' };
 }
 
 function emptyGrupo(index: number): GrupoForm {
@@ -64,6 +67,7 @@ export class TrainingPage {
   private readonly svc = inject(ProgramaTreinoService);
   private readonly perfilSvc = inject(PerfilService);
   private readonly auth = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
 
@@ -210,11 +214,83 @@ export class TrainingPage {
     this.editing.set(null);
   }
 
+  protected studentDisplayName(alunoId: string): string {
+    const s = this.students().find((st) => st.userId === alunoId);
+    return s?.alias || s?.name || s?.email || '';
+  }
+
+  // ── Video embed (generic) ─────────────────────────────────
+  protected readonly activeVideoKey = signal<string | null>(null);
+
+  protected videoKey(programId: string, grupoLetra: string, exNome: string): string {
+    return `${programId}|${grupoLetra}|${exNome}`;
+  }
+
+  protected toggleVideo(key: string): void {
+    this.activeVideoKey.update((cur) => (cur === key ? null : key));
+  }
+
+  /** Classify a URL so the template can pick the right player */
+  protected videoType(url: string): 'youtube' | 'vimeo' | 'direct' | 'iframe' {
+    if (/youtube\.com|youtu\.be/.test(url)) return 'youtube';
+    if (/vimeo\.com/.test(url)) return 'vimeo';
+    if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) return 'direct';
+    return 'iframe';
+  }
+
+  protected videoEmbedUrl(url: string): SafeResourceUrl {
+    const type = this.videoType(url);
+    let embedUrl = url;
+    if (type === 'youtube') {
+      const id = this.extractYoutubeId(url);
+      embedUrl = `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+    } else if (type === 'vimeo') {
+      const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+      embedUrl = m ? `https://player.vimeo.com/video/${m[1]}?badge=0` : url;
+    }
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
+  private extractYoutubeId(url: string): string {
+    const patterns = [
+      /[?&]v=([^&#]+)/,
+      /youtu\.be\/([^?&#]+)/,
+      /\/embed\/([^?&#]+)/,
+      /\/shorts\/([^?&#]+)/,
+    ];
+    for (const re of patterns) {
+      const m = url.match(re);
+      if (m) return m[1];
+    }
+    return url;
+  }
+
+  protected readonly aulaInput = signal('');
+
+  protected addAula(): void {
+    const v = this.aulaInput().trim();
+    if (!v || this.form.aulasRecomendadas.includes(v)) return;
+    this.form.aulasRecomendadas = [...this.form.aulasRecomendadas, v];
+    this.aulaInput.set('');
+  }
+
+  protected removeAula(i: number): void {
+    this.form.aulasRecomendadas = this.form.aulasRecomendadas.filter((_, idx) => idx !== i);
+  }
+
+  protected aulaKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.addAula();
+    }
+  }
+
   protected startEdit(p: ProgramaTreino): void {
     this.form = {
       objetivos: p.objetivos ?? '',
       alunoId: p.alunoId ?? '',
       observacoes: p.observacoes ?? '',
+      aulasRecomendadas: p.aulasRecomendadas ?? [],
       cardio: p.faseInicial.exercicios.map((c) => ({
         equipamento: c.equipamento,
         tempo: c.tempo,
@@ -228,6 +304,8 @@ export class TrainingPage {
           numeroMaquina: e.numeroMaquina ?? null,
           series: e.series,
           repeticoes: e.repeticoes,
+          carga:
+            e.progressao.length > 0 ? (e.progressao[e.progressao.length - 1].carga ?? null) : null,
           youtubeUrl: e.youtubeUrl ?? '',
         })),
       })),
@@ -306,7 +384,7 @@ export class TrainingPage {
       data: existing ? existing.data : new Date(),
       objetivos: this.form.objetivos.trim() || undefined,
       observacoes: this.form.observacoes.trim() || undefined,
-      aulasRecomendadas: existing?.aulasRecomendadas ?? [],
+      aulasRecomendadas: this.form.aulasRecomendadas,
       faseInicial: {
         exercicios: this.form.cardio
           .filter((c) => c.equipamento.trim())
@@ -330,7 +408,16 @@ export class TrainingPage {
                 numeroMaquina: e.numeroMaquina ?? undefined,
                 series: e.series,
                 repeticoes: e.repeticoes,
-                progressao: [],
+                progressao: (() => {
+                  const prev =
+                    existing?.fasePrincipal.grupos
+                      .find((g2) => g2.letra === g.letra)
+                      ?.exercicios.find((e2) => e2.nome === e.nome.trim())?.progressao ?? [];
+                  if (e.carga == null) return prev;
+                  const lastCarga = prev.length > 0 ? prev[prev.length - 1].carga : undefined;
+                  if (e.carga === lastCarga) return prev;
+                  return [...prev, { data: new Date(), carga: e.carga }];
+                })(),
                 youtubeUrl: e.youtubeUrl.trim() || undefined,
               })),
           })),
@@ -363,6 +450,13 @@ export class TrainingPage {
   }
 
   private emptyForm(): PlanForm {
-    return { objetivos: '', alunoId: '', cardio: [], grupos: [emptyGrupo(0)], observacoes: '' };
+    return {
+      objetivos: '',
+      alunoId: '',
+      cardio: [],
+      grupos: [emptyGrupo(0)],
+      observacoes: '',
+      aulasRecomendadas: [],
+    };
   }
 }

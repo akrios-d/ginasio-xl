@@ -94,6 +94,9 @@
                 <span class="program-objective">{{
                   p.objetivos ?? i18n.t('treino.semObjetivo')
                 }}</span>
+                @if (ptMode() && p.alunoId && studentDisplayName(p.alunoId)) {
+                  <span class="program-student-name">{{ studentDisplayName(p.alunoId) }}</span>
+                }
                 <span class="program-date">{{ p.data | date: 'dd MMM yyyy' }}</span>
                 @if (p.ptNome) {
                   <span class="program-pt">PT: {{ p.ptNome }}</span>
@@ -195,42 +198,93 @@
                   </h4>
                   <div class="exercise-list">
                     @for (ex of g.exercicios; track ex.nome) {
-                      <div class="exercise-row">
-                        <div class="exercise-info">
-                          <span class="exercise-name">{{ ex.nome }}</span>
-                          @if (ex.numeroMaquina) {
-                            <span class="exercise-machine"
-                              >{{ i18n.t('treino.machine') }} #{{ ex.numeroMaquina }}</span
-                            >
-                          }
+                      <div class="exercise-block">
+                        <div class="exercise-row">
+                          <div class="exercise-info">
+                            <span class="exercise-name">{{ ex.nome }}</span>
+                            @if (ex.numeroMaquina) {
+                              <span class="exercise-machine"
+                                >{{ i18n.t('treino.machine') }} #{{ ex.numeroMaquina }}</span
+                              >
+                            }
+                          </div>
+                          <div class="exercise-params">
+                            <span class="sets-reps">{{ ex.series }}×{{ ex.repeticoes }}</span>
+                            @if (ex.progressao.length > 0) {
+                              <span class="load-badge"
+                                >{{ ex.progressao[ex.progressao.length - 1].carga ?? ''
+                                }}{{
+                                  ex.progressao[ex.progressao.length - 1].carga ? ' kg' : ''
+                                }}</span
+                              >
+                            }
+                            @if (ex.youtubeUrl) {
+                              <button
+                                type="button"
+                                class="btn-yt-play"
+                                [class.btn-yt-play--active]="
+                                  activeVideoKey() === videoKey(p._id!, g.letra, ex.nome)
+                                "
+                                [attr.aria-label]="ex.nome"
+                                (click)="
+                                  toggleVideo(videoKey(p._id!, g.letra, ex.nome));
+                                  $event.stopPropagation()
+                                "
+                              >
+                                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                  <path
+                                    d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z"
+                                  />
+                                </svg>
+                              </button>
+                            }
+                          </div>
                         </div>
-                        <div class="exercise-params">
-                          <span class="sets-reps">{{ ex.series }}×{{ ex.repeticoes }}</span>
-                          @if (ex.progressao.length > 0) {
-                            <span class="load-badge"
-                              >{{ ex.progressao[ex.progressao.length - 1].carga ?? ''
-                              }}{{
-                                ex.progressao[ex.progressao.length - 1].carga ? ' kg' : ''
-                              }}</span
-                            >
-                          }
-                          @if (ex.youtubeUrl) {
-                            <a
-                              class="btn-yt-play"
-                              [href]="ex.youtubeUrl"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              [attr.aria-label]="ex.nome"
-                              (click)="$event.stopPropagation()"
-                            >
-                              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path
-                                  d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.75 15.5V8.5l6.5 3.5-6.5 3.5z"
-                                />
-                              </svg>
-                            </a>
-                          }
-                        </div>
+                        @if (
+                          ex.youtubeUrl && activeVideoKey() === videoKey(p._id!, g.letra, ex.nome)
+                        ) {
+                          <div class="yt-embed-container">
+                            @if (videoType(ex.youtubeUrl) === 'direct') {
+                              <video
+                                class="yt-embed"
+                                [src]="videoEmbedUrl(ex.youtubeUrl)"
+                                controls
+                                preload="metadata"
+                              ></video>
+                            } @else if (videoType(ex.youtubeUrl) === 'iframe') {
+                              <iframe
+                                class="yt-embed"
+                                [src]="videoEmbedUrl(ex.youtubeUrl)"
+                                frameborder="0"
+                                allowfullscreen
+                                loading="lazy"
+                              ></iframe>
+                              <a
+                                class="yt-fallback-link"
+                                [href]="ex.youtubeUrl"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                >{{ i18n.t('treino.openExternal') }}</a
+                              >
+                            } @else {
+                              <iframe
+                                class="yt-embed"
+                                [src]="videoEmbedUrl(ex.youtubeUrl)"
+                                frameborder="0"
+                                allow="
+                                  accelerometer;
+                                  autoplay;
+                                  clipboard-write;
+                                  encrypted-media;
+                                  gyroscope;
+                                  picture-in-picture;
+                                "
+                                allowfullscreen
+                                loading="lazy"
+                              ></iframe>
+                            }
+                          </div>
+                        }
                       </div>
                     }
                   </div>
@@ -511,51 +565,55 @@
                 />
               </div>
               <div class="ex-num-row">
-                <div class="ex-num-group">
-                  <label class="ex-num-label" [for]="'m-' + g.letra + '-' + ei"
-                    >{{ i18n.t('treino.machine') }} #</label
-                  >
+                <label class="ex-num-group">
+                  <span class="ex-num-label">{{ i18n.t('treino.machine') }} #</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.numeroMaquina"
                     [name]="'m-' + g.letra + '-' + ei"
-                    [id]="'m-' + g.letra + '-' + ei"
                     class="ex-num-input ex-machine-input"
                     min="1"
                     max="999"
                     placeholder="–"
                   />
-                </div>
+                </label>
                 <span class="ex-sep"></span>
-                <div class="ex-num-group">
-                  <label class="ex-num-label" [for]="'s-' + g.letra + '-' + ei">{{
-                    i18n.t('treino.criar.series')
-                  }}</label>
+                <label class="ex-num-group">
+                  <span class="ex-num-label">{{ i18n.t('treino.criar.series') }}</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.series"
                     [name]="'s-' + g.letra + '-' + ei"
-                    [id]="'s-' + g.letra + '-' + ei"
                     class="ex-num-input"
                     min="1"
                     max="99"
                   />
-                </div>
+                </label>
                 <span class="ex-sep">×</span>
-                <div class="ex-num-group">
-                  <label class="ex-num-label" [for]="'r-' + g.letra + '-' + ei">{{
-                    i18n.t('treino.criar.repeticoes')
-                  }}</label>
+                <label class="ex-num-group">
+                  <span class="ex-num-label">{{ i18n.t('treino.criar.repeticoes') }}</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.repeticoes"
                     [name]="'r-' + g.letra + '-' + ei"
-                    [id]="'r-' + g.letra + '-' + ei"
                     class="ex-num-input"
                     min="1"
                     max="999"
                   />
-                </div>
+                </label>
+                <span class="ex-sep"></span>
+                <label class="ex-num-group">
+                  <span class="ex-num-label">{{ i18n.t('treino.criar.carga') }}</span>
+                  <input
+                    type="number"
+                    [(ngModel)]="ex.carga"
+                    [name]="'c-' + g.letra + '-' + ei"
+                    class="ex-num-input ex-carga-input"
+                    min="0"
+                    step="0.5"
+                    placeholder="–"
+                  />
+                </label>
                 @if (g.exercicios.length > 1) {
                   <button type="button" class="btn-remove-ex" (click)="removeExercicio(ei)">
                     <svg
@@ -583,6 +641,41 @@
     </div>
 
     <div class="sheet-bottom">
+      <!-- Aulas recomendadas -->
+      <div class="form-group">
+        <label class="form-label">{{ i18n.t('treino.criar.aulasRecomendadas') }}</label>
+        @if (form.aulasRecomendadas.length > 0) {
+          <div class="aulas-chips">
+            @for (a of form.aulasRecomendadas; track $index; let ai = $index) {
+              <span class="aula-chip">
+                {{ a }}
+                <button
+                  type="button"
+                  class="aula-chip-remove"
+                  (click)="removeAula(ai)"
+                  aria-label="Remover"
+                >
+                  &#x2715;
+                </button>
+              </span>
+            }
+          </div>
+        }
+        <div class="aulas-input-row">
+          <input
+            type="text"
+            class="aulas-input"
+            [ngModel]="aulaInput()"
+            (ngModelChange)="aulaInput.set($event)"
+            name="aulaInput"
+            [placeholder]="i18n.t('treino.criar.aulasPlaceholder')"
+            (keydown)="aulaKeydown($event)"
+          />
+          <button type="button" class="btn-add-aula" (click)="addAula()">+</button>
+        </div>
+      </div>
+
+      <!-- Observações -->
       <div class="form-group">
         <label class="form-label" for="observacoes">{{ i18n.t('treino.criar.notas') }}</label>
         <textarea
@@ -593,6 +686,7 @@
           [placeholder]="i18n.t('treino.criar.notasPlaceholder')"
         ></textarea>
       </div>
+
       <div class="sheet-actions">
         <button type="button" class="btn-ghost" (click)="cancelCreate()">
           {{ i18n.t('treino.criar.cancel') }}

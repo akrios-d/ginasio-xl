@@ -751,3 +751,48 @@
     font-size: var(--t-meta);
   }
 }
+
+/* Weight progression dialog */
+.weight-subtitle {
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  margin: 0 0 12px;
+}
+
+.weight-exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.weight-exercise-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.weight-exercise-nome {
+  font-size: var(--t-body);
+  color: var(--c-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weight-exercise-current {
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  white-space: nowrap;
+}
+
+.weight-input {
+  width: 72px;
+  text-align: right;
+}
+
+.weight-sheet {
+  max-height: 75dvh;
+  overflow-y: auto;
+}

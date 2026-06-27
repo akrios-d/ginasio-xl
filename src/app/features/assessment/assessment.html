@@ -58,15 +58,6 @@
           />
           @if (studentComboOpen()) {
             <ul class="pt-student-dropdown" role="listbox" id="ptStudentListbox">
-              <li
-                class="pt-student-option"
-                [class.pt-student-option--active]="selectedStudentId() === null"
-                role="option"
-                [attr.aria-selected]="selectedStudentId() === null"
-                (mousedown)="selectStudentFromCombo(null)"
-              >
-                {{ i18n.t('avaliacao.mine') }}
-              </li>
               @for (s of filteredStudentsForCombo(); track s.userId) {
                 <li
                   class="pt-student-option"
@@ -115,6 +106,10 @@
         <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
       <span class="state-text">{{ i18n.t('common.error') }}</span>
+    </div>
+  } @else if (ptMode() && !selectedStudentId()) {
+    <div class="empty-state">
+      <p>{{ i18n.t('avaliacao.selectStudent') }}</p>
     </div>
   } @else if (fichas().length === 0) {
     <div class="empty-state">

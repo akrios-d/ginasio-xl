@@ -153,6 +153,12 @@
   color: var(--c-ink-3);
 }
 
+.program-student-name {
+  font-size: var(--t-meta);
+  font-weight: 500;
+  color: var(--c-primary, #4f9cf9);
+}
+
 .program-badges {
   display: flex;
   align-items: center;
@@ -283,6 +289,15 @@
   border-radius: var(--r-sm);
 }
 
+.exercise-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-block + .exercise-block {
+  margin-top: 4px;
+}
+
 .exercise-row + .exercise-row {
   margin-top: 4px;
 }
@@ -336,23 +351,62 @@
   width: 26px;
   height: 26px;
   border-radius: var(--r-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
   color: #ff0000;
-  text-decoration: none;
   opacity: 0.75;
   transition:
     opacity 150ms,
     transform 150ms;
   flex-shrink: 0;
+  padding: 0;
 }
 .btn-yt-play svg {
   width: 20px;
   height: 20px;
+}
+.btn-yt-play--active {
+  opacity: 1;
 }
 @media (hover: hover) {
   .btn-yt-play:hover {
     opacity: 1;
     transform: scale(1.1);
   }
+}
+
+.yt-embed-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  overflow: hidden;
+}
+
+.yt-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.yt-fallback-link {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  background: var(--c-surface);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  text-decoration: none;
+  opacity: 0.8;
+}
+.yt-fallback-link:hover {
+  opacity: 1;
 }
 
 .rest-info {
@@ -1013,6 +1067,7 @@
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .ex-num-group {
   display: flex;
@@ -1027,13 +1082,69 @@
   letter-spacing: 0.04em;
 }
 .ex-num-input {
-  width: 64px;
+  width: 58px;
   text-align: center;
-  padding: 8px 6px !important;
+  padding: 8px 4px !important;
 }
 .ex-machine-input {
-  width: 52px;
+  width: 48px;
 }
+.ex-carga-input {
+  width: 62px;
+}
+
+/* ── Aulas recomendadas ─────────────────────────── */
+.aulas-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.aula-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+  color: var(--c-accent);
+  border-radius: var(--r-pill);
+  font-size: var(--t-meta);
+  font-weight: 500;
+}
+
+.aula-chip-remove {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 2px;
+  min-height: unset;
+  line-height: 1;
+  font-size: 11px;
+  opacity: 0.7;
+}
+.aula-chip-remove:hover {
+  opacity: 1;
+  box-shadow: none;
+}
+
+.aulas-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.aulas-input {
+  flex: 1;
+}
+
+.btn-add-aula {
+  padding: 0 14px;
+  font-size: 1.2rem;
+  min-height: unset;
+  line-height: 1;
+}
+
 .ex-sep {
   font-size: var(--t-body);
   font-weight: 600;

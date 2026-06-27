@@ -25,6 +25,12 @@ interface CheckinForm {
   notas: string;
 }
 
+interface WeightExercise {
+  nome: string;
+  currentCarga: number | null;
+  newCarga: string; // user input; empty means no change
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -54,6 +60,12 @@ export class HomePage {
   protected readonly pendingDeleteId = signal<string | null>(null);
   protected form: CheckinForm = this.emptyForm();
   protected readonly selectedProgramId = signal('');
+
+  // Weight progression dialog
+  protected readonly weightDialogOpen = signal(false);
+  protected readonly weightExercises = signal<WeightExercise[]>([]);
+  protected readonly weightProgramId = signal('');
+  protected readonly weightSaving = signal(false);
 
   // ── Calendar computed ─────────────────────────────────────────────────────
   protected readonly monthLabel = computed(() => {
@@ -216,6 +228,10 @@ export class HomePage {
           this.checkins.update((list) => [newCheckin, ...list]);
           this.savingCheckin.set(false);
           this.addingCheckin.set(false);
+          // Offer weight update if a program+group was selected
+          if (this.form.programaTreinoId && this.form.grupoLetra) {
+            this.openWeightDialog(this.form.programaTreinoId, this.form.grupoLetra);
+          }
         },
         error: () => this.savingCheckin.set(false),
       });
@@ -237,6 +253,89 @@ export class HomePage {
       next: () => this.checkins.update((list) => list.filter((c) => c._id !== id)),
       error: () => undefined,
     });
+  }
+
+  // ── Weight progression dialog ─────────────────────────────────────────────
+  protected updateWeightInput(index: number, value: string): void {
+    this.weightExercises.update((list) =>
+      list.map((e, idx) =>
+        idx === index ? { nome: e.nome, currentCarga: e.currentCarga, newCarga: value } : e,
+      ),
+    );
+  }
+
+  protected openWeightDialog(programId: string, grupoLetra: string): void {
+    const prog = this.programs().find((p) => p._id === programId);
+    if (!prog) return;
+    const grupo = prog.fasePrincipal.grupos.find((g) => g.letra === grupoLetra);
+    if (!grupo || grupo.exercicios.length === 0) return;
+
+    const exercises: WeightExercise[] = grupo.exercicios.map((e) => {
+      const last = e.progressao.length > 0 ? e.progressao[e.progressao.length - 1] : null;
+      return { nome: e.nome, currentCarga: last?.carga ?? null, newCarga: '' };
+    });
+
+    this.weightProgramId.set(programId);
+    this.weightExercises.set(exercises);
+    this.weightDialogOpen.set(true);
+  }
+
+  protected skipWeightUpdate(): void {
+    this.weightDialogOpen.set(false);
+    this.weightExercises.set([]);
+  }
+
+  protected saveWeightUpdates(): void {
+    if (this.weightSaving()) return;
+    const pid = this.weightProgramId();
+    const prog = this.programs().find((p) => p._id === pid);
+    if (!prog) {
+      this.skipWeightUpdate();
+      return;
+    }
+
+    const exercises = this.weightExercises();
+    // Check if any weight actually changed
+    const hasChanges = exercises.some((e) => {
+      const v = parseFloat(e.newCarga);
+      return !isNaN(v) && v > 0 && v !== (e.currentCarga ?? undefined);
+    });
+    if (!hasChanges) {
+      this.skipWeightUpdate();
+      return;
+    }
+
+    this.weightSaving.set(true);
+    const now = new Date();
+    const updatedGrupos = prog.fasePrincipal.grupos.map((g) => ({
+      ...g,
+      exercicios: g.exercicios.map((ex) => {
+        const match = exercises.find((e) => e.nome === ex.nome);
+        if (!match) return ex;
+        const v = parseFloat(match.newCarga);
+        if (isNaN(v) || v <= 0 || v === (match.currentCarga ?? undefined)) return ex;
+        return { ...ex, progressao: [...ex.progressao, { data: now, carga: v }] };
+      }),
+    }));
+
+    this.treinoSvc
+      .update(pid, { fasePrincipal: { ...prog.fasePrincipal, grupos: updatedGrupos } })
+      .subscribe({
+        next: () => {
+          // Update local programs so future opens show correct carga
+          this.programs.update((list) =>
+            list.map((p) =>
+              p._id === pid
+                ? { ...p, fasePrincipal: { ...p.fasePrincipal, grupos: updatedGrupos } }
+                : p,
+            ),
+          );
+          this.weightSaving.set(false);
+          this.weightDialogOpen.set(false);
+          this.weightExercises.set([]);
+        },
+        error: () => this.weightSaving.set(false),
+      });
   }
 
   protected programName(id: string | undefined): string {

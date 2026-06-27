@@ -80,7 +80,7 @@ export class AssessmentPage {
   protected readonly studentComboOpen = signal(false);
   protected readonly studentComboDisplay = computed(() => {
     const id = this.selectedStudentId();
-    if (id === null) return this.i18n.t('avaliacao.mine');
+    if (id === null) return '';
     const s = this.students().find((st) => st.userId === id);
     if (!s) return id;
     return s.alias || s.name || s.email || id;
@@ -129,7 +129,12 @@ export class AssessmentPage {
       next: (list) => this.teachers.set(list),
     });
 
-    this.loadFichas();
+    // In PT mode on init, don't load own fichas — wait for student selection
+    if (this.ptMode()) {
+      this.loading.set(false);
+    } else {
+      this.loadFichas();
+    }
   }
 
   private loadFichas(studentId?: string): void {
@@ -198,6 +203,18 @@ export class AssessmentPage {
     const next = !this.ptMode();
     this.ptMode.set(next);
     localStorage.setItem(AssessmentPage.PT_MODE_KEY, String(next));
+    if (next) {
+      // Entered PT mode: clear own fichas, require student selection
+      this.fichas.set([]);
+      this.selectedStudentId.set(null);
+      this.loading.set(false);
+    } else {
+      // Exited PT mode: load own fichas
+      this.selectedStudentId.set(null);
+      this.fichaForm.studentId = '';
+      this.loading.set(true);
+      this.loadFichas();
+    }
   }
 
   protected toggle(id: string): void {
