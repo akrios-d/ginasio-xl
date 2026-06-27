@@ -197,7 +197,9 @@
   <div class="checkin-sheet weight-sheet" role="dialog" aria-modal="true">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-header">
-      <h3 class="sheet-title">{{ i18n.t('home.weight.title') }}</h3>
+      <h3 class="sheet-title">
+        {{ editingCheckinId() ? i18n.t('home.weight.editTitle') : i18n.t('home.weight.title') }}
+      </h3>
       <button type="button" class="sheet-close" (click)="cancelWeightDialog()">&#x2715;</button>
     </div>
     <p class="weight-subtitle">{{ i18n.t('home.weight.subtitle') }}</p>
@@ -223,9 +225,11 @@
       }
     </div>
     <div class="sheet-actions">
-      <button type="button" class="btn-ghost" (click)="skipWeightUpdate()">
-        {{ i18n.t('home.weight.skip') }}
-      </button>
+      @if (!editingCheckinId()) {
+        <button type="button" class="btn-ghost" (click)="skipWeightUpdate()">
+          {{ i18n.t('home.weight.skip') }}
+        </button>
+      }
       <button type="button" (click)="saveWeightUpdates()">
         {{ i18n.t('home.weight.save') }}
       </button>

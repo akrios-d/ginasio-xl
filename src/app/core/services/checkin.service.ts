@@ -29,6 +29,12 @@ export class CheckinService {
     return this.http.post<{ id: string }>(this.base, payload, { withCredentials: true });
   }
 
+  update(id: string, payload: Pick<Checkin, 'cargas' | 'notas'>): Observable<{ updated: boolean }> {
+    return this.http.patch<{ updated: boolean }>(`${this.base}/${id}`, payload, {
+      withCredentials: true,
+    });
+  }
+
   delete(id: string): Observable<{ deleted: boolean }> {
     return this.http.delete<{ deleted: boolean }>(`${this.base}/${id}`, { withCredentials: true });
   }

@@ -204,5 +204,6 @@
   "treino.criar.carga": "重量 (kg)",
   "treino.criar.aulasRecomendadas": "推荐活动",
   "treino.criar.aulasPlaceholder": "例如：瑜伽、普拉提…",
-  "avaliacao.metas.titulo": "设定目标（可选）"
+  "avaliacao.metas.titulo": "设定目标（可选）",
+  "home.weight.editTitle": "编辑负重"
 }

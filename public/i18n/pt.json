@@ -204,5 +204,6 @@
   "treino.criar.carga": "Carga (kg)",
   "treino.criar.aulasRecomendadas": "Atividades recomendadas",
   "treino.criar.aulasPlaceholder": "Ex: Yoga, Pilates…",
-  "avaliacao.metas.titulo": "Definir metas (opcional)"
+  "avaliacao.metas.titulo": "Definir metas (opcional)",
+  "home.weight.editTitle": "Editar cargas"
 }

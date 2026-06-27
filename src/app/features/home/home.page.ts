@@ -65,6 +65,8 @@ export class HomePage {
   protected readonly weightDialogOpen = signal(false);
   protected readonly weightExercises = signal<WeightExercise[]>([]);
   protected readonly weightProgramId = signal('');
+  // When editing an existing check-in, holds its _id; null means "create new"
+  protected readonly editingCheckinId = signal<string | null>(null);
   // Holds the check-in payload while the weight dialog is open (saved only on confirm/skip)
   private readonly pendingCheckinPayload = signal<{
     data: Date;
@@ -306,6 +308,27 @@ export class HomePage {
 
     this.weightProgramId.set(programId);
     this.weightExercises.set(exercises);
+
+    // Detect if there's already a check-in today for this group → edit mode
+    const todayStr = new Date().toDateString();
+    const todayCheckin = this.checkins().find(
+      (c) =>
+        c.programaTreinoId === programId &&
+        c.grupoLetra === grupoLetra &&
+        new Date(c.data).toDateString() === todayStr,
+    );
+    this.editingCheckinId.set(todayCheckin?._id ?? null);
+
+    // Pre-fill with today's cargas if editing
+    if (todayCheckin?.cargas?.length) {
+      this.weightExercises.update((list) =>
+        list.map((e) => {
+          const existing = todayCheckin.cargas!.find((x) => x.nome === e.nome);
+          return existing ? { ...e, newCarga: String(existing.carga) } : e;
+        }),
+      );
+    }
+
     this.weightDialogOpen.set(true);
   }
 
@@ -314,6 +337,7 @@ export class HomePage {
     this.weightDialogOpen.set(false);
     this.weightExercises.set([]);
     this.pendingCheckinPayload.set(null);
+    this.editingCheckinId.set(null);
     this.savingCheckin.set(false);
   }
 
@@ -333,6 +357,27 @@ export class HomePage {
 
     this.weightDialogOpen.set(false);
     this.weightExercises.set([]);
+
+    const editId = this.editingCheckinId();
+    this.editingCheckinId.set(null);
+
+    if (editId) {
+      // Update existing check-in
+      this.savingCheckin.set(true);
+      this.checkinSvc.update(editId, { cargas: cargas.length > 0 ? cargas : undefined }).subscribe({
+        next: () => {
+          this.checkins.update((list) =>
+            list.map((c) =>
+              c._id === editId ? { ...c, cargas: cargas.length > 0 ? cargas : c.cargas } : c,
+            ),
+          );
+          this.savingCheckin.set(false);
+          this.pendingCheckinPayload.set(null);
+        },
+        error: () => this.savingCheckin.set(false),
+      });
+      return;
+    }
 
     const pending = this.pendingCheckinPayload();
     if (pending) {

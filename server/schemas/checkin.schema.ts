@@ -13,3 +13,8 @@ export const ListCheckinSchema = z.object({
   to: z.string().optional(),
   studentId: z.string().optional(),
 });
+
+export const UpdateCheckinSchema = z.object({
+  cargas: z.array(z.object({ nome: z.string(), carga: z.number().positive() })).optional(),
+  notas: z.string().max(500).optional(),
+});
