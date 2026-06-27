@@ -26,6 +26,18 @@ import { Component, input } from '@angular/core';
           <circle cx="12" cy="10" r="2.6" fill="#006633" />
         </svg>
       }
+      @case ('pt-BR') {
+        <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- green background -->
+          <rect width="30" height="20" fill="#009C3B" />
+          <!-- yellow diamond -->
+          <polygon points="15,1.5 28.5,10 15,18.5 1.5,10" fill="#FFDF00" />
+          <!-- blue circle -->
+          <circle cx="15" cy="10" r="5.2" fill="#002776" />
+          <!-- white band -->
+          <path d="M9.9,8.2 A5.2,5.2 0 0 1 20.1,8.2" fill="none" stroke="#fff" stroke-width="1.6" />
+        </svg>
+      }
       @case ('zh') {
         <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect width="30" height="20" fill="#DE2910" />
