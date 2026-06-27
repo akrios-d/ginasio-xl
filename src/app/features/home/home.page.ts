@@ -66,6 +66,13 @@ export class HomePage {
   protected readonly weightExercises = signal<WeightExercise[]>([]);
   protected readonly weightProgramId = signal('');
   protected readonly weightSaving = signal(false);
+  // Holds the check-in payload while the weight dialog is open (saved only on confirm/skip)
+  private readonly pendingCheckinPayload = signal<{
+    data: Date;
+    programaTreinoId?: string;
+    grupoLetra?: string;
+    notas?: string;
+  } | null>(null);
 
   // ── Calendar computed ─────────────────────────────────────────────────────
   protected readonly monthLabel = computed(() => {
@@ -206,35 +213,45 @@ export class HomePage {
   protected saveCheckin(): void {
     if (this.savingCheckin()) return;
     const sel = this.selectedDate() ?? new Date();
-    this.savingCheckin.set(true);
+    const payload = {
+      data: sel,
+      programaTreinoId: this.form.programaTreinoId || undefined,
+      grupoLetra: this.form.grupoLetra || undefined,
+      notas: this.form.notas || undefined,
+    };
 
-    this.checkinSvc
-      .create({
-        data: sel,
-        programaTreinoId: this.form.programaTreinoId || undefined,
-        grupoLetra: this.form.grupoLetra || undefined,
-        notas: this.form.notas || undefined,
-      })
-      .subscribe({
-        next: (res) => {
-          const newCheckin: Checkin = {
-            _id: res.id,
-            userId: this.auth.userId() ?? '',
-            data: sel,
-            programaTreinoId: this.form.programaTreinoId || undefined,
-            grupoLetra: this.form.grupoLetra || undefined,
-            notas: this.form.notas || undefined,
-          };
-          this.checkins.update((list) => [newCheckin, ...list]);
-          this.savingCheckin.set(false);
-          this.addingCheckin.set(false);
-          // Offer weight update if a program+group was selected
-          if (this.form.programaTreinoId && this.form.grupoLetra) {
-            this.openWeightDialog(this.form.programaTreinoId, this.form.grupoLetra);
-          }
-        },
-        error: () => this.savingCheckin.set(false),
-      });
+    // If a program+group is selected, show weight dialog first — check-in saved on confirm/skip
+    if (this.form.programaTreinoId && this.form.grupoLetra) {
+      this.pendingCheckinPayload.set(payload);
+      this.addingCheckin.set(false);
+      this.openWeightDialog(this.form.programaTreinoId, this.form.grupoLetra);
+      return;
+    }
+
+    this.doSaveCheckin(payload);
+  }
+
+  private doSaveCheckin(payload: {
+    data: Date;
+    programaTreinoId?: string;
+    grupoLetra?: string;
+    notas?: string;
+  }): void {
+    this.savingCheckin.set(true);
+    this.checkinSvc.create(payload).subscribe({
+      next: (res) => {
+        const newCheckin: Checkin = {
+          _id: res.id,
+          userId: this.auth.userId() ?? '',
+          ...payload,
+        };
+        this.checkins.update((list) => [newCheckin, ...list]);
+        this.savingCheckin.set(false);
+        this.addingCheckin.set(false);
+        this.pendingCheckinPayload.set(null);
+      },
+      error: () => this.savingCheckin.set(false),
+    });
   }
 
   protected confirmRemove(id: string): void {
@@ -281,8 +298,10 @@ export class HomePage {
   }
 
   protected skipWeightUpdate(): void {
+    const pending = this.pendingCheckinPayload();
     this.weightDialogOpen.set(false);
     this.weightExercises.set([]);
+    if (pending) this.doSaveCheckin(pending);
   }
 
   protected saveWeightUpdates(): void {
@@ -331,6 +350,8 @@ export class HomePage {
           this.weightSaving.set(false);
           this.weightDialogOpen.set(false);
           this.weightExercises.set([]);
+          const pending = this.pendingCheckinPayload();
+          if (pending) this.doSaveCheckin(pending);
         },
         error: () => this.weightSaving.set(false),
       });
