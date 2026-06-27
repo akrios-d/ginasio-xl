@@ -12,11 +12,11 @@ describe('I18nService', () => {
   });
 
   it('defaults to a supported language', () => {
-    expect(['zh', 'en', 'pt', 'fr']).toContain(service.language());
+    expect(['zh', 'en', 'pt', 'pt-BR', 'fr']).toContain(service.language());
   });
 
-  it('exposes 4 language options', () => {
-    expect(service.languageOptions).toHaveLength(4);
+  it('exposes 5 language options', () => {
+    expect(service.languageOptions).toHaveLength(5);
   });
 
   it('setLanguage updates the signal', () => {
