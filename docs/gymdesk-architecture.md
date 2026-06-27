@@ -1,119 +1,154 @@
-# GymDesk — Architecture Overview
+# GymDesk — Architecture
 
-## What It Is
+## Overview
 
-GymDesk is a web application for gym teachers and students. Teachers create and manage training programs and track student assessments (body metrics, strength records). Students log daily workouts — including loads per exercise — and view their progress over time.
-
----
-
-## Deployment
-
-The entire application runs on **Vercel**:
-
-- The **Angular 22 SPA** is built at deploy time and served from Vercel's global CDN as a set of static files.
-- All backend logic lives in **Vercel Serverless Functions** under `api/`. Each file is an independent Node.js function handling one resource (check-ins, profiles, assessments, training programs, auth).
-- There is no persistent server process. Every API call cold-starts (or reuses) a short-lived function instance.
+GymDesk is a full-stack fitness management app deployed on **Vercel** with **AWS DynamoDB** as the database. Teachers manage training programs and track student assessments. Students log daily workouts with exercise loads and follow their progress over time.
 
 ---
 
-## AWS DynamoDB — Data Layer
-
-All application data is stored in **AWS DynamoDB**, accessed from Vercel Serverless Functions using the AWS SDK v3.
-
-### Table Design
-
-All tables use `PAY_PER_REQUEST` billing — no capacity planning required, cost scales with actual usage.
-
-| Table | Primary Key | GSI | Contents |
-|---|---|---|---|
-| `gymdesk-checkins` | `_id` (String) | `userId-index` | Workout logs with exercise loads |
-| `gymdesk-perfis` | `userId` (String) | — | User profiles, roles (student/teacher) |
-| `gymdesk-avaliacoes` | `_id` (String) | `userId-index` | Body metric assessments |
-| `gymdesk-programas-treino` | `_id` (String) | `userId-index` | Training programs with exercise groups |
-
-User-scoped tables have a **GSI on `userId`** for efficient per-user queries without table scans.
-
-The table prefix (`gymdesk-`) is configurable via `DYNAMO_TABLE_PREFIX` for multi-environment isolation (dev / staging / prod).
-
-### DB Abstraction Layer
-
-A custom abstraction layer (`server/lib/db.ts`, `server/lib/dynamo-provider.ts`) wraps the DynamoDB SDK and exposes a MongoDB-like interface to all route handlers. This means route handlers use `.findOne()`, `.find().sort().toArray()`, `.insertOne()`, `.updateOne()` — standard patterns — regardless of the underlying database.
-
-The `DynamoCollection` class translates these calls:
-- Update operators (`$set`, `$push`, `$addToSet`, `$pull`) → `UpdateExpression` with `ExpressionAttributeNames/Values`
-- Filter operators (`$or`, `$in`, date ranges, array contains) → `FilterExpression` with client-side post-processing for complex cases
-- `.find().sort().toArray()` → `Query` with GSI (userId) or `Scan` with client-side sort
-- IDs are plain UUID strings — DynamoDB has no ObjectId type
-
-This design means new data sources can be added without touching any route handler.
-
-### Data Flow
-
-```
-Browser (Angular 22)
-  → POST /api/checkin   (HTTPS + session cookie)
-    → Serverless Function validates session
-    → Zod validates request body
-    → DynamoCollection.insertOne()
-        → AWS SDK PutCommand → DynamoDB (gymdesk-checkins)
-    → 201 JSON response
-  → signal updated → UI re-renders
-```
-
----
-
-## API Route Handlers
-
-Each handler in `api/` follows the same pattern: validate session → validate body with Zod → call `getCollection()` → return JSON.
-
-| Route | Methods | Purpose |
-|---|---|---|
-| `/api/auth/[...nextauth]` | GET, POST | Google OAuth sign-in / session management |
-| `/api/session` | GET | Current user profile + roles |
-| `/api/checkin` | GET, POST | List / create workout check-ins |
-| `/api/checkin/[id]` | GET, PATCH, DELETE | Read / update (edit today's loads) / delete |
-| `/api/perfil` | GET, PUT | Read / update current user profile |
-| `/api/perfis` | GET | List student profiles (teacher only) |
-| `/api/avaliacao` | GET, POST | List / create assessments |
-| `/api/avaliacao/[id]` | GET, PUT, DELETE | Single assessment operations |
-| `/api/programa-treino` | GET, POST | List / create training programs |
-| `/api/programa-treino/[id]` | GET, PUT, DELETE | Single program operations |
-
----
-
-## Frontend (Angular 22)
-
-The SPA uses Angular's standalone component model with **Signals** for reactivity — no NgModules.
-
-Key patterns:
-- `signal<T>()` for mutable state, `computed()` for derived state.
-- `@if` / `@for` control flow blocks (Angular 17+ syntax).
-- Multi-language support (Portuguese, English, French, Chinese) via JSON files loaded at runtime.
-
-Feature pages: **Home** (daily check-in with load tracking), **Training** (collapsible program groups), **Assessment** (body metrics + load history from active programs), **Profile** (role management).
-
----
-
-## AWS Environment Variables
-
-| Variable | Description |
-|---|---|
-| `AWS_REGION` | DynamoDB region (e.g. `us-east-1`) |
-| `AWS_ACCESS_KEY_ID` | IAM user access key |
-| `AWS_SECRET_ACCESS_KEY` | IAM user secret |
-| `DYNAMO_TABLE_PREFIX` | Table name prefix (default: `gymdesk-`) |
-
----
-
-## Tech Stack
+## Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | Angular 22 (standalone, signals) |
-| Hosting / CDN | Vercel |
-| Backend | Vercel Serverless Functions (TypeScript) |
+| Frontend | Angular 22 (standalone components, Signals) |
+| Hosting | Vercel (SPA + Serverless Functions) |
 | Database | **AWS DynamoDB** |
-| DB abstraction | Custom provider (`server/lib/dynamo-provider.ts`) |
-| Authentication | Auth.js v5 + Google OAuth |
-| Input validation | Zod |
+| Auth | Auth.js v5 + Google OAuth |
+| Validation | Zod |
 | Language | TypeScript throughout |
+
+---
+
+## Why DynamoDB
+
+GymDesk is built around a key insight: gym data is inherently **user-scoped and write-heavy**. Students log check-ins daily. Teachers update programs frequently. Assessments accumulate over months.
+
+DynamoDB is the right fit because:
+
+- **Serverless-native** — no connection pooling, no idle capacity, no cold-start overhead. Each Vercel function call opens and closes cleanly.
+- **PAY_PER_REQUEST billing** — cost scales exactly with usage. Zero traffic = zero cost. A gym with 100 active students costs fractions of a cent per day in DB reads.
+- **Millisecond latency at any scale** — whether the app has 10 users or 10,000, read/write latency stays consistent. No query planner, no lock contention.
+- **No ops** — no cluster to manage, no replicas to configure, no backups to schedule. AWS handles availability, durability (3-AZ replication), and scaling automatically.
+- **GSIs for flexible access patterns** — the primary access pattern (get all items for a user) is served by a Global Secondary Index on `userId`, making per-user queries efficient without table scans.
+
+---
+
+## Data Model
+
+All tables use **PAY_PER_REQUEST** billing and **String** primary keys (UUIDs).
+
+### gymdesk-checkins
+
+Records a student's workout session for a specific training group on a specific day.
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `_id` | String (PK) | UUID |
+| `userId` | String (GSI) | links to the student |
+| `programaTreinoId` | String | which training program |
+| `grupoLetra` | String | exercise group (A, B, C…) |
+| `data` | String | ISO date |
+| `cargas` | List | `[{ nome, carga }]` — exercise loads in kg |
+| `notas` | String | optional notes |
+
+**Access patterns:** list all check-ins for a user (GSI `userId-index`); get single check-in by ID; update today's entry (PATCH).
+
+### gymdesk-perfis
+
+User profile — one item per user, keyed directly by `userId`.
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `userId` | String (PK) | Auth.js user ID |
+| `nome` | String | display name |
+| `roles` | List | `["student"]`, `["teacher"]`, or both |
+| `teacherIds` | List | teacher IDs the student is linked to |
+| `sharedWithTeacherIds` | List | teachers who can view this profile |
+
+No GSI needed — all queries are by `userId` directly.
+
+### gymdesk-programas-treino
+
+Training programs created by teachers and assigned to students.
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `_id` | String (PK) | UUID |
+| `userId` | String (GSI) | owner (teacher or student) |
+| `nome` | String | program name |
+| `ativo` | Boolean | only active programs shown to students |
+| `grupos` | List | exercise groups, each with a list of exercises |
+| `studentId` | String | student this program is assigned to |
+
+**Access patterns:** list programs for a user (GSI `userId-index`); get by ID.
+
+### gymdesk-avaliacoes
+
+Body metric assessments with historical tracking and targets.
+
+| Attribute | Type | Notes |
+|---|---|---|
+| `_id` | String (PK) | UUID |
+| `userId` | String (GSI) | student |
+| `data` | String | ISO date of assessment |
+| `peso`, `altura`, `imc` | Number | body metrics |
+| `massaMuscular`, `massaGorda` | Number | composition |
+| `metas` | Map | target values per metric |
+
+**Access patterns:** list assessments for a user sorted by date (GSI + client sort); get by ID.
+
+---
+
+## API Endpoints
+
+Vercel Serverless Functions in `api/`. Each function: validates session → validates body (Zod) → reads/writes DynamoDB → returns JSON.
+
+| Route | Methods | DynamoDB table |
+|---|---|---|
+| `/api/auth/[...nextauth]` | GET, POST | — (Auth.js managed) |
+| `/api/session` | GET | — (session lookup) |
+| `/api/checkin` | GET, POST | `gymdesk-checkins` |
+| `/api/checkin/[id]` | GET, PATCH, DELETE | `gymdesk-checkins` |
+| `/api/perfil` | GET, PUT | `gymdesk-perfis` |
+| `/api/perfis` | GET | `gymdesk-perfis` |
+| `/api/avaliacao` | GET, POST | `gymdesk-avaliacoes` |
+| `/api/avaliacao/[id]` | GET, PUT, DELETE | `gymdesk-avaliacoes` |
+| `/api/programa-treino` | GET, POST | `gymdesk-programas-treino` |
+| `/api/programa-treino/[id]` | GET, PUT, DELETE | `gymdesk-programas-treino` |
+
+---
+
+## Request Lifecycle
+
+```
+User logs a workout
+  → Angular signals update the UI optimistically
+  → POST /api/checkin  (HTTPS + session cookie)
+    → Vercel Serverless Function starts (cold or warm)
+    → Auth.js validates session token
+    → Zod parses and validates request body
+    → AWS SDK v3 PutCommand → DynamoDB (gymdesk-checkins)
+        ↳ 3-AZ durable write, single-digit ms latency
+    → 201 JSON response
+  → UI confirms, signal state settled
+```
+
+---
+
+## Scaling Characteristics
+
+| Scenario | DynamoDB behaviour |
+|---|---|
+| Single gym, 20 students | PAY_PER_REQUEST — minimal cost, instant |
+| 50 gyms, 2 000 students | Same latency, linear cost increase, zero config |
+| Daily check-in spike (6–8pm) | Auto-scales write throughput on demand |
+| New country / region | Deploy DynamoDB global tables for local latency |
+| Zero traffic (night) | Zero cost, zero idle capacity |
+
+DynamoDB's on-demand mode means GymDesk can go from a single gym to a national fitness chain without a single infrastructure change.
+
+---
+
+## Diagram
+
+See [`gymdesk-architecture.svg`](./gymdesk-architecture.svg) for the visual representation.
