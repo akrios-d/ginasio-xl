@@ -1,14 +1,15 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-export type AppLanguage = 'zh' | 'en' | 'pt' | 'fr';
+export type AppLanguage = 'zh' | 'en' | 'pt' | 'pt-BR' | 'fr';
 
 const STORAGE_KEY = 'ginasio-xl-language';
-const TRANSLATION_LANGS: AppLanguage[] = ['en', 'zh', 'pt', 'fr'];
+const TRANSLATION_LANGS: AppLanguage[] = ['en', 'zh', 'pt', 'pt-BR', 'fr'];
 
 const LOADED_TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
   en: {},
   zh: {},
   pt: {},
+  'pt-BR': {},
   fr: {},
 };
 
@@ -31,7 +32,8 @@ export class I18nService {
    * Used as the visible text inside the language picker (and for aria-labels).
    */
   readonly languageOptions: readonly { code: AppLanguage; label: string }[] = [
-    { code: 'pt', label: 'Português' },
+    { code: 'pt-BR', label: 'Português (BR)' },
+    { code: 'pt', label: 'Português (PT)' },
     { code: 'en', label: 'English' },
     { code: 'zh', label: '中文' },
     { code: 'fr', label: 'Français' },
@@ -55,9 +57,12 @@ export class I18nService {
     return Promise.all(requests).then(() => void 0);
   }
 
+  /** t() with pt-BR falling back to pt, then en. */
+
   /** BCP-47 locale used for date/number formatting (drives <input type="date"> display format). */
   private static readonly LOCALE_MAP: Record<AppLanguage, string> = {
-    pt: 'pt-BR',
+    'pt-BR': 'pt-BR',
+    pt: 'pt-PT',
     en: 'en-GB',
     fr: 'fr-FR',
     zh: 'zh-TW',
@@ -86,9 +91,11 @@ export class I18nService {
   t(key: string): string {
     const lang = this.language();
     const dict = LOADED_TRANSLATIONS[lang] || {};
-    const fallback = LOADED_TRANSLATIONS['en'] || {};
+    // pt-BR falls back to pt before en
+    const ptFallback = lang === 'pt-BR' ? LOADED_TRANSLATIONS['pt'] || {} : {};
+    const enFallback = LOADED_TRANSLATIONS['en'] || {};
 
-    return dict[key] ?? fallback[key] ?? key;
+    return dict[key] ?? ptFallback[key] ?? enFallback[key] ?? key;
   }
 
   private detectInitialLanguage(): AppLanguage {
@@ -99,16 +106,19 @@ export class I18nService {
 
     if (typeof navigator !== 'undefined') {
       const lang = navigator.language.toLowerCase();
+      if (lang === 'pt-br' || lang.startsWith('pt-b')) return 'pt-BR';
       if (lang.startsWith('pt')) return 'pt';
       if (lang.startsWith('zh')) return 'zh';
       if (lang.startsWith('fr')) return 'fr';
       if (lang.startsWith('en')) return 'en';
     }
 
-    return 'pt';
+    return 'pt-BR';
   }
 
   private isSupportedLanguage(value: string | null): value is AppLanguage {
-    return value === 'zh' || value === 'en' || value === 'pt' || value === 'fr';
+    return (
+      value === 'zh' || value === 'en' || value === 'pt' || value === 'pt-BR' || value === 'fr'
+    );
   }
 }
