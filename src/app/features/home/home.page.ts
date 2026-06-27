@@ -297,6 +297,15 @@ export class HomePage {
     this.weightDialogOpen.set(true);
   }
 
+  // X button — cancels everything, check-in is NOT saved
+  protected cancelWeightDialog(): void {
+    this.weightDialogOpen.set(false);
+    this.weightExercises.set([]);
+    this.pendingCheckinPayload.set(null);
+    this.savingCheckin.set(false);
+  }
+
+  // "No change" button — saves check-in without updating weights
   protected skipWeightUpdate(): void {
     const pending = this.pendingCheckinPayload();
     this.weightDialogOpen.set(false);

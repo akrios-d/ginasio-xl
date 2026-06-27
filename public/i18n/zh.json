@@ -29,7 +29,7 @@
   "home.weight.title": "负重有增加吗？",
   "home.weight.subtitle": "输入新的负重（千克），如无变化请留空。",
   "home.weight.noCarga": "—",
-  "home.weight.newCargaPlaceholder": "新重量 (kg)",
+  "home.weight.newCargaPlaceholder": "新重量",
   "home.weight.skip": "没有变化",
   "home.weight.save": "保存",
   "home.checkin.program": "计划",

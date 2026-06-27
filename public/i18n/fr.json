@@ -29,7 +29,7 @@
   "home.weight.title": "La charge a-t-elle augmenté ?",
   "home.weight.subtitle": "Entrez la nouvelle charge en kg (laissez vide si aucun changement).",
   "home.weight.noCarga": "—",
-  "home.weight.newCargaPlaceholder": "nouveau (kg)",
+  "home.weight.newCargaPlaceholder": "nouveau",
   "home.weight.skip": "Aucun changement",
   "home.weight.save": "Enregistrer",
   "home.checkin.program": "Programme",

@@ -29,7 +29,7 @@
   "home.weight.title": "Did any weight go up?",
   "home.weight.subtitle": "Enter new load in kg (leave blank if no change).",
   "home.weight.noCarga": "—",
-  "home.weight.newCargaPlaceholder": "new (kg)",
+  "home.weight.newCargaPlaceholder": "new",
   "home.weight.skip": "No change",
   "home.weight.save": "Save",
   "home.checkin.program": "Program",

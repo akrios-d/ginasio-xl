@@ -193,21 +193,23 @@
 
 <!-- Weight progression dialog -->
 @if (weightDialogOpen()) {
-  <div class="sheet-backdrop" (click)="skipWeightUpdate()" aria-hidden="true"></div>
+  <div class="sheet-backdrop" (click)="cancelWeightDialog()" aria-hidden="true"></div>
   <div class="checkin-sheet weight-sheet" role="dialog" aria-modal="true">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-header">
       <h3 class="sheet-title">{{ i18n.t('home.weight.title') }}</h3>
-      <button type="button" class="sheet-close" (click)="skipWeightUpdate()">&#x2715;</button>
+      <button type="button" class="sheet-close" (click)="cancelWeightDialog()">&#x2715;</button>
     </div>
     <p class="weight-subtitle">{{ i18n.t('home.weight.subtitle') }}</p>
     <div class="weight-exercise-list">
       @for (ex of weightExercises(); track ex.nome; let i = $index) {
         <div class="weight-exercise-row">
-          <span class="weight-exercise-nome">{{ ex.nome }}</span>
-          <span class="weight-exercise-current">
-            {{ ex.currentCarga !== null ? ex.currentCarga + ' kg' : i18n.t('home.weight.noCarga') }}
-          </span>
+          <div class="weight-exercise-info">
+            <span class="weight-exercise-nome">{{ ex.nome }}</span>
+            <span class="weight-exercise-current">
+              {{ ex.currentCarga !== null ? ex.currentCarga + ' kg' : '—' }}
+            </span>
+          </div>
           <input
             type="number"
             class="weight-input"
