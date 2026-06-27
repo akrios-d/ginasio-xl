@@ -151,13 +151,17 @@
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
               </button>
-              <label
+              <button
+                type="button"
                 class="card-toggle"
+                role="switch"
+                [attr.aria-checked]="p.ativo"
+                [attr.aria-label]="p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar')"
                 [title]="p.ativo ? i18n.t('treino.desativar') : i18n.t('treino.ativar')"
+                (click)="toggleActive(p); $event.stopPropagation()"
               >
-                <input type="checkbox" [checked]="p.ativo" (change)="toggleActive(p)" />
                 <span class="card-toggle-track"></span>
-              </label>
+              </button>
             </div>
           </div>
 
@@ -565,55 +569,67 @@
                 />
               </div>
               <div class="ex-num-row">
-                <label class="ex-num-group">
-                  <span class="ex-num-label">{{ i18n.t('treino.machine') }} #</span>
+                <div class="ex-num-group">
+                  <span class="ex-num-label" aria-hidden="true"
+                    >{{ i18n.t('treino.machine') }} #</span
+                  >
                   <input
                     type="number"
                     [(ngModel)]="ex.numeroMaquina"
                     [name]="'m-' + g.letra + '-' + ei"
+                    [attr.aria-label]="i18n.t('treino.machine')"
                     class="ex-num-input ex-machine-input"
                     min="1"
                     max="999"
                     placeholder="–"
                   />
-                </label>
+                </div>
                 <span class="ex-sep"></span>
-                <label class="ex-num-group">
-                  <span class="ex-num-label">{{ i18n.t('treino.criar.series') }}</span>
+                <div class="ex-num-group">
+                  <span class="ex-num-label" aria-hidden="true">{{
+                    i18n.t('treino.criar.series')
+                  }}</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.series"
                     [name]="'s-' + g.letra + '-' + ei"
+                    [attr.aria-label]="i18n.t('treino.criar.series')"
                     class="ex-num-input"
                     min="1"
                     max="99"
                   />
-                </label>
+                </div>
                 <span class="ex-sep">×</span>
-                <label class="ex-num-group">
-                  <span class="ex-num-label">{{ i18n.t('treino.criar.repeticoes') }}</span>
+                <div class="ex-num-group">
+                  <span class="ex-num-label" aria-hidden="true">{{
+                    i18n.t('treino.criar.repeticoes')
+                  }}</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.repeticoes"
                     [name]="'r-' + g.letra + '-' + ei"
+                    [attr.aria-label]="i18n.t('treino.criar.repeticoes')"
                     class="ex-num-input"
                     min="1"
                     max="999"
                   />
-                </label>
+                </div>
                 <span class="ex-sep"></span>
-                <label class="ex-num-group">
-                  <span class="ex-num-label">{{ i18n.t('treino.criar.carga') }}</span>
+                <div class="ex-num-group">
+                  <span class="ex-num-label" aria-hidden="true">{{
+                    i18n.t('treino.criar.carga')
+                  }}</span>
                   <input
                     type="number"
                     [(ngModel)]="ex.carga"
                     [name]="'c-' + g.letra + '-' + ei"
+                    [attr.aria-label]="i18n.t('treino.criar.carga')"
                     class="ex-num-input ex-carga-input"
                     min="0"
                     step="0.5"
                     placeholder="–"
                   />
-                </label>
+                </div>
                 @if (g.exercicios.length > 1) {
                   <button type="button" class="btn-remove-ex" (click)="removeExercicio(ei)">
                     <svg
@@ -643,7 +659,7 @@
     <div class="sheet-bottom">
       <!-- Aulas recomendadas -->
       <div class="form-group">
-        <label class="form-label">{{ i18n.t('treino.criar.aulasRecomendadas') }}</label>
+        <span class="form-label">{{ i18n.t('treino.criar.aulasRecomendadas') }}</span>
         @if (form.aulasRecomendadas.length > 0) {
           <div class="aulas-chips">
             @for (a of form.aulasRecomendadas; track $index; let ai = $index) {

@@ -270,7 +270,7 @@ export class HomePage {
     const grupo = prog.fasePrincipal.grupos.find((g) => g.letra === grupoLetra);
     if (!grupo || grupo.exercicios.length === 0) return;
 
-    const exercises: WeightExercise[] = grupo.exercicios.map((e) => {
+    const exercises = grupo.exercicios.map((e) => {
       const last = e.progressao.length > 0 ? e.progressao[e.progressao.length - 1] : null;
       return { nome: e.nome, currentCarga: last?.carga ?? null, newCarga: '' };
     });
@@ -295,7 +295,6 @@ export class HomePage {
     }
 
     const exercises = this.weightExercises();
-    // Check if any weight actually changed
     const hasChanges = exercises.some((e) => {
       const v = parseFloat(e.newCarga);
       return !isNaN(v) && v > 0 && v !== (e.currentCarga ?? undefined);
@@ -322,7 +321,6 @@ export class HomePage {
       .update(pid, { fasePrincipal: { ...prog.fasePrincipal, grupos: updatedGrupos } })
       .subscribe({
         next: () => {
-          // Update local programs so future opens show correct carga
           this.programs.update((list) =>
             list.map((p) =>
               p._id === pid
@@ -343,7 +341,7 @@ export class HomePage {
     return this.programs().find((p) => p._id === id)?.objetivos ?? '';
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // -- Helpers
   private loadMonth(): void {
     this.calLoading.set(true);
     const year = this.viewYear();
