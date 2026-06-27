@@ -633,7 +633,7 @@
   }
 </section>
 
-<!-- ── Create / Edit ficha sheet ─────────────────── -->
+<!-- ── Create / Edit ficha sheet ───────────────── -->
 @if (creatingFicha() || editingFicha()) {
   <div class="sheet-backdrop" (click)="cancelCreateFicha()" aria-hidden="true"></div>
   <div class="ficha-sheet" role="dialog" aria-modal="true">
@@ -703,7 +703,7 @@
       <div class="metas-section">
         <button type="button" class="btn-metas-toggle" (click)="metasOpen.set(!metasOpen())">
           <span>{{ i18n.t('avaliacao.metas.titulo') }}</span>
-          <span class="metas-chevron" [class.metas-chevron--open]="metasOpen()">▼</span>
+          <span class="metas-chevron" [class.metas-chevron--open]="metasOpen()">&#9660;</span>
         </button>
 
         @if (metasOpen()) {

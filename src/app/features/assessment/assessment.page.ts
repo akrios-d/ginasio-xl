@@ -252,7 +252,9 @@ export class AssessmentPage {
       // Load own check-ins to show carga evolution
       this.checkinSvc.list().subscribe({
         next: (list) => this.studentCheckins.set(list),
-        error: () => {},
+        error: () => {
+          /* non-critical */
+        },
       });
     }
   }
@@ -315,7 +317,9 @@ export class AssessmentPage {
     if (id) {
       this.checkinSvc.listForStudent(id).subscribe({
         next: (list) => this.studentCheckins.set(list),
-        error: () => {},
+        error: () => {
+          /* non-critical */
+        },
       });
     }
   }
