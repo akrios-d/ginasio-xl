@@ -10,6 +10,8 @@ import {
 } from '../../core/services/perfil.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { CheckinService } from '../../core/services/checkin.service';
+import { ProgramaTreinoService } from '../../core/services/programa-treino.service';
+import type { ProgramaTreino } from '../../core/models';
 import type { FichaAvaliacao, EntradaAvaliacao, MetasAvaliacao } from '../../core/models';
 import type { Checkin } from '../../core/models/checkin.model';
 import { OBJETIVO_OPTIONS } from '../../core/models';
@@ -160,6 +162,7 @@ export class AssessmentPage {
   private readonly perfilSvc = inject(PerfilService);
   private readonly auth = inject(AuthService);
   private readonly checkinSvc = inject(CheckinService);
+  private readonly treinoSvc = inject(ProgramaTreinoService);
 
   private static readonly PT_MODE_KEY = 'gymdesk:pt-mode';
 
@@ -223,7 +226,9 @@ export class AssessmentPage {
 
   // Student check-ins (PT mode — to show cargas)
   protected readonly studentCheckins = signal<Checkin[]>([]);
+  protected readonly studentPrograms = signal<ProgramaTreino[]>([]);
   protected readonly cargasOpen = signal(false);
+  protected readonly cargasOpenGroups = signal<string[]>([]);
 
   protected readonly objetivos = OBJETIVOS;
   protected entryForm: EntryForm = this.emptyEntryForm();
@@ -249,9 +254,15 @@ export class AssessmentPage {
       this.loading.set(false);
     } else {
       this.loadFichas();
-      // Load own check-ins to show carga evolution
+      // Load own check-ins + programs to show carga evolution
       this.checkinSvc.list().subscribe({
         next: (list) => this.studentCheckins.set(list),
+        error: () => {
+          /* non-critical */
+        },
+      });
+      this.treinoSvc.list().subscribe({
+        next: (progs) => this.studentPrograms.set(progs),
         error: () => {
           /* non-critical */
         },
@@ -317,6 +328,12 @@ export class AssessmentPage {
     if (id) {
       this.checkinSvc.listForStudent(id).subscribe({
         next: (list) => this.studentCheckins.set(list),
+        error: () => {
+          /* non-critical */
+        },
+      });
+      this.treinoSvc.list({ alunoId: id, asPt: true }).subscribe({
+        next: (progs) => this.studentPrograms.set(progs),
         error: () => {
           /* non-critical */
         },
@@ -671,6 +688,20 @@ export class AssessmentPage {
     const checkins = this.studentCheckins().filter((c) => c.cargas?.length);
     if (!checkins.length) return [];
 
+    // Build teacher-target map: "grupoLetra|exercicioNome" → recommended carga
+    // (skip programaId — avoids mismatch when _id is undefined or serialized differently)
+    const targetMap = new Map<string, number>();
+    for (const prog of this.studentPrograms()) {
+      for (const grupo of prog.fasePrincipal.grupos) {
+        for (const ex of grupo.exercicios) {
+          const latest = [...ex.progressao].reverse().find((p) => p.carga != null);
+          if (latest?.carga != null) {
+            targetMap.set(`${grupo.letra}|${ex.nome}`, latest.carga);
+          }
+        }
+      }
+    }
+
     // Group: programaTreinoId|grupoLetra → { exercicio → [{data, carga}] }
     const groups = new Map<
       string,
@@ -701,19 +732,67 @@ export class AssessmentPage {
         const sorted = entries.sort((a, b) => b.data.getTime() - a.data.getTime());
         const latest = sorted[0];
         const first = sorted[sorted.length - 1];
-        // % increase from first session (0 = no change, 1 = doubled)
-        const rawPct = first.carga > 0 ? (latest.carga - first.carga) / first.carga : 0;
-        const clamped = Math.max(0, Math.min(1, rawPct));
-        const pct = Math.round(rawPct * 100); // can exceed 100 for display
-        const dashOffset = RING_CIRC * (1 - clamped);
+        const teacherTarget = targetMap.get(`${g.grupo}|${nome}`) ?? null;
+
+        let pct: number;
+        let dashOffset: number;
         let color: string;
-        if (rawPct >= 0.75) color = 'var(--c-success)';
-        else if (rawPct >= 0.25) color = 'var(--c-accent)';
-        else color = 'var(--c-warn)';
-        return { nome, entries: sorted, latest, first, pct, dashOffset, color };
+        let onFire = false;
+
+        if (teacherTarget !== null && teacherTarget > 0) {
+          // Compare against teacher's recommended load
+          const ratio = latest.carga / teacherTarget;
+          if (ratio >= 1) {
+            // Exceeded target 🔥
+            onFire = true;
+            color = 'var(--c-danger)';
+            dashOffset = 0; // full ring
+            pct = Math.round(ratio * 100);
+          } else {
+            const clamped = Math.max(0, ratio);
+            dashOffset = RING_CIRC * (1 - clamped);
+            pct = Math.round(clamped * 100);
+            color =
+              clamped >= 0.75
+                ? 'var(--c-success)'
+                : clamped >= 0.4
+                  ? 'var(--c-accent)'
+                  : 'var(--c-warn)';
+          }
+        } else {
+          // No teacher target: show % increase from first session
+          const rawPct = first.carga > 0 ? (latest.carga - first.carga) / first.carga : 0;
+          const clamped = Math.max(0, Math.min(1, rawPct));
+          pct = Math.round(rawPct * 100);
+          dashOffset = RING_CIRC * (1 - clamped);
+          color =
+            rawPct >= 0.75
+              ? 'var(--c-success)'
+              : rawPct >= 0.25
+                ? 'var(--c-accent)'
+                : 'var(--c-warn)';
+        }
+
+        return {
+          nome,
+          entries: sorted,
+          latest,
+          first,
+          teacherTarget,
+          pct,
+          dashOffset,
+          color,
+          onFire,
+        };
       }),
     }));
   });
+
+  protected toggleCargasGrupo(grupo: string): void {
+    this.cargasOpenGroups.update((list) =>
+      list.includes(grupo) ? list.filter((g) => g !== grupo) : [...list, grupo],
+    );
+  }
 
   protected hasActiveMetas(f: FichaAvaliacao): boolean {
     if (!f.metas || f.avaliacoes.length === 0) return false;

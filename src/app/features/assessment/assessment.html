@@ -587,53 +587,70 @@
       }
     </div>
 
-    <!-- ── Cargas do aluno (PT mode only) ── -->
+    <!-- ── Cargas do aluno ── -->
     @if (cargasSummary().length > 0) {
       <div class="cargas-section">
         <button type="button" class="btn-metas-toggle" (click)="cargasOpen.set(!cargasOpen())">
           <span>Cargas registadas</span>
-          <span class="metas-chevron" [class.metas-chevron--open]="cargasOpen()">▼</span>
+          <span class="metas-chevron" [class.metas-chevron--open]="cargasOpen()">&#9660;</span>
         </button>
 
         @if (cargasOpen()) {
           @for (grupo of cargasSummary(); track grupo.grupo) {
             <div class="cargas-grupo">
-              <p class="cargas-grupo-label">Grupo {{ grupo.grupo }}</p>
-              <div class="cargas-rings">
-                @for (ex of grupo.exercises; track ex.nome) {
-                  <div class="ring-item">
-                    <svg class="ring-svg" viewBox="0 0 80 80" aria-hidden="true">
-                      <circle cx="40" cy="40" r="30" class="ring-track" />
-                      <circle
-                        cx="40"
-                        cy="40"
-                        r="30"
-                        class="ring-arc"
-                        [style.stroke]="ex.color"
-                        [attr.stroke-dasharray]="188.5"
-                        [attr.stroke-dashoffset]="ex.dashOffset"
-                        transform="rotate(-90 40 40)"
-                      />
-                      <text
-                        x="40"
-                        y="37"
-                        class="ring-pct"
-                        text-anchor="middle"
-                        [style.fill]="ex.color"
-                      >
-                        {{ ex.entries.length > 1 ? '+' + ex.pct + '%' : ex.latest.carga + 'kg' }}
-                      </text>
-                      <text x="40" y="51" class="ring-val" text-anchor="middle">
-                        {{ ex.entries.length > 1 ? ex.latest.carga + ' kg' : '' }}
-                      </text>
-                    </svg>
-                    <p class="ring-label">{{ ex.nome }}</p>
-                    @if (ex.entries.length > 1) {
-                      <p class="ring-meta-val">início: {{ ex.first.carga }} kg</p>
-                    }
-                  </div>
-                }
-              </div>
+              <button
+                type="button"
+                class="cargas-grupo-toggle"
+                (click)="toggleCargasGrupo(grupo.grupo)"
+              >
+                <span class="cargas-grupo-label">Grupo {{ grupo.grupo }}</span>
+                <span
+                  class="metas-chevron"
+                  [class.metas-chevron--open]="cargasOpenGroups().includes(grupo.grupo)"
+                  >&#9660;</span
+                >
+              </button>
+              @if (cargasOpenGroups().includes(grupo.grupo)) {
+                <div class="cargas-rings">
+                  @for (ex of grupo.exercises; track ex.nome) {
+                    <div class="ring-item">
+                      <svg class="ring-svg" viewBox="0 0 80 80" aria-hidden="true">
+                        <circle cx="40" cy="40" r="30" class="ring-track" />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="30"
+                          class="ring-arc"
+                          [style.stroke]="ex.color"
+                          [attr.stroke-dasharray]="188.5"
+                          [attr.stroke-dashoffset]="ex.dashOffset"
+                          transform="rotate(-90 40 40)"
+                        />
+                        <text
+                          x="40"
+                          y="37"
+                          class="ring-pct"
+                          text-anchor="middle"
+                          [style.fill]="ex.color"
+                        >
+                          {{ ex.onFire ? '🔥' : ex.pct + '%' }}
+                        </text>
+                        <text x="40" y="51" class="ring-val" text-anchor="middle">
+                          {{ ex.latest.carga }} kg
+                        </text>
+                      </svg>
+                      <p class="ring-label">{{ ex.nome }}</p>
+                      <p class="ring-meta-val" [style.color]="ex.onFire ? 'var(--c-danger)' : ''">
+                        @if (ex.teacherTarget) {
+                          meta: {{ ex.teacherTarget }} kg
+                        } @else if (ex.entries.length > 1) {
+                          in&#237;cio: {{ ex.first.carga }} kg
+                        }
+                      </p>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           }
         }
