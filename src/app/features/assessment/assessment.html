@@ -588,7 +588,7 @@
     </div>
 
     <!-- ── Cargas do aluno (PT mode only) ── -->
-    @if (ptMode() && isTeacher() && selectedStudentId() && cargasSummary().length > 0) {
+    @if (cargasSummary().length > 0) {
       <div class="cargas-section">
         <button type="button" class="btn-metas-toggle" (click)="cargasOpen.set(!cargasOpen())">
           <span>Cargas registadas</span>
