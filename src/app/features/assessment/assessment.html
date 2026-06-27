@@ -599,32 +599,41 @@
           @for (grupo of cargasSummary(); track grupo.grupo) {
             <div class="cargas-grupo">
               <p class="cargas-grupo-label">Grupo {{ grupo.grupo }}</p>
-              <table class="cargas-table">
-                <thead>
-                  <tr>
-                    <th>Exercício</th>
-                    <th>Última carga</th>
-                    <th>Data</th>
-                    <th>Histórico</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (ex of grupo.exercises; track ex.nome) {
-                    <tr>
-                      <td>{{ ex.nome }}</td>
-                      <td class="cargas-latest">{{ ex.latest.carga }} kg</td>
-                      <td class="cargas-date">{{ ex.latest.data | date: 'dd/MM/yy' }}</td>
-                      <td class="cargas-history">
-                        @for (e of ex.entries; track e.data; let i = $index) {
-                          @if (i < 5) {
-                            <span class="cargas-history-chip">{{ e.carga }}kg</span>
-                          }
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
+              <div class="cargas-rings">
+                @for (ex of grupo.exercises; track ex.nome) {
+                  <div class="ring-item">
+                    <svg class="ring-svg" viewBox="0 0 80 80" aria-hidden="true">
+                      <circle cx="40" cy="40" r="30" class="ring-track" />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="30"
+                        class="ring-arc"
+                        [style.stroke]="ex.color"
+                        [attr.stroke-dasharray]="188.5"
+                        [attr.stroke-dashoffset]="ex.dashOffset"
+                        transform="rotate(-90 40 40)"
+                      />
+                      <text
+                        x="40"
+                        y="37"
+                        class="ring-pct"
+                        text-anchor="middle"
+                        [style.fill]="ex.color"
+                      >
+                        {{ ex.entries.length > 1 ? '+' + ex.pct + '%' : ex.latest.carga + 'kg' }}
+                      </text>
+                      <text x="40" y="51" class="ring-val" text-anchor="middle">
+                        {{ ex.entries.length > 1 ? ex.latest.carga + ' kg' : '' }}
+                      </text>
+                    </svg>
+                    <p class="ring-label">{{ ex.nome }}</p>
+                    @if (ex.entries.length > 1) {
+                      <p class="ring-meta-val">início: {{ ex.first.carga }} kg</p>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
         }
@@ -806,17 +815,6 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="metaAbd">{{ i18n.t('avaliacao.abd') }}</label>
-              <input
-                id="metaAbd"
-                type="number"
-                step="0.1"
-                [(ngModel)]="fichaForm.metas.perimetroAbdominal"
-                name="metaAbd"
-                placeholder="cm"
-              />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="metaCint">{{ i18n.t('avaliacao.cint') }}</label>
               <input
                 id="metaCint"
                 type="number"

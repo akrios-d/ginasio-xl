@@ -1191,3 +1191,30 @@
 .metas-grid input {
   width: 100%;
 }
+
+/* ── Cargas rings ───────────────────────────────────────────────── */
+
+.cargas-section {
+  margin-top: 12px;
+  border-top: 1px solid var(--c-border);
+}
+
+.cargas-grupo {
+  padding: 8px 0 4px;
+}
+
+.cargas-grupo-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-ink-2);
+  margin: 0 0 8px 4px;
+}
+
+.cargas-rings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 4px 8px;
+}

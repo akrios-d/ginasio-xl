@@ -697,11 +697,21 @@ export class AssessmentPage {
     return Array.from(groups.values()).map((g) => ({
       programaId: g.programaId,
       grupo: g.grupo,
-      exercises: Array.from(g.exercises.entries()).map(([nome, entries]) => ({
-        nome,
-        entries: entries.sort((a, b) => b.data.getTime() - a.data.getTime()),
-        latest: entries.reduce((best, e) => (e.data > best.data ? e : best)),
-      })),
+      exercises: Array.from(g.exercises.entries()).map(([nome, entries]) => {
+        const sorted = entries.sort((a, b) => b.data.getTime() - a.data.getTime());
+        const latest = sorted[0];
+        const first = sorted[sorted.length - 1];
+        // % increase from first session (0 = no change, 1 = doubled)
+        const rawPct = first.carga > 0 ? (latest.carga - first.carga) / first.carga : 0;
+        const clamped = Math.max(0, Math.min(1, rawPct));
+        const pct = Math.round(rawPct * 100); // can exceed 100 for display
+        const dashOffset = RING_CIRC * (1 - clamped);
+        let color: string;
+        if (rawPct >= 0.75) color = 'var(--c-success)';
+        else if (rawPct >= 0.25) color = 'var(--c-accent)';
+        else color = 'var(--c-warn)';
+        return { nome, entries: sorted, latest, first, pct, dashOffset, color };
+      }),
     }));
   });
 
