@@ -205,5 +205,10 @@
   "treino.criar.aulasRecomendadas": "Atividades recomendadas",
   "treino.criar.aulasPlaceholder": "Ex: Yoga, Pilates…",
   "avaliacao.metas.titulo": "Definir metas (opcional)",
-  "home.weight.editTitle": "Editar cargas"
+  "home.weight.editTitle": "Editar cargas",
+  "avaliacao.editEntry.title": "Editar",
+  "avaliacao.cargas.titulo": "Cargas registadas",
+  "avaliacao.cargas.grupo": "Grupo",
+  "avaliacao.metas.meta": "meta",
+  "avaliacao.cargas.inicio": "início"
 }

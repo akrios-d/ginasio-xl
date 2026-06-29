@@ -260,7 +260,7 @@
                             <button
                               type="button"
                               class="btn-entry-edit"
-                              title="Edit"
+                              [title]="i18n.t('avaliacao.editEntry.title')"
                               (click)="startEditEntry(f._id!, ri, e, f.avaliacoes.length)"
                             >
                               <svg
@@ -333,7 +333,9 @@
                         </text>
                       </svg>
                       <div class="ring-label">{{ i18n.t(ring.i18nKey) }}</div>
-                      <div class="ring-meta-val">meta: {{ ring.meta }}{{ ring.unit }}</div>
+                      <div class="ring-meta-val">
+                        {{ i18n.t('avaliacao.metas.meta') }}: {{ ring.meta }}{{ ring.unit }}
+                      </div>
                     </div>
                   }
                 </div>
@@ -590,7 +592,7 @@
     <!-- ── Cargas do aluno ── -->
     @if (cargasSummary().length > 0) {
       <div class="cargas-section">
-        <p class="cargas-section-title">Cargas registadas</p>
+        <p class="cargas-section-title">{{ i18n.t('avaliacao.cargas.titulo') }}</p>
         @for (grupo of cargasSummary(); track grupo.grupo) {
           <div class="cargas-grupo">
             <button
@@ -598,7 +600,9 @@
               class="cargas-grupo-toggle"
               (click)="toggleCargasGrupo(grupo.grupo)"
             >
-              <span class="cargas-grupo-label">Grupo {{ grupo.grupo }}</span>
+              <span class="cargas-grupo-label"
+                >{{ i18n.t('avaliacao.cargas.grupo') }} {{ grupo.grupo }}</span
+              >
               <span
                 class="metas-chevron"
                 [class.metas-chevron--open]="cargasOpenGroups().includes(grupo.grupo)"
@@ -637,9 +641,9 @@
                     <p class="ring-label">{{ ex.nome }}</p>
                     <p class="ring-meta-val" [style.color]="ex.onFire ? 'var(--c-danger)' : ''">
                       @if (ex.teacherTarget) {
-                        meta: {{ ex.teacherTarget }} kg
+                        {{ i18n.t('avaliacao.metas.meta') }}: {{ ex.teacherTarget }} kg
                       } @else if (ex.entries.length > 1) {
-                        in&#237;cio: {{ ex.first.carga }} kg
+                        {{ i18n.t('avaliacao.cargas.inicio') }}: {{ ex.first.carga }} kg
                       }
                     </p>
                   </div>

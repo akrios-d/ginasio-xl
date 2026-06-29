@@ -205,5 +205,10 @@
   "treino.criar.aulasRecomendadas": "推荐活动",
   "treino.criar.aulasPlaceholder": "例如：瑜伽、普拉提…",
   "avaliacao.metas.titulo": "设定目标（可选）",
-  "home.weight.editTitle": "编辑负重"
+  "home.weight.editTitle": "编辑负重",
+  "avaliacao.editEntry.title": "编辑",
+  "avaliacao.cargas.titulo": "已记录负荷",
+  "avaliacao.cargas.grupo": "组",
+  "avaliacao.metas.meta": "目标",
+  "avaliacao.cargas.inicio": "开始"
 }

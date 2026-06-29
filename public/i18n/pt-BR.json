@@ -205,5 +205,10 @@
   "common.cancel": "Cancelar",
   "app.goodMorning": "Bom dia",
   "app.goodAfternoon": "Boa tarde",
-  "app.goodEvening": "Boa noite"
+  "app.goodEvening": "Boa noite",
+  "avaliacao.editEntry.title": "Editar",
+  "avaliacao.cargas.titulo": "Cargas registradas",
+  "avaliacao.cargas.grupo": "Grupo",
+  "avaliacao.metas.meta": "meta",
+  "avaliacao.cargas.inicio": "início"
 }
