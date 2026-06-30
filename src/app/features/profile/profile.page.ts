@@ -6,10 +6,64 @@ import {
   type StudentInfo,
   type TeacherInfo,
 } from '../../core/services/perfil.service';
+import { AnamnesisService } from '../../core/services/anamnesis.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Flag } from '../../shared/components/flag/flag';
 import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { Icon } from '../../shared/components/icon/icon';
+import type { Anamnesis, AnamnesisGoal } from '../../core/models';
+
+interface AnamnesisForm {
+  birthDate: string;
+  exerciseRoutine: string;
+  medicalConditions: string;
+  painComplaints: string;
+  trainingProgress: string;
+  dizzinessFainting: string;
+  primaryGoal: AnamnesisGoal | '';
+  medicationsSupplements: string;
+  medicalExams: string;
+  diet: string;
+  sleepQuality: string;
+  waterIntake: string;
+  alcoholSmoking: string;
+}
+
+function emptyForm(): AnamnesisForm {
+  return {
+    birthDate: '',
+    exerciseRoutine: '',
+    medicalConditions: '',
+    painComplaints: '',
+    trainingProgress: '',
+    dizzinessFainting: '',
+    primaryGoal: '',
+    medicationsSupplements: '',
+    medicalExams: '',
+    diet: '',
+    sleepQuality: '',
+    waterIntake: '',
+    alcoholSmoking: '',
+  };
+}
+
+function anamnesisToForm(a: Anamnesis): AnamnesisForm {
+  return {
+    birthDate: a.birthDate ?? '',
+    exerciseRoutine: a.exerciseRoutine ?? '',
+    medicalConditions: a.medicalConditions ?? '',
+    painComplaints: a.painComplaints ?? '',
+    trainingProgress: a.trainingProgress ?? '',
+    dizzinessFainting: a.dizzinessFainting ?? '',
+    primaryGoal: a.primaryGoal ?? '',
+    medicationsSupplements: a.medicationsSupplements ?? '',
+    medicalExams: a.medicalExams ?? '',
+    diet: a.diet ?? '',
+    sleepQuality: a.sleepQuality ?? '',
+    waterIntake: a.waterIntake ?? '',
+    alcoholSmoking: a.alcoholSmoking ?? '',
+  };
+}
 
 @Component({
   selector: 'app-profile',
@@ -21,6 +75,7 @@ import { Icon } from '../../shared/components/icon/icon';
 export class ProfilePage {
   protected readonly i18n = inject(I18nService);
   private readonly perfilSvc = inject(PerfilService);
+  private readonly anamnesisSvc = inject(AnamnesisService);
   protected readonly auth = inject(AuthService);
 
   protected loading = signal(true);
@@ -50,6 +105,18 @@ export class ProfilePage {
   protected linkSaving = signal(false);
   protected linkError = signal('');
   protected unlinkingId = signal<string | null>(null);
+
+  // Student: anamnesis form
+  protected anamnesisOpen = signal(false);
+  protected anamnesisLoading = signal(false);
+  protected anamnesisSaving = signal(false);
+  protected anamnesisSaved = signal(false);
+  protected anamnesisForm = signal<AnamnesisForm>(emptyForm());
+
+  // Teacher: view student's anamnesis
+  protected viewingAnamnesisFor = signal<StudentInfo | null>(null);
+  protected studentAnamnesis = signal<Anamnesis | null>(null);
+  protected studentAnamnesisLoading = signal(false);
 
   constructor() {
     this.perfilSvc.get().subscribe({
@@ -223,5 +290,79 @@ export class ProfilePage {
 
   protected pickLanguage(code: AppLanguage): void {
     this.i18n.setLanguage(code);
+  }
+
+  // ── Student: anamnesis form ──────────────────────────────
+  protected openAnamnesis(): void {
+    if (this.anamnesisOpen()) return;
+    this.anamnesisOpen.set(true);
+    this.anamnesisLoading.set(true);
+    this.anamnesisSvc.get().subscribe({
+      next: (data) => {
+        this.anamnesisForm.set(data ? anamnesisToForm(data) : emptyForm());
+        this.anamnesisLoading.set(false);
+      },
+      error: () => this.anamnesisLoading.set(false),
+    });
+  }
+
+  protected closeAnamnesis(): void {
+    this.anamnesisOpen.set(false);
+  }
+
+  protected updateAnamnesisField<K extends keyof AnamnesisForm>(
+    key: K,
+    value: AnamnesisForm[K],
+  ): void {
+    this.anamnesisForm.update((f) => ({ ...f, [key]: value }));
+  }
+
+  protected saveAnamnesis(): void {
+    if (this.anamnesisSaving()) return;
+    this.anamnesisSaving.set(true);
+    const f = this.anamnesisForm();
+    this.anamnesisSvc
+      .save({
+        birthDate: f.birthDate || undefined,
+        exerciseRoutine: f.exerciseRoutine || undefined,
+        medicalConditions: f.medicalConditions || undefined,
+        painComplaints: f.painComplaints || undefined,
+        trainingProgress: f.trainingProgress || undefined,
+        dizzinessFainting: f.dizzinessFainting || undefined,
+        primaryGoal: f.primaryGoal || undefined,
+        medicationsSupplements: f.medicationsSupplements || undefined,
+        medicalExams: f.medicalExams || undefined,
+        diet: f.diet || undefined,
+        sleepQuality: f.sleepQuality || undefined,
+        waterIntake: f.waterIntake || undefined,
+        alcoholSmoking: f.alcoholSmoking || undefined,
+      })
+      .subscribe({
+        next: () => {
+          this.anamnesisSaving.set(false);
+          this.anamnesisSaved.set(true);
+          setTimeout(() => this.anamnesisSaved.set(false), 2500);
+        },
+        error: () => this.anamnesisSaving.set(false),
+      });
+  }
+
+  // ── Teacher: view student anamnesis ─────────────────────
+  protected openStudentAnamnesis(s: StudentInfo): void {
+    this.viewingAnamnesisFor.set(s);
+    this.studentAnamnesis.set(null);
+    this.studentAnamnesisLoading.set(true);
+    this.anamnesisSvc.getForStudent(s.userId).subscribe({
+      next: (data) => {
+        this.studentAnamnesis.set(data);
+        this.studentAnamnesisLoading.set(false);
+      },
+      error: () => this.studentAnamnesisLoading.set(false),
+    });
+  }
+
+  protected closeStudentAnamnesis(): void {
+    this.viewingAnamnesisFor.set(null);
+    this.studentAnamnesis.set(null);
   }
 }

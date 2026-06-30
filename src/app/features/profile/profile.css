@@ -607,3 +607,237 @@
   min-height: unset;
   line-height: 1.4;
 }
+
+/* ── Student actions (in teacher sheet) ──────────── */
+.student-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-anamnesis-view {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  min-height: unset;
+  background: transparent;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-ink-2);
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    color 120ms;
+}
+@media (hover: hover) {
+  .btn-anamnesis-view:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+    box-shadow: none;
+  }
+}
+
+/* ── Anamnesis sheet ─────────────────────────────── */
+.anamnesis-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 201;
+  background: var(--c-surface);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  max-height: 92dvh;
+  overflow-y: auto;
+  animation: slide-up 220ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (min-width: 600px) {
+  .anamnesis-sheet {
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    width: min(580px, 94vw);
+    border-radius: var(--r-lg);
+    animation: scale-in 180ms ease;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.anamnesis-subtitle {
+  margin: 2px 0 0;
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+}
+
+/* ── Anamnesis form ──────────────────────────────── */
+.anamnesis-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.anamnesis-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anamnesis-group--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.anamnesis-input--date {
+  width: auto;
+}
+
+.anamnesis-label {
+  font-size: var(--t-secondary);
+  font-weight: 600;
+  color: var(--c-ink);
+  line-height: 1.4;
+}
+
+.anamnesis-hint {
+  margin: 0;
+  font-size: var(--t-meta);
+  color: var(--c-ink-3);
+  line-height: 1.45;
+}
+
+.anamnesis-input {
+  padding: 7px 10px;
+  background: var(--c-surface-alt, var(--c-surface));
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-size: var(--t-meta);
+  color: var(--c-ink);
+  transition: border-color 120ms;
+  width: 100%;
+  box-sizing: border-box;
+}
+.anamnesis-input:focus {
+  outline: none;
+  border-color: var(--c-accent);
+}
+
+.anamnesis-textarea {
+  padding: 8px 10px;
+  background: var(--c-surface-alt, var(--c-surface));
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 120ms;
+  line-height: 1.5;
+}
+.anamnesis-textarea:focus {
+  outline: none;
+  border-color: var(--c-accent);
+}
+
+.q-num {
+  color: var(--c-accent);
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* ── Goal radio group ────────────────────────────── */
+.goal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.goal-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  cursor: pointer;
+}
+
+.goal-option input[type='radio'] {
+  accent-color: var(--c-accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ── Form footer ─────────────────────────────────── */
+.anamnesis-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.anamnesis-saved {
+  font-size: var(--t-secondary);
+  color: var(--c-success, #16a34a);
+  font-weight: 500;
+  animation: fade-in 160ms ease;
+}
+
+/* ── Teacher read-only view ──────────────────────── */
+.anamnesis-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.readonly-biometric {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.bio-chip {
+  font-size: var(--t-meta);
+  color: var(--c-ink-2);
+  background: var(--c-surface-alt, var(--c-border));
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+
+.readonly-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--c-border);
+}
+.readonly-item:last-child {
+  border-bottom: none;
+}
+
+.readonly-label {
+  margin: 0;
+  font-size: var(--t-meta);
+  font-weight: 600;
+  color: var(--c-ink-2);
+}
+
+.readonly-value {
+  margin: 0;
+  font-size: var(--t-secondary);
+  color: var(--c-ink);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}

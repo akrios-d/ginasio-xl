@@ -6,6 +6,7 @@ import { ZodError } from 'zod';
 import { setCors, handleOptions } from '../server/lib/cors.js';
 import { getCollection, mapDocumentId } from '../server/lib/mongo.js';
 import { requireSession } from '../server/lib/session.js';
+import { ObjectId } from 'mongodb';
 import { clientPromise, AUTH_DB_NAME } from '../server/lib/auth.config.js';
 import { UpsertPerfilSchema } from '../server/schemas/perfil.schema.js';
 
@@ -13,10 +14,13 @@ import { UpsertPerfilSchema } from '../server/schemas/perfil.schema.js';
 async function getAuthUser(userId: string): Promise<{ name: string | null; email: string | null }> {
   try {
     const client = await clientPromise;
+    // Auth.js stores user _id as ObjectId; userId from the session is its string representation.
+    // We must convert it back to ObjectId — a plain string query will never match.
+    const oid = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
     const user = await client
       .db(AUTH_DB_NAME)
       .collection('users')
-      .findOne({ _id: userId as unknown as import('mongodb').ObjectId });
+      .findOne({ _id: oid as any });
     return {
       name: (user?.['name'] as string | null) ?? null,
       email: (user?.['email'] as string | null) ?? null,

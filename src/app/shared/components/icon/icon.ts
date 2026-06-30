@@ -13,6 +13,7 @@ export type IconName =
   | 'arrow-left'
   | 'arrow-right'
   | 'chart'
+  | 'clipboard'
   | 'close'
   | 'dumbbell'
   | 'edit'

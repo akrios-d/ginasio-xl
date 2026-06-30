@@ -1,7 +1,7 @@
 {
   "/api": {
-    "target": "https://my-gym-desk.vercel.app",
-    "secure": true,
+    "target": "http://localhost:3000",
+    "secure": false,
     "changeOrigin": true
   }
 }

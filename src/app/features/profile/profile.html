@@ -44,6 +44,17 @@
           }
         </div>
 
+        <!-- Student: anamnesis -->
+        @if (!isTeacher()) {
+          <div class="prof-section">
+            <button type="button" class="btn-students-open" (click)="openAnamnesis()">
+              <app-icon name="clipboard" [size]="16" />
+              {{ i18n.t('anamnesis.title') }}
+              <app-icon name="arrow-right" [size]="16" />
+            </button>
+          </div>
+        }
+
         <!-- Teacher: open students sheet -->
         @if (isTeacher()) {
           <div class="prof-section">
@@ -95,7 +106,7 @@
           <div class="user-id-row">
             <code class="user-id-value">{{ auth.userId() }}</code>
             <button type="button" class="btn-copy" (click)="copyId()">
-              {{ idCopied() ? '\u2713' : i18n.t('profile.copy') }}
+              {{ idCopied() ? '✓' : i18n.t('profile.copy') }}
             </button>
           </div>
         </div>
@@ -216,14 +227,24 @@
                 }
               }
             </div>
-            <button
-              type="button"
-              class="btn-assoc btn-assoc--remove"
-              [disabled]="unlinkingId() === s.userId"
-              (click)="unlinkStudent(s)"
-            >
-              {{ i18n.t('profile.removeAluno') }}
-            </button>
+            <div class="student-actions">
+              <button
+                type="button"
+                class="btn-anamnesis-view"
+                [title]="i18n.t('anamnesis.viewBtn')"
+                (click)="openStudentAnamnesis(s)"
+              >
+                <app-icon name="clipboard" [size]="14" />
+              </button>
+              <button
+                type="button"
+                class="btn-assoc btn-assoc--remove"
+                [disabled]="unlinkingId() === s.userId"
+                (click)="unlinkStudent(s)"
+              >
+                {{ i18n.t('profile.removeAluno') }}
+              </button>
+            </div>
           </li>
         }
       </ul>
@@ -255,5 +276,378 @@
         {{ i18n.t('profile.removeTrainador') }}
       </button>
     </div>
+  </div>
+}
+
+<!-- ── Student: anamnesis sheet ──────────────────── -->
+@if (anamnesisOpen()) {
+  <div
+    class="sheet-backdrop"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="i18n.t('profile.cancelBtn')"
+    (click)="closeAnamnesis()"
+    (keyup.escape)="closeAnamnesis()"
+  ></div>
+  <div class="anamnesis-sheet">
+    <div class="sheet-header">
+      <div>
+        <span class="sheet-title">{{ i18n.t('anamnesis.title') }}</span>
+        <p class="anamnesis-subtitle">{{ i18n.t('anamnesis.subtitle') }}</p>
+      </div>
+      <button type="button" class="sheet-close" (click)="closeAnamnesis()">
+        <app-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    @if (anamnesisLoading()) {
+      <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
+    } @else {
+      <form class="anamnesis-form" (ngSubmit)="saveAnamnesis()">
+        <!-- Birth date -->
+        <div class="anamnesis-group anamnesis-group--inline">
+          <label class="anamnesis-label">{{ i18n.t('anamnesis.birthDate') }}</label>
+          <input
+            class="anamnesis-input anamnesis-input--date"
+            type="date"
+            [ngModel]="anamnesisForm().birthDate"
+            (ngModelChange)="updateAnamnesisField('birthDate', $event)"
+            name="birthDate"
+          />
+        </div>
+
+        <!-- Q1 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">1.</span> {{ i18n.t('anamnesis.q1.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q1.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().exerciseRoutine"
+            (ngModelChange)="updateAnamnesisField('exerciseRoutine', $event)"
+            name="exerciseRoutine"
+          ></textarea>
+        </div>
+
+        <!-- Q2 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">2.</span> {{ i18n.t('anamnesis.q2.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q2.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().medicalConditions"
+            (ngModelChange)="updateAnamnesisField('medicalConditions', $event)"
+            name="medicalConditions"
+          ></textarea>
+        </div>
+
+        <!-- Q3 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">3.</span> {{ i18n.t('anamnesis.q3.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q3.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().painComplaints"
+            (ngModelChange)="updateAnamnesisField('painComplaints', $event)"
+            name="painComplaints"
+          ></textarea>
+        </div>
+
+        <!-- Q4 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">4.</span> {{ i18n.t('anamnesis.q4.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q4.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().trainingProgress"
+            (ngModelChange)="updateAnamnesisField('trainingProgress', $event)"
+            name="trainingProgress"
+          ></textarea>
+        </div>
+
+        <!-- Q5 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">5.</span> {{ i18n.t('anamnesis.q5.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q5.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="2"
+            [ngModel]="anamnesisForm().dizzinessFainting"
+            (ngModelChange)="updateAnamnesisField('dizzinessFainting', $event)"
+            name="dizzinessFainting"
+          ></textarea>
+        </div>
+
+        <!-- Q6 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">6.</span> {{ i18n.t('anamnesis.q6.label') }}
+          </label>
+          <div class="goal-options">
+            @for (opt of ['aesthetic', 'health', 'both']; track opt) {
+              <label class="goal-option">
+                <input
+                  type="radio"
+                  [name]="'primaryGoal'"
+                  [value]="opt"
+                  [ngModel]="anamnesisForm().primaryGoal"
+                  (ngModelChange)="updateAnamnesisField('primaryGoal', $event)"
+                />
+                {{ i18n.t('anamnesis.q6.' + opt) }}
+              </label>
+            }
+          </div>
+        </div>
+
+        <!-- Q7 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">7.</span> {{ i18n.t('anamnesis.q7.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q7.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().medicationsSupplements"
+            (ngModelChange)="updateAnamnesisField('medicationsSupplements', $event)"
+            name="medicationsSupplements"
+          ></textarea>
+        </div>
+
+        <!-- Q8 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">8.</span> {{ i18n.t('anamnesis.q8.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q8.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().medicalExams"
+            (ngModelChange)="updateAnamnesisField('medicalExams', $event)"
+            name="medicalExams"
+          ></textarea>
+        </div>
+
+        <!-- Q9 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">9.</span> {{ i18n.t('anamnesis.q9.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q9.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="3"
+            [ngModel]="anamnesisForm().diet"
+            (ngModelChange)="updateAnamnesisField('diet', $event)"
+            name="diet"
+          ></textarea>
+        </div>
+
+        <!-- Q10 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">10.</span> {{ i18n.t('anamnesis.q10.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q10.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="2"
+            [ngModel]="anamnesisForm().sleepQuality"
+            (ngModelChange)="updateAnamnesisField('sleepQuality', $event)"
+            name="sleepQuality"
+          ></textarea>
+        </div>
+
+        <!-- Q11 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">11.</span> {{ i18n.t('anamnesis.q11.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q11.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="2"
+            [ngModel]="anamnesisForm().waterIntake"
+            (ngModelChange)="updateAnamnesisField('waterIntake', $event)"
+            name="waterIntake"
+          ></textarea>
+        </div>
+
+        <!-- Q12 -->
+        <div class="anamnesis-group">
+          <label class="anamnesis-label">
+            <span class="q-num">12.</span> {{ i18n.t('anamnesis.q12.label') }}
+          </label>
+          <p class="anamnesis-hint">{{ i18n.t('anamnesis.q12.hint') }}</p>
+          <textarea
+            class="anamnesis-textarea"
+            rows="2"
+            [ngModel]="anamnesisForm().alcoholSmoking"
+            (ngModelChange)="updateAnamnesisField('alcoholSmoking', $event)"
+            name="alcoholSmoking"
+          ></textarea>
+        </div>
+
+        <div class="anamnesis-footer">
+          <button type="submit" class="btn-assoc" [disabled]="anamnesisSaving()">
+            {{ anamnesisSaving() ? i18n.t('common.saving') : i18n.t('anamnesis.save') }}
+          </button>
+          @if (anamnesisSaved()) {
+            <span class="anamnesis-saved">✓ {{ i18n.t('anamnesis.saved') }}</span>
+          }
+        </div>
+      </form>
+    }
+  </div>
+}
+
+<!-- ── Teacher: student anamnesis sheet (read-only) ─ -->
+@if (viewingAnamnesisFor(); as student) {
+  <div
+    class="sheet-backdrop"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="i18n.t('profile.cancelBtn')"
+    (click)="closeStudentAnamnesis()"
+    (keyup.escape)="closeStudentAnamnesis()"
+  ></div>
+  <div class="anamnesis-sheet">
+    <div class="sheet-header">
+      <div>
+        <span class="sheet-title">{{ i18n.t('anamnesis.title') }}</span>
+        <p class="anamnesis-subtitle">{{ student.alias || student.name || student.email }}</p>
+      </div>
+      <button type="button" class="sheet-close" (click)="closeStudentAnamnesis()">
+        <app-icon name="close" [size]="20" />
+      </button>
+    </div>
+
+    @if (studentAnamnesisLoading()) {
+      <p class="text-muted">{{ i18n.t('profile.loading') }}</p>
+    } @else if (!studentAnamnesis()) {
+      <p class="text-muted">{{ i18n.t('anamnesis.empty') }}</p>
+    } @else {
+      @let a = studentAnamnesis()!;
+      <div class="anamnesis-readonly">
+        @if (a.birthDate) {
+          <div class="readonly-biometric">
+            <span class="bio-chip">
+              <strong>{{ i18n.t('anamnesis.birthDate') }}:</strong> {{ a.birthDate }}
+            </span>
+          </div>
+        }
+
+        @if (a.exerciseRoutine) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">1.</span> {{ i18n.t('anamnesis.q1.label') }}
+            </p>
+            <p class="readonly-value">{{ a.exerciseRoutine }}</p>
+          </div>
+        }
+        @if (a.medicalConditions) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">2.</span> {{ i18n.t('anamnesis.q2.label') }}
+            </p>
+            <p class="readonly-value">{{ a.medicalConditions }}</p>
+          </div>
+        }
+        @if (a.painComplaints) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">3.</span> {{ i18n.t('anamnesis.q3.label') }}
+            </p>
+            <p class="readonly-value">{{ a.painComplaints }}</p>
+          </div>
+        }
+        @if (a.trainingProgress) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">4.</span> {{ i18n.t('anamnesis.q4.label') }}
+            </p>
+            <p class="readonly-value">{{ a.trainingProgress }}</p>
+          </div>
+        }
+        @if (a.dizzinessFainting) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">5.</span> {{ i18n.t('anamnesis.q5.label') }}
+            </p>
+            <p class="readonly-value">{{ a.dizzinessFainting }}</p>
+          </div>
+        }
+        @if (a.primaryGoal) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">6.</span> {{ i18n.t('anamnesis.q6.label') }}
+            </p>
+            <p class="readonly-value">{{ i18n.t('anamnesis.q6.' + a.primaryGoal) }}</p>
+          </div>
+        }
+        @if (a.medicationsSupplements) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">7.</span> {{ i18n.t('anamnesis.q7.label') }}
+            </p>
+            <p class="readonly-value">{{ a.medicationsSupplements }}</p>
+          </div>
+        }
+        @if (a.medicalExams) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">8.</span> {{ i18n.t('anamnesis.q8.label') }}
+            </p>
+            <p class="readonly-value">{{ a.medicalExams }}</p>
+          </div>
+        }
+        @if (a.diet) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">9.</span> {{ i18n.t('anamnesis.q9.label') }}
+            </p>
+            <p class="readonly-value">{{ a.diet }}</p>
+          </div>
+        }
+        @if (a.sleepQuality) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">10.</span> {{ i18n.t('anamnesis.q10.label') }}
+            </p>
+            <p class="readonly-value">{{ a.sleepQuality }}</p>
+          </div>
+        }
+        @if (a.waterIntake) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">11.</span> {{ i18n.t('anamnesis.q11.label') }}
+            </p>
+            <p class="readonly-value">{{ a.waterIntake }}</p>
+          </div>
+        }
+        @if (a.alcoholSmoking) {
+          <div class="readonly-item">
+            <p class="readonly-label">
+              <span class="q-num">12.</span> {{ i18n.t('anamnesis.q12.label') }}
+            </p>
+            <p class="readonly-value">{{ a.alcoholSmoking }}</p>
+          </div>
+        }
+      </div>
+    }
   </div>
 }
