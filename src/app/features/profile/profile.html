@@ -45,15 +45,13 @@
         </div>
 
         <!-- Student: anamnesis -->
-        @if (!isTeacher()) {
-          <div class="prof-section">
-            <button type="button" class="btn-students-open" (click)="openAnamnesis()">
-              <app-icon name="clipboard" [size]="16" />
-              {{ i18n.t('anamnesis.title') }}
-              <app-icon name="arrow-right" [size]="16" />
-            </button>
-          </div>
-        }
+        <div class="prof-section">
+          <button type="button" class="btn-students-open" (click)="openAnamnesis()">
+            <app-icon name="clipboard" [size]="16" />
+            {{ i18n.t('anamnesis.title') }}
+            <app-icon name="arrow-right" [size]="16" />
+          </button>
+        </div>
 
         <!-- Teacher: open students sheet -->
         @if (isTeacher()) {
