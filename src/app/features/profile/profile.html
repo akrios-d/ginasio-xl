@@ -306,8 +306,9 @@
       <form class="anamnesis-form" (ngSubmit)="saveAnamnesis()">
         <!-- Birth date -->
         <div class="anamnesis-group anamnesis-group--inline">
-          <label class="anamnesis-label">{{ i18n.t('anamnesis.birthDate') }}</label>
+          <label class="anamnesis-label" for="birthDate">{{ i18n.t('anamnesis.birthDate') }}</label>
           <input
+            id="birthDate"
             class="anamnesis-input anamnesis-input--date"
             type="date"
             [ngModel]="anamnesisForm().birthDate"
@@ -318,11 +319,12 @@
 
         <!-- Q1 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="exerciseRoutine">
             <span class="q-num">1.</span> {{ i18n.t('anamnesis.q1.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q1.hint') }}</p>
           <textarea
+            id="exerciseRoutine"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().exerciseRoutine"
@@ -333,11 +335,12 @@
 
         <!-- Q2 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="medicalConditions">
             <span class="q-num">2.</span> {{ i18n.t('anamnesis.q2.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q2.hint') }}</p>
           <textarea
+            id="medicalConditions"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().medicalConditions"
@@ -348,11 +351,12 @@
 
         <!-- Q3 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="painComplaints">
             <span class="q-num">3.</span> {{ i18n.t('anamnesis.q3.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q3.hint') }}</p>
           <textarea
+            id="painComplaints"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().painComplaints"
@@ -363,11 +367,12 @@
 
         <!-- Q4 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="trainingProgress">
             <span class="q-num">4.</span> {{ i18n.t('anamnesis.q4.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q4.hint') }}</p>
           <textarea
+            id="trainingProgress"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().trainingProgress"
@@ -378,11 +383,12 @@
 
         <!-- Q5 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="dizzinessFainting">
             <span class="q-num">5.</span> {{ i18n.t('anamnesis.q5.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q5.hint') }}</p>
           <textarea
+            id="dizzinessFainting"
             class="anamnesis-textarea"
             rows="2"
             [ngModel]="anamnesisForm().dizzinessFainting"
@@ -391,11 +397,11 @@
           ></textarea>
         </div>
 
-        <!-- Q6 -->
+        <!-- Q6: radio group — use <p> instead of <label> since it describes the group, not a single control -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <p class="anamnesis-label">
             <span class="q-num">6.</span> {{ i18n.t('anamnesis.q6.label') }}
-          </label>
+          </p>
           <div class="goal-options">
             @for (opt of ['aesthetic', 'health', 'both']; track opt) {
               <label class="goal-option">
@@ -414,11 +420,12 @@
 
         <!-- Q7 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="medicationsSupplements">
             <span class="q-num">7.</span> {{ i18n.t('anamnesis.q7.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q7.hint') }}</p>
           <textarea
+            id="medicationsSupplements"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().medicationsSupplements"
@@ -429,11 +436,12 @@
 
         <!-- Q8 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="medicalExams">
             <span class="q-num">8.</span> {{ i18n.t('anamnesis.q8.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q8.hint') }}</p>
           <textarea
+            id="medicalExams"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().medicalExams"
@@ -444,11 +452,12 @@
 
         <!-- Q9 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="diet">
             <span class="q-num">9.</span> {{ i18n.t('anamnesis.q9.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q9.hint') }}</p>
           <textarea
+            id="diet"
             class="anamnesis-textarea"
             rows="3"
             [ngModel]="anamnesisForm().diet"
@@ -459,11 +468,12 @@
 
         <!-- Q10 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="sleepQuality">
             <span class="q-num">10.</span> {{ i18n.t('anamnesis.q10.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q10.hint') }}</p>
           <textarea
+            id="sleepQuality"
             class="anamnesis-textarea"
             rows="2"
             [ngModel]="anamnesisForm().sleepQuality"
@@ -474,11 +484,12 @@
 
         <!-- Q11 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="waterIntake">
             <span class="q-num">11.</span> {{ i18n.t('anamnesis.q11.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q11.hint') }}</p>
           <textarea
+            id="waterIntake"
             class="anamnesis-textarea"
             rows="2"
             [ngModel]="anamnesisForm().waterIntake"
@@ -489,11 +500,12 @@
 
         <!-- Q12 -->
         <div class="anamnesis-group">
-          <label class="anamnesis-label">
+          <label class="anamnesis-label" for="alcoholSmoking">
             <span class="q-num">12.</span> {{ i18n.t('anamnesis.q12.label') }}
           </label>
           <p class="anamnesis-hint">{{ i18n.t('anamnesis.q12.hint') }}</p>
           <textarea
+            id="alcoholSmoking"
             class="anamnesis-textarea"
             rows="2"
             [ngModel]="anamnesisForm().alcoholSmoking"
